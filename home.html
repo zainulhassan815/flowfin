@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en" data-pair="literata">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Home / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  /* Page bg (outside phone) */
+  --page-bg: #1C1C20;
+
+  /* Semantic */
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  /* Category palette */
+  --cat-bank: #82C5D4;
+  --cat-cash: #C5D982;
+  --cat-food: #E8A87B;
+  --cat-transport: #8AB4E0;
+  --cat-fun: #C98ED4;
+  --cat-salary: #9CD4A2;
+  --cat-rent: #D89A82;
+  --cat-utilities: #E8CC7B;
+  --cat-subs: #9A8AE0;
+  --cat-debt: #E08A8A;
+  --cat-other: #B4B4BC;
+
+  /* Typography */
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+.caption {
+  position: fixed;
+  top: 28px;
+  left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 10;
+  font-weight: 500;
+}
+.caption em {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 300;
+  opacity: 0.85;
+}
+
+.caption-r {
+  position: fixed;
+  bottom: 28px;
+  left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 10;
+  font-weight: 500;
+}
+
+
+/* ------- Phone frame ------- */
+.phone {
+  width: 390px;
+  height: 844px;
+  background: var(--bg);
+  border-radius: 52px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E,
+    0 0 0 12px #0A0A0C,
+    0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28),
+    0 6px 14px rgba(0,0,0,0.18);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.notch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 32px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 20;
+}
+
+/* ------- Status bar ------- */
+.status-bar {
+  height: 50px;
+  padding: 18px 32px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  font-weight: 500;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 5;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ------- App header ------- */
+.app-header {
+  padding: 8px 24px 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.brand-mark {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.brand-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-left: 2px;
+  align-self: center;
+  margin-bottom: 4px;
+}
+
+.header-actions { display: flex; gap: 4px; }
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-mute);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color .2s;
+}
+.icon-btn:hover { color: var(--text); }
+
+/* ------- Scroll container ------- */
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 120px;
+  scrollbar-width: none;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ------- Hero ------- */
+.hero { padding: 16px 24px 24px; }
+
+.hero-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-label::before {
+  content: '';
+  width: 14px;
+  height: 1px;
+  background: var(--text-soft);
+}
+
+.hero-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.hero-currency {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 24px;
+  color: var(--text-mute);
+  letter-spacing: -0.02em;
+}
+.hero-amount {
+  font-family: var(--font-mono), monospace;
+  font-size: 56px;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text);
+}
+.hero-decimal {
+  font-family: var(--font-mono), monospace;
+  font-size: 24px;
+  font-weight: 300;
+  color: var(--text-mute);
+  letter-spacing: -0.02em;
+}
+
+.hero-meta {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border-strong);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.05em;
+}
+.hero-meta-item { display: flex; align-items: center; gap: 6px; }
+.hero-meta-item .v { color: var(--text); }
+.hero-meta-trend { color: var(--pos); display: inline-flex; align-items: center; gap: 4px; }
+
+/* ------- Section ------- */
+.section { padding: 0 24px; margin-top: 32px; }
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 18px;
+}
+.section-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.section-link {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ------- Account list ------- */
+.segment-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 6px;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.segment-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-strong);
+}
+.segment-label-total {
+  color: var(--text);
+  letter-spacing: 0.05em;
+  font-size: 11px;
+}
+
+.account-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 14px;
+}
+.account-row:last-of-type { border-bottom: none; }
+
+.acct-icon {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--icon-border, var(--border-strong));
+  background: var(--icon-bg, transparent);
+  border-radius: 10px;
+  color: var(--icon-color, var(--text-mute));
+  flex-shrink: 0;
+}
+.acct-icon.budget { border-style: dashed; }
+
+.acct-icon.cat-bank      { --icon-color: var(--cat-bank);      --icon-border: rgba(130,197,212,0.32); --icon-bg: rgba(130,197,212,0.08); }
+.acct-icon.cat-cash      { --icon-color: var(--cat-cash);      --icon-border: rgba(197,217,130,0.32); --icon-bg: rgba(197,217,130,0.08); }
+.acct-icon.cat-food      { --icon-color: var(--cat-food);      --icon-border: rgba(232,168,123,0.36); --icon-bg: rgba(232,168,123,0.08); }
+.acct-icon.cat-transport { --icon-color: var(--cat-transport); --icon-border: rgba(138,180,224,0.36); --icon-bg: rgba(138,180,224,0.08); }
+.acct-icon.cat-fun       { --icon-color: var(--cat-fun);       --icon-border: rgba(201,142,212,0.36); --icon-bg: rgba(201,142,212,0.08); }
+.acct-icon.cat-salary    { --icon-color: var(--cat-salary);    --icon-border: rgba(156,212,162,0.36); --icon-bg: rgba(156,212,162,0.08); }
+.acct-icon.cat-subs      { --icon-color: var(--cat-subs);      --icon-border: rgba(154,138,224,0.36); --icon-bg: rgba(154,138,224,0.08); }
+.acct-icon.cat-transfer  { --icon-color: var(--transfer);      --icon-border: rgba(130,197,212,0.32); --icon-bg: rgba(130,197,212,0.06); }
+
+.acct-body { flex: 1; min-width: 0; }
+.acct-name {
+  font-family: var(--font-serif), serif;
+  font-weight: 400;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.acct-meta {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  color: var(--text-mute);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.acct-amount {
+  font-family: var(--font-mono), monospace;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text);
+  text-align: right;
+  letter-spacing: -0.02em;
+}
+.acct-amount .dec { color: var(--text-mute); font-weight: 400; }
+
+/* ------- Pending ------- */
+.pending-strip {
+  margin-top: 8px;
+  background: linear-gradient(180deg, rgba(224,185,132,0.06), rgba(224,185,132,0.02));
+  border: 1px solid rgba(224,185,132,0.15);
+  border-radius: 14px;
+  padding: 4px;
+}
+
+.pending-row {
+  display: flex;
+  align-items: center;
+  padding: 14px;
+  gap: 14px;
+  border-bottom: 1px solid rgba(224,185,132,0.08);
+}
+.pending-row:last-child { border-bottom: none; }
+
+.pending-marker {
+  width: 6px;
+  height: 36px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.pending-marker.due { background: var(--warn); }
+.pending-marker.late { background: var(--neg); }
+
+.pending-body { flex: 1; min-width: 0; }
+.pending-name {
+  font-family: var(--font-serif), serif;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.pending-meta {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+}
+.pending-meta .late-tag { color: var(--neg); }
+.pending-meta .due-tag { color: var(--warn); }
+
+.pay-btn {
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 9px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .2s;
+}
+.pay-btn:hover { background: var(--accent); color: #0A0A0B; border-color: var(--accent); }
+
+/* ------- Transactions ------- */
+.txn-date {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin: 18px 0 4px;
+}
+.txn-date:first-of-type { margin-top: 0; }
+
+.txn-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.txn-row:last-child { border-bottom: none; }
+
+.txn-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--icon-color, var(--text-mute));
+  background: var(--icon-bg, transparent);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.txn-icon.income     { --icon-color: var(--pos);          --icon-bg: rgba(156,212,162,0.10); }
+.txn-icon.transfer   { --icon-color: var(--transfer);     --icon-bg: rgba(130,197,212,0.10); }
+.txn-icon.cat-food   { --icon-color: var(--cat-food);     --icon-bg: rgba(232,168,123,0.10); }
+.txn-icon.cat-transport { --icon-color: var(--cat-transport); --icon-bg: rgba(138,180,224,0.10); }
+.txn-icon.cat-fun    { --icon-color: var(--cat-fun);      --icon-bg: rgba(201,142,212,0.10); }
+.txn-icon.cat-subs   { --icon-color: var(--cat-subs);     --icon-bg: rgba(154,138,224,0.10); }
+
+.txn-body { flex: 1; min-width: 0; }
+.txn-name {
+  font-family: var(--font-serif), serif;
+  font-size: 16px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.txn-meta {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  color: var(--text-mute);
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+.txn-amount {
+  font-family: var(--font-mono), monospace;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: right;
+  letter-spacing: -0.02em;
+}
+.txn-amount.neg { color: var(--text); }
+.txn-amount.pos { color: var(--pos); }
+.txn-amount.transfer { color: var(--transfer); }
+
+/* ------- FAB ------- */
+.fab {
+  position: absolute;
+  bottom: 104px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  background: var(--accent);
+  color: #0A0A0B;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  box-shadow:
+    0 12px 28px rgba(232,220,192,0.18),
+    0 4px 10px rgba(232,220,192,0.12);
+  z-index: 10;
+  transition: transform .2s;
+}
+.fab:hover { transform: scale(1.05); }
+
+/* ------- Tab bar ------- */
+.tab-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 88px;
+  background: rgba(8,8,10,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding: 14px 12px 0;
+  z-index: 5;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-mute);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  flex: 1;
+  padding: 4px 0;
+}
+.tab.active { color: var(--text); }
+.tab.active .tab-icon { color: var(--text); }
+
+.tab-icon { color: var(--text-mute); transition: color .2s; }
+
+/* Home indicator */
+.home-indicator {
+  position: absolute;
+  bottom: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  background: var(--text);
+  border-radius: 3px;
+  opacity: 0.4;
+  z-index: 6;
+}
+
+</style>
+</head>
+<body>
+<div class="caption">
+  FlowFin / 01<br>
+  <em>Home — iPhone 14 · 390×844</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <!-- signal -->
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <!-- wifi -->
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <!-- battery -->
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="app-header">
+    <div class="brand">
+      <span class="brand-mark">flowfin</span>
+      <span class="brand-dot"></span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" title="Search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="M21 21l-4.3-4.3"/>
+        </svg>
+      </button>
+      <button class="icon-btn" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="scroll">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-label">Available balance</div>
+      <div class="hero-row">
+        <span class="hero-currency">Rs</span>
+        <span class="hero-amount">47,000</span>
+        <span class="hero-decimal">.00</span>
+      </div>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span>Allocated</span>
+          <span class="v">Rs 16,000</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-trend">
+            <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 7L8 3M8 3H4M8 3V7"/>
+            </svg>
+            +12%
+          </span>
+          <span>this month</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACCOUNTS -->
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title">Accounts</h2>
+        <a href="#" class="section-link">All
+          <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M3 2L7 5L3 8"/>
+          </svg>
+        </a>
+      </div>
+
+      <div class="segment-label">
+        <span>Real</span>
+        <span class="segment-label-total">Rs 47,000</span>
+      </div>
+
+      <div class="account-row">
+        <div class="acct-icon cat-bank">
+          <!-- bank -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+          </svg>
+        </div>
+        <div class="acct-body">
+          <div class="acct-name">Bank</div>
+          <div class="acct-meta">HBL · Primary</div>
+        </div>
+        <div class="acct-amount">40,000<span class="dec">.00</span></div>
+      </div>
+
+      <div class="account-row">
+        <div class="acct-icon cat-cash">
+          <!-- wallet -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/>
+            <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/>
+            <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+          </svg>
+        </div>
+        <div class="acct-body">
+          <div class="acct-name">Cash</div>
+          <div class="acct-meta">Wallet</div>
+        </div>
+        <div class="acct-amount">7,000<span class="dec">.00</span></div>
+      </div>
+
+      <div class="segment-label">
+        <span>Budget</span>
+        <span class="segment-label-total">Rs 16,000</span>
+      </div>
+
+      <div class="account-row">
+        <div class="acct-icon budget cat-food">
+          <!-- food -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/>
+          </svg>
+        </div>
+        <div class="acct-body">
+          <div class="acct-name">Food</div>
+          <div class="acct-meta">Monthly · Dec</div>
+        </div>
+        <div class="acct-amount">9,000<span class="dec">.00</span></div>
+      </div>
+
+      <div class="account-row">
+        <div class="acct-icon budget cat-transport">
+          <!-- transport -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 17h14M6 17V9l2-4h8l2 4v8M8 13h8M7 17v2M17 17v2"/>
+          </svg>
+        </div>
+        <div class="acct-body">
+          <div class="acct-name">Transport</div>
+          <div class="acct-meta">Monthly · Dec</div>
+        </div>
+        <div class="acct-amount">4,500<span class="dec">.00</span></div>
+      </div>
+
+      <div class="account-row">
+        <div class="acct-icon budget cat-fun">
+          <!-- entertainment -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="9 7 16 12 9 17 9 7"/>
+            <circle cx="12" cy="12" r="9"/>
+          </svg>
+        </div>
+        <div class="acct-body">
+          <div class="acct-name">Fun</div>
+          <div class="acct-meta">Monthly · Dec</div>
+        </div>
+        <div class="acct-amount">2,500<span class="dec">.00</span></div>
+      </div>
+    </section>
+
+    <!-- PENDING -->
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title">Pending <span style="color:var(--text-mute); font-size:15px; font-style:normal; font-family:var(--font-mono), monospace;">(2)</span></h2>
+        <a href="#" class="section-link">All
+          <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 2L7 5L3 8"/></svg>
+        </a>
+      </div>
+
+      <div class="pending-strip">
+        <div class="pending-row">
+          <div class="pending-marker due"></div>
+          <div class="pending-body">
+            <div class="pending-name">Gym Membership</div>
+            <div class="pending-meta">Rs 5,000 · Bank · <span class="due-tag">Due today</span></div>
+          </div>
+          <button class="pay-btn">Pay</button>
+        </div>
+        <div class="pending-row">
+          <div class="pending-marker late"></div>
+          <div class="pending-body">
+            <div class="pending-name">Netflix</div>
+            <div class="pending-meta">Rs 1,500 · Bank · <span class="late-tag">3 days late</span></div>
+          </div>
+          <button class="pay-btn">Pay</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS -->
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title">Recent</h2>
+        <a href="#" class="section-link">All
+          <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 2L7 5L3 8"/></svg>
+        </a>
+      </div>
+
+      <div class="txn-date">Today · 27 Dec</div>
+
+      <div class="txn-row">
+        <div class="txn-icon cat-food">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/>
+          </svg>
+        </div>
+        <div class="txn-body">
+          <div class="txn-name">Mess Lunch</div>
+          <div class="txn-meta">Food · Dining</div>
+        </div>
+        <div class="txn-amount neg">−500<span style="color:var(--text-mute)">.00</span></div>
+      </div>
+
+      <div class="txn-row">
+        <div class="txn-icon transfer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 8h14M14 5l3 3-3 3M21 16H7M10 13l-3 3 3 3"/>
+          </svg>
+        </div>
+        <div class="txn-body">
+          <div class="txn-name">ATM Withdrawal</div>
+          <div class="txn-meta">Bank → Cash</div>
+        </div>
+        <div class="txn-amount transfer">5,000<span style="color:var(--text-mute)">.00</span></div>
+      </div>
+
+      <div class="txn-row">
+        <div class="txn-icon cat-transport">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 17h14M6 17V9l2-4h8l2 4v8M8 13h8M7 17v2M17 17v2"/>
+          </svg>
+        </div>
+        <div class="txn-body">
+          <div class="txn-name">Rickshaw</div>
+          <div class="txn-meta">Cash · Transport</div>
+        </div>
+        <div class="txn-amount neg">−100<span style="color:var(--text-mute)">.00</span></div>
+      </div>
+
+      <div class="txn-date">Yesterday · 26 Dec</div>
+
+      <div class="txn-row">
+        <div class="txn-icon income">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19V5M5 12l7-7 7 7"/>
+          </svg>
+        </div>
+        <div class="txn-body">
+          <div class="txn-name">December Salary</div>
+          <div class="txn-meta">Bank · Salary</div>
+        </div>
+        <div class="txn-amount pos">+150,000<span style="color:var(--text-mute)">.00</span></div>
+      </div>
+
+      <div class="txn-row">
+        <div class="txn-icon transfer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 8h14M14 5l3 3-3 3M21 16H7M10 13l-3 3 3 3"/>
+          </svg>
+        </div>
+        <div class="txn-body">
+          <div class="txn-name">Allocated to Food</div>
+          <div class="txn-meta">Bank → Food</div>
+        </div>
+        <div class="txn-amount transfer">15,000<span style="color:var(--text-mute)">.00</span></div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" aria-label="Add transaction">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M12 5v14M5 12h14"/>
+    </svg>
+  </button>
+
+  <!-- Tab bar -->
+  <nav class="tab-bar">
+    <button class="tab active">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10z"/>
+      </svg>
+      Home
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="6" width="18" height="13" rx="2"/>
+        <path d="M3 10h18M7 15h3"/>
+      </svg>
+      Accounts
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>
+      </svg>
+      Recur
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 11a4 4 0 1 0-8 0M5 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/>
+        <circle cx="13" cy="7" r="4"/>
+      </svg>
+      Debts
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19V5M9 19V9M14 19v-6M19 19V3"/>
+      </svg>
+      Reports
+    </button>
+  </nav>
+
+  <div class="home-indicator"></div>
+
+</div>
+
+</body>
+</html>

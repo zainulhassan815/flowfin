@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundations — FlowFin Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Type sample sizing variants */
+  .ts-hero      { font-family: var(--font-mono), monospace; font-size: 56px; font-weight: 300; letter-spacing: -0.04em; line-height: 1; }
+  .ts-display   { font-family: var(--font-serif), serif; font-style: italic; font-size: 48px; font-weight: 400; letter-spacing: -0.03em; line-height: 1; }
+  .ts-h1        { font-family: var(--font-serif), serif; font-style: italic; font-size: 28px; font-weight: 400; letter-spacing: -0.02em; }
+  .ts-h2        { font-family: var(--font-serif), serif; font-style: italic; font-size: 22px; font-weight: 400; letter-spacing: -0.02em; }
+  .ts-body-lg   { font-family: var(--font-serif), serif; font-size: 17px; font-weight: 400; letter-spacing: -0.01em; }
+  .ts-body      { font-family: var(--font-serif), serif; font-size: 15px; font-weight: 400; letter-spacing: -0.01em; }
+  .ts-label     { font-family: var(--font-mono), monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 500; }
+  .ts-caption   { font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500; color: var(--text-mute); }
+  .ts-mono-num  { font-family: var(--font-mono), monospace; font-size: 22px; font-weight: 500; letter-spacing: -0.02em; }
+
+  /* Spacing demo */
+  .space-stack { display: flex; flex-direction: column; gap: 12px; }
+  .space-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .space-bar-fill {
+    background: rgba(232,220,192,0.18);
+    border: 1px solid rgba(232,220,192,0.3);
+    height: 26px;
+    border-radius: 4px;
+  }
+  .space-bar-token {
+    font-family: var(--font-mono), monospace;
+    font-size: 11px;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    width: 60px;
+    font-weight: 500;
+  }
+  .space-bar-px {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    color: var(--text-soft);
+    width: 50px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Radius demo */
+  .radius-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .radius-tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .radius-sample {
+    width: 60px; height: 60px;
+    background: linear-gradient(135deg, rgba(232,220,192,0.15), rgba(130,197,212,0.10));
+    border: 1px solid rgba(232,220,192,0.3);
+  }
+  .radius-token {
+    font-family: var(--font-mono), monospace;
+    font-size: 11px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .radius-usage {
+    font-family: var(--font-mono), monospace;
+    font-size: 9.5px;
+    color: var(--text-soft);
+    letter-spacing: 0.04em;
+    text-align: center;
+  }
+
+  /* Motion */
+  .motion-row {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .motion-row:last-child { border-bottom: none; }
+  .motion-token {
+    font-family: var(--font-mono), monospace;
+    font-size: 11px;
+    color: var(--text);
+    width: 140px;
+    font-weight: 500;
+  }
+  .motion-spec {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    color: var(--text-mute);
+    flex: 1;
+    letter-spacing: 0.02em;
+  }
+</style>
+</head>
+<body>
+
+<nav class="ds-nav">
+  <a href="index.html" class="ds-brand">
+    <span class="ds-brand-mark">flowfin</span>
+    <span class="ds-brand-dot"></span>
+    <span class="ds-brand-tag">Design System</span>
+  </a>
+  <div class="ds-nav-links">
+    <a href="index.html" class="ds-nav-link">Overview</a>
+    <a href="foundations.html" class="ds-nav-link active">Foundations</a>
+    <a href="components.html" class="ds-nav-link">Components</a>
+    <a href="icons.html" class="ds-nav-link">Icons</a>
+  </div>
+</nav>
+
+<main class="ds-page">
+
+  <header class="ds-page-header">
+    <div class="ds-eyebrow">01 — Foundations</div>
+    <h1 class="ds-page-title">Foundations</h1>
+    <p class="ds-page-lede">
+      The atomic tokens of FlowFin — colors, type, spacing, radius and motion.
+      Every component is built from these.
+    </p>
+  </header>
+
+  <!-- ═══ COLORS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">01.1</div>
+      <h2 class="ds-section-title">Colors</h2>
+      <p class="ds-section-desc">
+        A deep dark base, a single warm accent, and a saturation-matched category
+        palette. Each token has a single semantic role.
+      </p>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">Surfaces &amp; borders</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #08080A"></div><div class="swatch-info"><div class="swatch-token">--bg</div><div class="swatch-hex">#08080A</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #101013"></div><div class="swatch-info"><div class="swatch-token">--surface</div><div class="swatch-hex">#101013</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #16161A"></div><div class="swatch-info"><div class="swatch-token">--surface-2</div><div class="swatch-hex">#16161A</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #1C1C20"></div><div class="swatch-info"><div class="swatch-token">--surface-3</div><div class="swatch-hex">#1C1C20</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #1E1E22"></div><div class="swatch-info"><div class="swatch-token">--border</div><div class="swatch-hex">#1E1E22</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #2A2A2F"></div><div class="swatch-info"><div class="swatch-token">--border-strong</div><div class="swatch-hex">#2A2A2F</div></div></div>
+      </div>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">Text tiers</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #F2F2F4"></div><div class="swatch-info"><div class="swatch-token">--text</div><div class="swatch-hex">#F2F2F4</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #B4B4BC"></div><div class="swatch-info"><div class="swatch-token">--text-mute</div><div class="swatch-hex">#B4B4BC</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #8A8A92"></div><div class="swatch-info"><div class="swatch-token">--text-soft</div><div class="swatch-hex">#8A8A92</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #565660"></div><div class="swatch-info"><div class="swatch-token">--text-faint</div><div class="swatch-hex">#565660</div></div></div>
+      </div>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">Semantic</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #E8DCC0"></div><div class="swatch-info"><div class="swatch-token">--accent</div><div class="swatch-hex">#E8DCC0 · CTA</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #9CD4A2"></div><div class="swatch-info"><div class="swatch-token">--pos</div><div class="swatch-hex">#9CD4A2 · Income</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #E8B66E"></div><div class="swatch-info"><div class="swatch-token">--warn</div><div class="swatch-hex">#E8B66E · Due</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #E08A8A"></div><div class="swatch-info"><div class="swatch-token">--neg</div><div class="swatch-hex">#E08A8A · Late</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #82C5D4"></div><div class="swatch-info"><div class="swatch-token">--transfer</div><div class="swatch-hex">#82C5D4 · Transfer</div></div></div>
+      </div>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">Category palette</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #82C5D4"></div><div class="swatch-info"><div class="swatch-token">--cat-bank</div><div class="swatch-hex">#82C5D4</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #C5D982"></div><div class="swatch-info"><div class="swatch-token">--cat-cash</div><div class="swatch-hex">#C5D982</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #E8A87B"></div><div class="swatch-info"><div class="swatch-token">--cat-food</div><div class="swatch-hex">#E8A87B</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #A8D479"></div><div class="swatch-info"><div class="swatch-token">--cat-grocery</div><div class="swatch-hex">#A8D479</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #8AB4E0"></div><div class="swatch-info"><div class="swatch-token">--cat-transport</div><div class="swatch-hex">#8AB4E0</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #C98ED4"></div><div class="swatch-info"><div class="swatch-token">--cat-fun</div><div class="swatch-hex">#C98ED4</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #9CD4A2"></div><div class="swatch-info"><div class="swatch-token">--cat-salary</div><div class="swatch-hex">#9CD4A2</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #9A8AE0"></div><div class="swatch-info"><div class="swatch-token">--cat-subs</div><div class="swatch-hex">#9A8AE0</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #D89A82"></div><div class="swatch-info"><div class="swatch-token">--cat-rent</div><div class="swatch-hex">#D89A82</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #E8CC7B"></div><div class="swatch-info"><div class="swatch-token">--cat-utilities</div><div class="swatch-hex">#E8CC7B</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #E89AB8"></div><div class="swatch-info"><div class="swatch-token">--cat-shop</div><div class="swatch-hex">#E89AB8</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #DC8A8A"></div><div class="swatch-info"><div class="swatch-token">--cat-health</div><div class="swatch-hex">#DC8A8A</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #8AC9D4"></div><div class="swatch-info"><div class="swatch-token">--cat-edu</div><div class="swatch-hex">#8AC9D4</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #C9A8D4"></div><div class="swatch-info"><div class="swatch-token">--cat-care</div><div class="swatch-hex">#C9A8D4</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #E08A8A"></div><div class="swatch-info"><div class="swatch-token">--cat-debt</div><div class="swatch-hex">#E08A8A</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="--swatch-bg: #B4B4BC"></div><div class="swatch-info"><div class="swatch-token">--cat-other</div><div class="swatch-hex">#B4B4BC</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ TYPOGRAPHY ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">01.2</div>
+      <h2 class="ds-section-title">Typography</h2>
+      <p class="ds-section-desc">
+        Two families pair across the system. <strong>Literata</strong> (serif) handles all
+        readable text — names, descriptions, titles. <strong>Geist Mono</strong>
+        handles every number, label, and micro-caption.
+      </p>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">Type scale</div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-name">Hero amount</div>
+          <div class="type-spec">Geist Mono · 56 / 300 · -0.04em</div>
+        </div>
+        <div class="type-sample"><span class="ts-hero">Rs 47,000</span></div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-name">Display title</div>
+          <div class="type-spec">Literata · 48 italic · -0.03em</div>
+        </div>
+        <div class="type-sample"><span class="ts-display">Accounts</span></div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-name">H1 — Page title</div>
+          <div class="type-spec">Literata · 28 italic · -0.02em</div>
+        </div>
+        <div class="type-sample"><span class="ts-h1">New recurring</span></div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-name">H2 — Section</div>
+          <div class="type-spec">Literata · 22 italic · -0.02em</div>
+        </div>
+        <div class="type-sample"><span class="ts-h2">Pending</span></div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-name">Body large</div>
+          <div class="type-spec">Literata · 17 / 400 · -0.01em</div>
+        </div>
+        <div class="type-sample"><span class="ts-body-lg">Bank — HBL Primary Account</span></div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-name">Body</div>
+          <div class="type-spec">Literata · 15 / 400 · -0.01em</div>
+        </div>
+        <div class="type-sample"><span class="ts-body">Salary, refunds, and other income sources.</span></div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-name">Label</div>
+          <div class="type-spec">Geist Mono · 11 / 500 · 0.22em · UC</div>
+        </div>
+        <div class="type-sample"><span class="ts-label" style="color: var(--text-mute)">Available balance</span></div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-name">Caption</div>
+          <div class="type-spec">Geist Mono · 10 / 500 · 0.18em · UC</div>
+        </div>
+        <div class="type-sample"><span class="ts-caption">25 May 2026 · in 30 days</span></div>
+      </div>
+
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-name">Mono number</div>
+          <div class="type-spec">Geist Mono · 22 / 500 · -0.02em</div>
+        </div>
+        <div class="type-sample"><span class="ts-mono-num">40,000<span style="color: var(--text-mute); font-weight: 400">.00</span></span></div>
+      </div>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">Rules of thumb</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+        <div class="demo-block tile" style="padding: 20px;">
+          <div class="demo-label">Serif</div>
+          <p style="font-size: 14px; color: var(--text-mute); line-height: 1.55;">
+            Names, descriptions, titles, anything narrative. Use italic for display moments (page titles, section headers). Regular weight by default — avoid bold.
+          </p>
+        </div>
+        <div class="demo-block tile" style="padding: 20px;">
+          <div class="demo-label">Mono</div>
+          <p style="font-size: 14px; color: var(--text-mute); line-height: 1.55;">
+            All numbers (currency, dates, percentages). Labels and small captions in uppercase with wide tracking. Weight 500 for emphasis, 400 for decimals.
+          </p>
+        </div>
+        <div class="demo-block tile" style="padding: 20px;">
+          <div class="demo-label">Currency symbol</div>
+          <p style="font-size: 14px; color: var(--text-mute); line-height: 1.55;">
+            "Rs" is always set in italic serif, sized smaller than the numeric value it sits next to. It is part of the narrative, not the number.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SPACING ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">01.3</div>
+      <h2 class="ds-section-title">Spacing</h2>
+      <p class="ds-section-desc">
+        Mostly 4px increments. The system favors generous whitespace over
+        decorative dividers — silence over noise.
+      </p>
+    </div>
+
+    <div class="demo-block">
+      <div class="space-stack" style="width: 100%; max-width: 580px;">
+        <div class="space-bar">
+          <span class="space-bar-token">2</span>
+          <span class="space-bar-px">2px</span>
+          <div class="space-bar-fill" style="width: 2px;"></div>
+        </div>
+        <div class="space-bar">
+          <span class="space-bar-token">4</span>
+          <span class="space-bar-px">4px</span>
+          <div class="space-bar-fill" style="width: 4px;"></div>
+        </div>
+        <div class="space-bar">
+          <span class="space-bar-token">8</span>
+          <span class="space-bar-px">8px</span>
+          <div class="space-bar-fill" style="width: 8px;"></div>
+        </div>
+        <div class="space-bar">
+          <span class="space-bar-token">10</span>
+          <span class="space-bar-px">10px</span>
+          <div class="space-bar-fill" style="width: 10px;"></div>
+        </div>
+        <div class="space-bar">
+          <span class="space-bar-token">12</span>
+          <span class="space-bar-px">12px</span>
+          <div class="space-bar-fill" style="width: 12px;"></div>
+        </div>
+        <div class="space-bar">
+          <span class="space-bar-token">14</span>
+          <span class="space-bar-px">14px</span>
+          <div class="space-bar-fill" style="width: 14px;"></div>
+        </div>
+        <div class="space-bar">
+          <span class="space-bar-token">16</span>
+          <span class="space-bar-px">16px</span>
+          <div class="space-bar-fill" style="width: 16px;"></div>
+        </div>
+        <div class="space-bar">
+          <span class="space-bar-token">20</span>
+          <span class="space-bar-px">20px</span>
+          <div class="space-bar-fill" style="width: 20px;"></div>
+        </div>
+        <div class="space-bar">
+          <span class="space-bar-token">24</span>
+          <span class="space-bar-px">24px</span>
+          <div class="space-bar-fill" style="width: 24px;"></div>
+        </div>
+        <div class="space-bar">
+          <span class="space-bar-token">32</span>
+          <span class="space-bar-px">32px</span>
+          <div class="space-bar-fill" style="width: 32px;"></div>
+        </div>
+        <div class="space-bar">
+          <span class="space-bar-token">56</span>
+          <span class="space-bar-px">56px</span>
+          <div class="space-bar-fill" style="width: 56px;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ RADIUS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">01.4</div>
+      <h2 class="ds-section-title">Radius</h2>
+      <p class="ds-section-desc">
+        Round inside, rounder outside. Small interior shapes use 8–12px;
+        large containers (cards, sheets) push to 14–28px.
+      </p>
+    </div>
+
+    <div class="radius-grid">
+      <div class="radius-tile">
+        <div class="radius-sample" style="border-radius: 4px;"></div>
+        <div class="radius-token">4px</div>
+        <div class="radius-usage">tiny chips,<br>receipt thumb</div>
+      </div>
+      <div class="radius-tile">
+        <div class="radius-sample" style="border-radius: 8px;"></div>
+        <div class="radius-token">8px</div>
+        <div class="radius-usage">icon button,<br>small tags</div>
+      </div>
+      <div class="radius-tile">
+        <div class="radius-sample" style="border-radius: 10px;"></div>
+        <div class="radius-token">10px</div>
+        <div class="radius-usage">icon tile,<br>search input</div>
+      </div>
+      <div class="radius-tile">
+        <div class="radius-sample" style="border-radius: 12px;"></div>
+        <div class="radius-token">12px</div>
+        <div class="radius-usage">buttons,<br>list rows</div>
+      </div>
+      <div class="radius-tile">
+        <div class="radius-sample" style="border-radius: 14px;"></div>
+        <div class="radius-token">14px</div>
+        <div class="radius-usage">cards,<br>pills, CTAs</div>
+      </div>
+      <div class="radius-tile">
+        <div class="radius-sample" style="border-radius: 28px 28px 4px 4px;"></div>
+        <div class="radius-token">28px (top)</div>
+        <div class="radius-usage">bottom sheet</div>
+      </div>
+      <div class="radius-tile">
+        <div class="radius-sample" style="border-radius: 50%;"></div>
+        <div class="radius-token">50%</div>
+        <div class="radius-usage">avatar,<br>FAB, check</div>
+      </div>
+      <div class="radius-tile">
+        <div class="radius-sample" style="border-radius: 52px;"></div>
+        <div class="radius-token">52px</div>
+        <div class="radius-usage">device frame</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ MOTION ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">01.5</div>
+      <h2 class="ds-section-title">Motion</h2>
+      <p class="ds-section-desc">
+        Motion is functional, not decorative. Use short durations (under 200ms)
+        for most hover and tap responses. Easing stays default (ease) unless
+        animating sheets or modals.
+      </p>
+    </div>
+
+    <div class="demo-block">
+      <div style="width: 100%;">
+        <div class="motion-row">
+          <div class="motion-token">color</div>
+          <div class="motion-spec">.15s — hover color shifts on links, icons, secondary buttons</div>
+        </div>
+        <div class="motion-row">
+          <div class="motion-token">background</div>
+          <div class="motion-spec">.12s — row hover backgrounds, key press feedback</div>
+        </div>
+        <div class="motion-row">
+          <div class="motion-token">border-color</div>
+          <div class="motion-spec">.15s — card and input focus / hover</div>
+        </div>
+        <div class="motion-row">
+          <div class="motion-token">transform: scale</div>
+          <div class="motion-spec">.08s — tap-down feedback on calc keys, FAB</div>
+        </div>
+        <div class="motion-row">
+          <div class="motion-token">width (progress)</div>
+          <div class="motion-spec">.3s — budget progress bar fill changes</div>
+        </div>
+        <div class="motion-row">
+          <div class="motion-token">opacity (blink)</div>
+          <div class="motion-spec">1s — cursor blink (50% on / 50% off, infinite)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="ds-footer">
+    <div><a href="index.html" style="color: var(--text-mute);">← Back to overview</a></div>
+    <div>01 · Foundations</div>
+  </footer>
+
+</main>
+
+</body>
+</html>

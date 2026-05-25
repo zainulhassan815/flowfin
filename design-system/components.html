@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Components — FlowFin Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* ═══ COMPONENT STYLES (mirrored from app) ═══ */
+
+  /* Buttons */
+  .btn-primary {
+    background: var(--accent); color: #0A0A0B;
+    border: 1px solid var(--accent); border-radius: 14px;
+    padding: 14px 28px;
+    font-family: var(--font-mono), monospace;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    font-weight: 600; cursor: pointer; display: inline-flex;
+    align-items: center; gap: 8px;
+    transition: background .15s, transform .08s;
+  }
+  .btn-primary:hover { background: #F0E4C8; }
+  .btn-primary:active { transform: scale(.98); }
+
+  .btn-secondary {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border-strong); border-radius: 14px;
+    padding: 13px 26px;
+    font-family: var(--font-mono), monospace;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    font-weight: 500; cursor: pointer; display: inline-flex;
+    align-items: center; gap: 8px;
+    transition: border-color .15s, color .15s;
+  }
+  .btn-secondary:hover { border-color: var(--text-soft); }
+
+  .btn-ghost {
+    background: transparent; color: var(--accent);
+    border: none;
+    padding: 12px 16px;
+    font-family: var(--font-mono), monospace;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    font-weight: 500; cursor: pointer;
+  }
+  .btn-ghost:hover { color: #F0E4C8; }
+
+  .btn-icon {
+    width: 38px; height: 38px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; border: 1px solid var(--border-strong);
+    color: var(--text-mute); border-radius: 50%;
+    cursor: pointer; transition: color .15s, border-color .15s;
+  }
+  .btn-icon:hover { color: var(--text); border-color: var(--text-soft); }
+
+  .btn-icon-plain {
+    width: 36px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; border: none;
+    color: var(--text-mute); border-radius: 10px;
+    cursor: pointer; transition: color .15s, background .15s;
+  }
+  .btn-icon-plain:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+
+  /* FAB */
+  .fab {
+    width: 56px; height: 56px;
+    background: var(--accent); color: #0A0A0B;
+    border-radius: 50%; border: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 12px 28px rgba(232,220,192,0.18), 0 4px 10px rgba(232,220,192,0.12);
+    transition: transform .15s;
+  }
+  .fab:hover { transform: scale(1.05); }
+
+  /* Status badges */
+  .status-due, .status-late, .status-soon {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 500; padding: 4px 9px; border-radius: 6px;
+  }
+  .status-due  { color: var(--warn); background: rgba(232,182,110,0.08); }
+  .status-late { color: var(--neg);  background: rgba(224,138,138,0.08); }
+  .status-soon { color: var(--warn); background: rgba(232,182,110,0.06); }
+
+  /* Frequency tag */
+  .freq-tag {
+    font-family: var(--font-mono), monospace;
+    font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-soft); background: rgba(255,255,255,0.05);
+    padding: 3px 7px; border-radius: 5px; font-weight: 500;
+  }
+
+  /* Count badge */
+  .count-badge {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px; font-weight: 500;
+    background: rgba(255,255,255,0.06); color: var(--text);
+    padding: 2px 7px; border-radius: 8px;
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    height: 5px; background: rgba(255,255,255,0.06);
+    border-radius: 3px; overflow: hidden;
+  }
+  .progress-fill { height: 100%; border-radius: 3px; }
+  .progress-fill.food      { background: var(--cat-food); }
+  .progress-fill.transport { background: var(--cat-transport); }
+  .progress-fill.fun       { background: var(--cat-fun); }
+
+  /* Tile icon (40px square) */
+  .tile-icon {
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--icon-border, var(--border-strong));
+    background: var(--icon-bg, transparent);
+    border-radius: 10px; color: var(--icon-color, var(--text-mute));
+    flex-shrink: 0;
+  }
+  .tile-icon.budget { border-style: dashed; }
+  .tile-icon.cat-bank      { --icon-color: var(--cat-bank);      --icon-border: rgba(130,197,212,0.32); --icon-bg: rgba(130,197,212,0.08); }
+  .tile-icon.cat-cash      { --icon-color: var(--cat-cash);      --icon-border: rgba(197,217,130,0.32); --icon-bg: rgba(197,217,130,0.08); }
+  .tile-icon.cat-food      { --icon-color: var(--cat-food);      --icon-border: rgba(232,168,123,0.36); --icon-bg: rgba(232,168,123,0.08); }
+  .tile-icon.cat-transport { --icon-color: var(--cat-transport); --icon-border: rgba(138,180,224,0.36); --icon-bg: rgba(138,180,224,0.08); }
+  .tile-icon.cat-fun       { --icon-color: var(--cat-fun);       --icon-border: rgba(201,142,212,0.36); --icon-bg: rgba(201,142,212,0.08); }
+  .tile-icon.cat-subs      { --icon-color: var(--cat-subs);      --icon-border: rgba(154,138,224,0.36); --icon-bg: rgba(154,138,224,0.08); }
+
+  /* Account card (mirror of app) */
+  .account-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .ac-main { display: flex; align-items: center; gap: 14px; }
+  .ac-info { flex: 1; min-width: 0; }
+  .ac-name {
+    font-family: var(--font-serif), serif;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .ac-meta {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px; color: var(--text-mute);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-top: 4px; font-weight: 500;
+  }
+  .ac-bal {
+    font-family: var(--font-mono), monospace;
+    font-size: 17px; font-weight: 500;
+    color: var(--text); letter-spacing: -0.02em;
+    text-align: right;
+  }
+  .ac-bal .dec { color: var(--text-mute); font-weight: 400; }
+
+  .ac-progress {
+    margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .ac-progress-meta {
+    display: flex; justify-content: space-between;
+    font-family: var(--font-mono), monospace;
+    font-size: 11px; color: var(--text-mute); margin-bottom: 8px;
+  }
+  .ac-progress-meta strong { color: var(--text); font-weight: 500; }
+
+  /* Pending card with actions */
+  .pending-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 14px 12px;
+  }
+  .pc-main { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+  .pc-body { flex: 1; }
+  .pc-name {
+    font-family: var(--font-serif), serif;
+    font-size: 17px;
+    color: var(--text); letter-spacing: -0.01em;
+  }
+  .pc-meta {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px; color: var(--text-mute);
+    letter-spacing: 0.06em; margin-top: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .pc-meta .dot { width: 3px; height: 3px; background: var(--text-faint); border-radius: 50%; }
+  .pc-meta .status-text-due { color: var(--warn); font-weight: 500; }
+  .pc-meta .status-text-late { color: var(--neg); font-weight: 500; }
+  .pc-amount-val {
+    font-family: var(--font-mono), monospace;
+    font-size: 18px; font-weight: 500;
+    color: var(--text); letter-spacing: -0.02em;
+  }
+  .pc-amount-val .dec { color: var(--text-mute); font-weight: 400; }
+  .pc-actions {
+    display: flex; gap: 8px; padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .pc-btn {
+    flex: 1; height: 38px; border-radius: 10px;
+    font-family: var(--font-mono), monospace;
+    font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase; font-weight: 600;
+    cursor: pointer; display: flex;
+    align-items: center; justify-content: center; gap: 6px;
+    transition: all .15s;
+  }
+  .pc-btn.skip {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text-mute);
+  }
+  .pc-btn.pay {
+    flex: 1.4;
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    color: #0A0A0B;
+  }
+
+  /* Transaction row */
+  .txn-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 0;
+  }
+  .txn-icon {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--icon-color, var(--text-mute));
+    background: var(--icon-bg, transparent);
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .txn-icon.cat-food      { --icon-color: var(--cat-food);      --icon-bg: rgba(232,168,123,0.10); }
+  .txn-icon.cat-transport { --icon-color: var(--cat-transport); --icon-bg: rgba(138,180,224,0.10); }
+  .txn-icon.income        { --icon-color: var(--pos);           --icon-bg: rgba(156,212,162,0.10); }
+  .txn-icon.transfer      { --icon-color: var(--transfer);      --icon-bg: rgba(130,197,212,0.10); }
+  .txn-body { flex: 1; }
+  .txn-name {
+    font-family: var(--font-serif), serif;
+    font-size: 16px; color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .txn-meta {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px; color: var(--text-mute);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-top: 4px; font-weight: 500;
+  }
+  .txn-amount {
+    font-family: var(--font-mono), monospace;
+    font-size: 15px; font-weight: 500;
+    text-align: right; letter-spacing: -0.02em;
+  }
+  .txn-amount.neg { color: var(--text); }
+  .txn-amount.pos { color: var(--pos); }
+  .txn-amount.transfer { color: var(--transfer); }
+  .txn-amount .dec { color: var(--text-mute); font-weight: 400; }
+
+  /* Form row */
+  .form-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .form-row:last-child { border-bottom: none; }
+  .form-row-label {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--text-soft);
+    width: 64px; flex-shrink: 0; font-weight: 500;
+  }
+  .form-row-value {
+    flex: 1; display: flex; align-items: center; gap: 10px;
+  }
+  .form-row-text {
+    flex: 1;
+    font-family: var(--font-serif), serif;
+    font-size: 16px; color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .form-row-text.placeholder { color: var(--text-soft); font-style: italic; }
+  .form-row-aux {
+    font-family: var(--font-mono), monospace;
+    font-size: 12px; font-weight: 500;
+    color: var(--text-mute);
+  }
+  .form-row-chev { color: var(--text-faint); }
+
+  /* Segmented control */
+  .segmented {
+    display: flex; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 4px; gap: 2px;
+  }
+  .seg-item {
+    flex: 1; padding: 10px 16px;
+    text-align: center; border-radius: 9px;
+    font-family: var(--font-serif), serif;
+    font-size: 15px; color: var(--text-soft);
+    cursor: pointer; border: none; background: transparent;
+    letter-spacing: -0.01em; transition: all .15s;
+  }
+  .seg-item.active {
+    background: rgba(232,220,192,0.10);
+    color: var(--text); font-style: italic;
+    box-shadow: inset 0 0 0 1px rgba(232,220,192,0.18);
+  }
+
+  /* Search input */
+  .search-input {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .search-input svg { color: var(--text-soft); }
+  .search-input .placeholder {
+    font-family: var(--font-serif), serif;
+    font-size: 15px; color: var(--text-soft);
+    font-style: italic; letter-spacing: -0.01em;
+  }
+
+  /* Text input with cursor */
+  .name-input {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 0 12px;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  .name-value {
+    flex: 1;
+    font-family: var(--font-serif), serif;
+    font-size: 20px; color: var(--text);
+    letter-spacing: -0.01em;
+    display: flex; align-items: center; gap: 3px;
+  }
+  .name-cursor {
+    display: inline-block;
+    width: 1.5px; height: 20px;
+    background: var(--accent); border-radius: 1px;
+    animation: blink 1s infinite;
+  }
+  @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+
+  /* Picker row */
+  .picker-row {
+    display: flex; align-items: center; padding: 11px 14px;
+    gap: 14px; border-radius: 10px; cursor: pointer;
+    transition: background .12s;
+  }
+  .picker-row:hover { background: rgba(255,255,255,0.025); }
+  .picker-row.selected { background: rgba(232,220,192,0.06); }
+  .picker-row .row-body { flex: 1; }
+  .picker-row .row-name {
+    font-family: var(--font-serif), serif;
+    font-size: 16px; color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .picker-row .row-meta {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px; color: var(--text-mute);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-top: 4px; font-weight: 500;
+  }
+  .picker-row .row-amount {
+    font-family: var(--font-mono), monospace;
+    font-size: 14px; font-weight: 500;
+    color: var(--text); margin-right: 4px;
+  }
+  .row-check {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border-strong); color: transparent;
+  }
+  .picker-row.selected .row-check {
+    background: var(--accent); border-color: var(--accent);
+    color: #0A0A0B;
+  }
+
+  /* Tab bar */
+  .tab-bar {
+    height: 88px;
+    background: rgba(8,8,10,0.92);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    display: flex; justify-content: space-around;
+    padding: 14px 12px 0;
+  }
+  .tab {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    color: var(--text-mute); background: transparent; border: none;
+    cursor: pointer; flex: 1;
+    font-family: var(--font-mono), monospace;
+    font-size: 9.5px; letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .tab.active { color: var(--text); }
+
+  /* CTA bar */
+  .cta-save {
+    width: 100%; height: 52px;
+    background: var(--accent); color: #0A0A0B;
+    border: none; border-radius: 14px;
+    font-family: var(--font-mono), monospace;
+    font-size: 12px; letter-spacing: 0.22em;
+    text-transform: uppercase; font-weight: 600;
+    cursor: pointer; display: flex;
+    align-items: center; justify-content: center; gap: 10px;
+  }
+
+  /* Sheet (mini illustration) */
+  .sheet-mini {
+    width: 100%; max-width: 340px;
+    background: var(--surface-2);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .sheet-handle {
+    display: flex; justify-content: center; padding: 10px 0 6px;
+  }
+  .sheet-handle::after {
+    content: ''; width: 36px; height: 4px;
+    background: rgba(255,255,255,0.18); border-radius: 2px;
+  }
+  .sheet-mini-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sheet-mini-title {
+    flex: 1;
+    font-family: var(--font-serif), serif;
+    font-style: italic; font-size: 16px;
+    color: var(--text); text-align: center;
+  }
+  .sheet-mini-close {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border-strong);
+    border-radius: 50%; color: var(--text-mute);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sheet-mini-body {
+    padding: 16px;
+    font-family: var(--font-mono), monospace;
+    font-size: 11px; color: var(--text-soft);
+    text-transform: uppercase; letter-spacing: 0.18em;
+    text-align: center; font-style: normal;
+  }
+</style>
+</head>
+<body>
+
+<nav class="ds-nav">
+  <a href="index.html" class="ds-brand">
+    <span class="ds-brand-mark">flowfin</span>
+    <span class="ds-brand-dot"></span>
+    <span class="ds-brand-tag">Design System</span>
+  </a>
+  <div class="ds-nav-links">
+    <a href="index.html" class="ds-nav-link">Overview</a>
+    <a href="foundations.html" class="ds-nav-link">Foundations</a>
+    <a href="components.html" class="ds-nav-link active">Components</a>
+    <a href="icons.html" class="ds-nav-link">Icons</a>
+  </div>
+</nav>
+
+<main class="ds-page">
+
+  <header class="ds-page-header">
+    <div class="ds-eyebrow">02 — Components</div>
+    <h1 class="ds-page-title">Components</h1>
+    <p class="ds-page-lede">
+      The reusable building blocks of the FlowFin interface — buttons, cards,
+      form rows, badges, sheets. Every component is live (not screenshotted).
+    </p>
+  </header>
+
+  <!-- ═══ BUTTONS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.1</div>
+      <h2 class="ds-section-title">Buttons</h2>
+      <p class="ds-section-desc">
+        One primary action per screen. Mono labels in uppercase with wide
+        tracking — this is one of the few places body type goes into mono.
+      </p>
+    </div>
+
+    <div class="demo-grid-2">
+      <div class="demo-block tile">
+        <div class="demo-label">Primary CTA</div>
+        <button class="btn-primary">
+          Save Recurring
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Secondary / Outline</div>
+        <button class="btn-secondary">Cancel</button>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Ghost / Text link</div>
+        <button class="btn-ghost">Save</button>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Icon button (circular)</div>
+        <button class="btn-icon" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Icon button (plain)</div>
+        <button class="btn-icon-plain" aria-label="Add">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">FAB — Floating Action</div>
+        <button class="fab" aria-label="Add">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ STATUS & TAGS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.2</div>
+      <h2 class="ds-section-title">Status &amp; tags</h2>
+      <p class="ds-section-desc">
+        Small inline labels for urgency, frequency, and counts. Tagged content
+        sits inline with prose, not in headers.
+      </p>
+    </div>
+
+    <div class="demo-block center">
+      <span class="status-due">Due today</span>
+      <span class="status-late">3 days late</span>
+      <span class="status-soon">Soon</span>
+      <span class="freq-tag">Monthly</span>
+      <span class="freq-tag">Weekly</span>
+      <span class="freq-tag">Yearly</span>
+      <span class="count-badge">2</span>
+      <span class="count-badge">12</span>
+    </div>
+  </section>
+
+  <!-- ═══ FORM ROWS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.3</div>
+      <h2 class="ds-section-title">Form rows</h2>
+      <p class="ds-section-desc">
+        A horizontal pattern with a mono label (left), a serif value (center),
+        an optional aux number, and a chevron — used wherever the user
+        configures a setting that opens a picker.
+      </p>
+    </div>
+
+    <div class="demo-block" style="padding: 0 24px;">
+      <div style="width: 100%;">
+
+        <div class="form-row">
+          <div class="form-row-label">From</div>
+          <div class="form-row-value">
+            <div class="tile-icon cat-bank" style="width: 28px; height: 28px; border-radius: 8px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+              </svg>
+            </div>
+            <span class="form-row-text">Bank</span>
+            <span class="form-row-aux">40,000</span>
+            <svg class="form-row-chev" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 2L7 5L3 8"/></svg>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-row-label">Category</div>
+          <div class="form-row-value">
+            <div class="tile-icon cat-food" style="width: 28px; height: 28px; border-radius: 8px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/>
+              </svg>
+            </div>
+            <span class="form-row-text">Food &amp; Dining</span>
+            <svg class="form-row-chev" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 2L7 5L3 8"/></svg>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-row-label">Date</div>
+          <div class="form-row-value">
+            <span class="form-row-text">Today, <em style="color: var(--text-mute)">25 May 2026</em></span>
+            <svg class="form-row-chev" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 2L7 5L3 8"/></svg>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-row-label">Note</div>
+          <div class="form-row-value">
+            <span class="form-row-text placeholder">Add a note…</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ INPUTS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.4</div>
+      <h2 class="ds-section-title">Inputs &amp; controls</h2>
+      <p class="ds-section-desc">
+        Text inputs use an underline pattern with a blinking cream cursor.
+        Segmented controls handle small enumerations. Search uses a rounded
+        tile with an italic placeholder.
+      </p>
+    </div>
+
+    <div class="demo-grid-2">
+
+      <div class="demo-block tile">
+        <div class="demo-label">Text input (with cursor)</div>
+        <div class="name-input" style="width: 100%;">
+          <span class="name-value">
+            Gym Membership<span class="name-cursor"></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Search input</div>
+        <div class="search-input" style="width: 100%;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M21 21l-4.3-4.3"/>
+          </svg>
+          <span class="placeholder">Search categories…</span>
+        </div>
+      </div>
+
+      <div class="demo-block tile" style="grid-column: span 2;">
+        <div class="demo-label">Segmented control</div>
+        <div class="segmented" style="max-width: 360px;">
+          <button class="seg-item">Weekly</button>
+          <button class="seg-item active">Monthly</button>
+          <button class="seg-item">Yearly</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ CARDS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.5</div>
+      <h2 class="ds-section-title">Cards</h2>
+      <p class="ds-section-desc">
+        Three card patterns: the account card (with optional budget progress),
+        the pending payment card (with skip / pay actions), and lighter list
+        cards used in pickers.
+      </p>
+    </div>
+
+    <div class="demo-grid-2">
+
+      <div class="demo-block tile">
+        <div class="demo-label">Real account card</div>
+        <div class="account-card" style="width: 100%;">
+          <div class="ac-main">
+            <div class="tile-icon cat-bank">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+              </svg>
+            </div>
+            <div class="ac-info">
+              <div class="ac-name">Bank</div>
+              <div class="ac-meta">HBL · Primary</div>
+            </div>
+            <div class="ac-bal">40,000<span class="dec">.00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Budget account card (with progress)</div>
+        <div class="account-card" style="width: 100%;">
+          <div class="ac-main">
+            <div class="tile-icon budget cat-food">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/>
+              </svg>
+            </div>
+            <div class="ac-info">
+              <div class="ac-name">Food</div>
+              <div class="ac-meta">Monthly · Dec</div>
+            </div>
+            <div class="ac-bal">9,000<span class="dec">.00</span></div>
+          </div>
+          <div class="ac-progress">
+            <div class="ac-progress-meta">
+              <span><strong>6,000</strong> of 15,000 spent</span>
+              <span style="color: var(--text-soft); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;">40%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill food" style="width: 40%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-block tile" style="grid-column: span 2;">
+        <div class="demo-label">Pending payment card (with actions)</div>
+        <div class="pending-card" style="max-width: 460px; width: 100%;">
+          <div class="pc-main">
+            <div class="tile-icon cat-subs">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="5" width="20" height="14" rx="2"/>
+                <polygon points="11 9 16 12 11 15 11 9" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="pc-body">
+              <div class="pc-name">Netflix</div>
+              <div class="pc-meta">
+                <span>Monthly · 22nd</span>
+                <span class="dot"></span>
+                <span class="status-text-late">3 days late</span>
+              </div>
+            </div>
+            <div class="pc-amount-val">1,500<span class="dec">.00</span></div>
+          </div>
+          <div class="pc-actions">
+            <button class="pc-btn skip">Skip</button>
+            <button class="pc-btn pay">
+              Mark Paid
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ LIST ROWS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.6</div>
+      <h2 class="ds-section-title">List rows</h2>
+      <p class="ds-section-desc">
+        Transaction rows and picker rows. Selected picker rows get a soft
+        cream tint and a filled cream circle with check.
+      </p>
+    </div>
+
+    <div class="demo-grid-2">
+
+      <div class="demo-block tile">
+        <div class="demo-label">Transaction rows</div>
+        <div style="width: 100%;">
+
+          <div class="txn-row">
+            <div class="txn-icon cat-food">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/>
+              </svg>
+            </div>
+            <div class="txn-body">
+              <div class="txn-name">Mess Lunch</div>
+              <div class="txn-meta">Food · Dining</div>
+            </div>
+            <div class="txn-amount neg">−500<span class="dec">.00</span></div>
+          </div>
+
+          <div class="txn-row">
+            <div class="txn-icon transfer">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8h14M14 5l3 3-3 3M21 16H7M10 13l-3 3 3 3"/>
+              </svg>
+            </div>
+            <div class="txn-body">
+              <div class="txn-name">ATM Withdrawal</div>
+              <div class="txn-meta">Bank → Cash</div>
+            </div>
+            <div class="txn-amount transfer">5,000<span class="dec">.00</span></div>
+          </div>
+
+          <div class="txn-row">
+            <div class="txn-icon income">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            </div>
+            <div class="txn-body">
+              <div class="txn-name">December Salary</div>
+              <div class="txn-meta">Bank · Salary</div>
+            </div>
+            <div class="txn-amount pos">+150,000<span class="dec">.00</span></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Picker rows (with selection)</div>
+        <div style="width: 100%;">
+
+          <div class="picker-row selected">
+            <div class="tile-icon cat-bank" style="width: 36px; height: 36px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+              </svg>
+            </div>
+            <div class="row-body">
+              <div class="row-name">Bank</div>
+              <div class="row-meta">HBL · Primary</div>
+            </div>
+            <div class="row-amount">40,000</div>
+            <div class="row-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+            </div>
+          </div>
+
+          <div class="picker-row">
+            <div class="tile-icon cat-cash" style="width: 36px; height: 36px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/>
+                <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/>
+                <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+              </svg>
+            </div>
+            <div class="row-body">
+              <div class="row-name">Cash</div>
+              <div class="row-meta">Wallet</div>
+            </div>
+            <div class="row-amount">7,000</div>
+            <div class="row-check"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ PROGRESS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.7</div>
+      <h2 class="ds-section-title">Progress bars</h2>
+      <p class="ds-section-desc">
+        5px slim bars filled with the relevant category color. Used in budget
+        cards and any "spent vs allocated" display.
+      </p>
+    </div>
+
+    <div class="demo-block">
+      <div style="width: 100%; display: flex; flex-direction: column; gap: 16px; max-width: 480px;">
+        <div>
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-mute); margin-bottom: 6px; letter-spacing: 0.04em;">Food · 40%</div>
+          <div class="progress-bar"><div class="progress-fill food" style="width: 40%"></div></div>
+        </div>
+        <div>
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-mute); margin-bottom: 6px; letter-spacing: 0.04em;">Transport · 10%</div>
+          <div class="progress-bar"><div class="progress-fill transport" style="width: 10%"></div></div>
+        </div>
+        <div>
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-mute); margin-bottom: 6px; letter-spacing: 0.04em;">Fun · 80%</div>
+          <div class="progress-bar"><div class="progress-fill fun" style="width: 80%"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ NAVIGATION ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.8</div>
+      <h2 class="ds-section-title">Navigation</h2>
+      <p class="ds-section-desc">
+        Five-tab bottom bar. Active tab gets full-contrast text; others stay
+        muted. Icons are 20×20 line strokes.
+      </p>
+    </div>
+
+    <div class="demo-block">
+      <div class="tab-bar" style="width: 100%; max-width: 420px;">
+        <button class="tab">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10z"/></svg>
+          Home
+        </button>
+        <button class="tab active">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/></svg>
+          Accounts
+        </button>
+        <button class="tab">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          Recur
+        </button>
+        <button class="tab">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 11a4 4 0 1 0-8 0M5 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/><circle cx="13" cy="7" r="4"/></svg>
+          Debts
+        </button>
+        <button class="tab">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M9 19V9M14 19v-6M19 19V3"/></svg>
+          Reports
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SHEETS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.9</div>
+      <h2 class="ds-section-title">Bottom sheets</h2>
+      <p class="ds-section-desc">
+        Used for pickers and confirmations. Anatomy: drag handle (top), header
+        (close + title + optional Done action), body (scrollable), and footer.
+      </p>
+    </div>
+
+    <div class="demo-block center">
+      <div class="sheet-mini">
+        <div class="sheet-handle"></div>
+        <div class="sheet-mini-header">
+          <div class="sheet-mini-close">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </div>
+          <div class="sheet-mini-title">Select account</div>
+          <div style="width: 28px"></div>
+        </div>
+        <div class="sheet-mini-body">Body content</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="ds-footer">
+    <div><a href="index.html" style="color: var(--text-mute);">← Back to overview</a></div>
+    <div>02 · Components</div>
+  </footer>
+
+</main>
+
+</body>
+</html>

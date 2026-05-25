@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Icons — FlowFin Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Tint helpers for category icons */
+  .tint-bank      { --tint-color: var(--cat-bank); }
+  .tint-cash      { --tint-color: var(--cat-cash); }
+  .tint-food      { --tint-color: var(--cat-food); }
+  .tint-grocery   { --tint-color: var(--cat-grocery); }
+  .tint-transport { --tint-color: var(--cat-transport); }
+  .tint-fun       { --tint-color: var(--cat-fun); }
+  .tint-salary    { --tint-color: var(--cat-salary); }
+  .tint-subs      { --tint-color: var(--cat-subs); }
+  .tint-rent      { --tint-color: var(--cat-rent); }
+  .tint-utilities { --tint-color: var(--cat-utilities); }
+  .tint-shop      { --tint-color: var(--cat-shop); }
+  .tint-health    { --tint-color: var(--cat-health); }
+  .tint-edu       { --tint-color: var(--cat-edu); }
+  .tint-care      { --tint-color: var(--cat-care); }
+  .tint-debt      { --tint-color: var(--cat-debt); }
+  .tint-other     { --tint-color: var(--cat-other); }
+
+  .icon-cell svg { color: var(--tint-color, var(--text)); }
+
+  .icon-rules {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 32px;
+  }
+  .rule-row {
+    display: flex; align-items: center;
+    gap: 20px; padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-key {
+    width: 130px; flex-shrink: 0;
+    font-family: var(--font-mono), monospace;
+    font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--text-soft);
+    font-weight: 500;
+  }
+  .rule-value {
+    font-family: var(--font-serif), serif;
+    font-size: 15px; color: var(--text);
+    letter-spacing: -0.01em;
+  }
+</style>
+</head>
+<body>
+
+<nav class="ds-nav">
+  <a href="index.html" class="ds-brand">
+    <span class="ds-brand-mark">flowfin</span>
+    <span class="ds-brand-dot"></span>
+    <span class="ds-brand-tag">Design System</span>
+  </a>
+  <div class="ds-nav-links">
+    <a href="index.html" class="ds-nav-link">Overview</a>
+    <a href="foundations.html" class="ds-nav-link">Foundations</a>
+    <a href="components.html" class="ds-nav-link">Components</a>
+    <a href="icons.html" class="ds-nav-link active">Icons</a>
+  </div>
+</nav>
+
+<main class="ds-page">
+
+  <header class="ds-page-header">
+    <div class="ds-eyebrow">03 — Icons</div>
+    <h1 class="ds-page-title">Icons</h1>
+    <p class="ds-page-lede">
+      A custom line-icon set drawn inline as SVG. Every glyph follows the same
+      stroke rules — uniform weight, consistent corners, no decorative flourishes.
+    </p>
+  </header>
+
+  <!-- ═══ RULES ═══ -->
+  <section class="ds-section" style="padding-top: 0;">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">03.0</div>
+      <h2 class="ds-section-title">Drawing rules</h2>
+    </div>
+
+    <div class="icon-rules">
+      <div class="rule-row">
+        <div class="rule-key">Format</div>
+        <div class="rule-value">Inline SVG with <code style="font-family: var(--font-mono); font-size: 13px; color: var(--text-mute);">fill="none"</code></div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-key">Stroke</div>
+        <div class="rule-value">1.5px (1.6 – 1.8 for tab bar and small UI)</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-key">Linecap</div>
+        <div class="rule-value">round — never butt or square</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-key">Linejoin</div>
+        <div class="rule-value">round</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-key">Color</div>
+        <div class="rule-value">currentColor — inherits parent text color or category tint</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-key">Canvas</div>
+        <div class="rule-value">24 × 24 viewBox · rendered at 14 – 22px</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ NAVIGATION ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">03.1</div>
+      <h2 class="ds-section-title">Navigation</h2>
+      <p class="ds-section-desc">The five bottom-tab destinations.</p>
+    </div>
+
+    <div class="icon-grid">
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10z"/></svg>
+        <div class="icon-cell-name">home</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/></svg>
+        <div class="icon-cell-name">accounts</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+        <div class="icon-cell-name">recurring</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 11a4 4 0 1 0-8 0M5 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/><circle cx="13" cy="7" r="4"/></svg>
+        <div class="icon-cell-name">debts</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M9 19V9M14 19v-6M19 19V3"/></svg>
+        <div class="icon-cell-name">reports</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ACTIONS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">03.2</div>
+      <h2 class="ds-section-title">Actions</h2>
+      <p class="ds-section-desc">Buttons and toolbar affordances.</p>
+    </div>
+
+    <div class="icon-grid">
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        <div class="icon-cell-name">add / plus</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        <div class="icon-cell-name">close</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18L9 12L15 6"/></svg>
+        <div class="icon-cell-name">back</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18L15 12L9 6"/></svg>
+        <div class="icon-cell-name">forward</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        <div class="icon-cell-name">settings</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <div class="icon-cell-name">search</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+        <div class="icon-cell-name">sort / filter</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <div class="icon-cell-name">edit</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/></svg>
+        <div class="icon-cell-name">more</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <div class="icon-cell-name">history</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4"/></svg>
+        <div class="icon-cell-name">archive</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+        <div class="icon-cell-name">pause</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ STATUS / ARROWS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">03.3</div>
+      <h2 class="ds-section-title">Status &amp; arrows</h2>
+      <p class="ds-section-desc">Directional indicators and confirmation marks.</p>
+    </div>
+
+    <div class="icon-grid">
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+        <div class="icon-cell-name">check</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        <div class="icon-cell-name">arrow-up<br>(income)</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        <div class="icon-cell-name">arrow-down<br>(expense)</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        <div class="icon-cell-name">arrow-right<br>(cta)</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16L19 6M19 6H9M19 6V16"/></svg>
+        <div class="icon-cell-name">trend-up</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8L19 18M19 18H9M19 18V8"/></svg>
+        <div class="icon-cell-name">trend-down</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h14M14 5l3 3-3 3M21 16H7M10 13l-3 3 3 3"/></svg>
+        <div class="icon-cell-name">transfer</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4H8L2 10l6 6h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM12 9l5 5M17 9l-5 5"/></svg>
+        <div class="icon-cell-name">backspace</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ACCOUNT TYPES ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">03.4</div>
+      <h2 class="ds-section-title">Accounts</h2>
+      <p class="ds-section-desc">Icons for Real account types. Shown here with their category tint.</p>
+    </div>
+
+    <div class="icon-grid">
+      <div class="icon-cell tint-bank">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
+        <div class="icon-cell-name">bank</div>
+      </div>
+      <div class="icon-cell tint-cash">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+        <div class="icon-cell-name">wallet / cash</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CATEGORIES ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">03.5</div>
+      <h2 class="ds-section-title">Categories</h2>
+      <p class="ds-section-desc">
+        Expense and income category glyphs. Shown here with their category tint —
+        in context they typically appear inside a tinted icon tile.
+      </p>
+    </div>
+
+    <div class="icon-grid">
+      <div class="icon-cell tint-food">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/></svg>
+        <div class="icon-cell-name">food / dining</div>
+      </div>
+      <div class="icon-cell tint-grocery">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M2 4h2.5l3 13h12L22 7H6"/></svg>
+        <div class="icon-cell-name">groceries</div>
+      </div>
+      <div class="icon-cell tint-rent">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9z"/><path d="M9 22V12h6v10"/></svg>
+        <div class="icon-cell-name">rent</div>
+      </div>
+      <div class="icon-cell tint-utilities">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <div class="icon-cell-name">utilities</div>
+      </div>
+      <div class="icon-cell tint-transport">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6 17V9l2-4h8l2 4v8M8 13h8M7 17v2M17 17v2"/></svg>
+        <div class="icon-cell-name">transport</div>
+      </div>
+      <div class="icon-cell tint-shop">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+        <div class="icon-cell-name">shopping</div>
+      </div>
+      <div class="icon-cell tint-fun">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="9 7 16 12 9 17 9 7"/><circle cx="12" cy="12" r="9"/></svg>
+        <div class="icon-cell-name">entertainment</div>
+      </div>
+      <div class="icon-cell tint-care">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <div class="icon-cell-name">personal care</div>
+      </div>
+      <div class="icon-cell tint-subs">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+        <div class="icon-cell-name">subscriptions</div>
+      </div>
+      <div class="icon-cell tint-health">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16M4 12h16"/></svg>
+        <div class="icon-cell-name">healthcare</div>
+      </div>
+      <div class="icon-cell tint-edu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/></svg>
+        <div class="icon-cell-name">education</div>
+      </div>
+      <div class="icon-cell tint-debt">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3l4 4-4 4M3 7h18M7 13l-4 4 4 4M21 17H3"/></svg>
+        <div class="icon-cell-name">debt</div>
+      </div>
+      <div class="icon-cell tint-salary">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <div class="icon-cell-name">salary</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l4 4v16H6z"/><path d="M14 2v4h4"/><path d="M9 12h6M9 16h4"/></svg>
+        <div class="icon-cell-name">receipt</div>
+      </div>
+      <div class="icon-cell tint-other">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/></svg>
+        <div class="icon-cell-name">other</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ MISC ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">03.6</div>
+      <h2 class="ds-section-title">Status bar &amp; system</h2>
+      <p class="ds-section-desc">iOS device chrome icons used in the mockup phone frame.</p>
+    </div>
+
+    <div class="icon-grid">
+      <div class="icon-cell">
+        <svg width="22" height="14" viewBox="0 0 17 11" fill="none">
+          <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+          <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+          <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+          <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+        </svg>
+        <div class="icon-cell-name">signal</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="22" height="14" viewBox="0 0 15 11" fill="none">
+          <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+          <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div class="icon-cell-name">wifi</div>
+      </div>
+      <div class="icon-cell">
+        <svg width="28" height="14" viewBox="0 0 27 12" fill="none">
+          <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+          <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+          <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+        </svg>
+        <div class="icon-cell-name">battery</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="ds-footer">
+    <div><a href="index.html" style="color: var(--text-mute);">← Back to overview</a></div>
+    <div>03 · Icons</div>
+  </footer>
+
+</main>
+
+</body>
+</html>

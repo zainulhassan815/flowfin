@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Add Transaction / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  --cat-bank: #82C5D4;
+  --cat-cash: #C5D982;
+  --cat-food: #E8A87B;
+  --cat-transport: #8AB4E0;
+  --cat-fun: #C98ED4;
+  --cat-salary: #9CD4A2;
+  --cat-subs: #9A8AE0;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.caption {
+  position: fixed;
+  top: 28px;
+  left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 10;
+  font-weight: 500;
+}
+.caption em {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 400;
+  opacity: 0.85;
+}
+.caption-r {
+  position: fixed;
+  bottom: 28px;
+  left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 10;
+  font-weight: 500;
+}
+
+/* ===== Phone frame ===== */
+.phone {
+  width: 390px;
+  height: 844px;
+  background: var(--bg);
+  border-radius: 52px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E,
+    0 0 0 12px #0A0A0C,
+    0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28),
+    0 6px 14px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+}
+.notch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 32px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 30;
+}
+
+.status-bar {
+  height: 50px;
+  padding: 18px 32px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+  z-index: 5;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Full-screen sheet ===== */
+.sheet {
+  flex: 1;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+.sheet-header {
+  height: 56px;
+  padding: 0 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+.sheet-back {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-mute);
+  cursor: pointer;
+  margin-left: -8px;
+  transition: color .15s;
+}
+.sheet-back:hover { color: var(--text); }
+.sheet-title {
+  font-family: var(--font-serif), serif;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.sheet-save {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 4px;
+}
+
+/* ===== Tabs ===== */
+.sheet-tabs {
+  display: flex;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 12px 0 14px;
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-soft);
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  position: relative;
+  transition: color .2s;
+}
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width .2s ease;
+  border-radius: 2px;
+}
+.tab-btn.active {
+  color: var(--text);
+  font-style: italic;
+}
+.tab-btn.active::after { width: 60%; }
+
+/* Type-aware accent color */
+.sheet[data-type="expense"]  { --type-color: var(--accent); }
+.sheet[data-type="income"]   { --type-color: var(--pos); }
+.sheet[data-type="transfer"] { --type-color: var(--transfer); }
+
+.sheet .tab-btn.active::after { background: var(--type-color); }
+.sheet .sheet-save { color: var(--type-color); }
+.sheet .key.equals {
+  background: var(--type-color);
+  border-color: var(--type-color);
+}
+.sheet .key.op { color: var(--type-color); border-color: rgba(255,255,255,0.12); }
+.sheet[data-type="expense"]  .key.op { background: rgba(232,220,192,0.04); border-color: rgba(232,220,192,0.16); }
+.sheet[data-type="income"]   .key.op { background: rgba(156,212,162,0.04); border-color: rgba(156,212,162,0.16); }
+.sheet[data-type="transfer"] .key.op { background: rgba(130,197,212,0.04); border-color: rgba(130,197,212,0.16); }
+
+.sheet .expr-op { color: var(--type-color); }
+.sheet .expr-cursor { background: var(--type-color); }
+
+/* Type variants — show/hide */
+.sheet[data-type="expense"]  .is-income,
+.sheet[data-type="expense"]  .is-transfer { display: none; }
+.sheet[data-type="income"]   .is-expense,
+.sheet[data-type="income"]   .is-transfer { display: none; }
+.sheet[data-type="transfer"] .is-expense,
+.sheet[data-type="transfer"] .is-income { display: none; }
+
+/* ===== Amount display ===== */
+.amount-display {
+  padding: 14px 20px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+}
+.expr-line {
+  font-family: var(--font-mono), monospace;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-mute);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+}
+.expr-op { color: var(--accent); padding: 0 2px; }
+.expr-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 1px;
+  animation: blink 1s infinite;
+  margin-left: 1px;
+}
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.result-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+}
+.amount-currency {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--text-mute);
+  letter-spacing: -0.02em;
+}
+.amount-value {
+  font-family: var(--font-mono), monospace;
+  font-size: 52px;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text);
+}
+.amount-decimal {
+  font-family: var(--font-mono), monospace;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-mute);
+}
+
+/* ===== Form rows ===== */
+.form {
+  padding: 0 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.form-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.form-row:last-child { border-bottom: none; }
+
+.form-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  width: 64px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.form-value {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.form-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--icon-border, var(--border-strong));
+  background: var(--icon-bg, transparent);
+  border-radius: 8px;
+  color: var(--icon-color, var(--text-mute));
+  flex-shrink: 0;
+}
+.form-icon.budget { border-style: dashed; }
+
+.form-icon.cat-food      { --icon-color: var(--cat-food);      --icon-border: rgba(232,168,123,0.36); --icon-bg: rgba(232,168,123,0.08); }
+.form-icon.cat-transport { --icon-color: var(--cat-transport); --icon-border: rgba(138,180,224,0.36); --icon-bg: rgba(138,180,224,0.08); }
+.form-icon.cat-bank      { --icon-color: var(--cat-bank);      --icon-border: rgba(130,197,212,0.32); --icon-bg: rgba(130,197,212,0.08); }
+.form-icon.cat-cash      { --icon-color: var(--cat-cash);      --icon-border: rgba(197,217,130,0.32); --icon-bg: rgba(197,217,130,0.08); }
+.form-icon.cat-salary    { --icon-color: var(--cat-salary);    --icon-border: rgba(156,212,162,0.36); --icon-bg: rgba(156,212,162,0.08); }
+.form-icon.cat-fun       { --icon-color: var(--cat-fun);       --icon-border: rgba(201,142,212,0.36); --icon-bg: rgba(201,142,212,0.08); }
+
+.form-text {
+  flex: 1;
+  font-family: var(--font-serif), serif;
+  font-size: 16px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.form-text.placeholder { color: var(--text-soft); font-style: italic; }
+
+.form-aux {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-mute);
+  letter-spacing: -0.01em;
+}
+
+.form-chevron {
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+/* ===== Attachment row ===== */
+.form-row-attach {
+  align-items: flex-start !important;
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+}
+.form-row-attach .form-label {
+  padding-top: 14px;
+}
+
+.attach-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-right: 4px;
+}
+.attach-strip::-webkit-scrollbar { display: none; }
+
+.receipt-thumb {
+  width: 44px;
+  height: 56px;
+  flex-shrink: 0;
+  position: relative;
+  border-radius: 4px 4px 0 0;
+  transform: rotate(-2deg);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+.receipt-thumb svg { display: block; }
+.receipt-thumb + .receipt-thumb { transform: rotate(2deg); margin-left: -4px; }
+
+.attach-add {
+  width: 44px;
+  height: 56px;
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px dashed rgba(255,255,255,0.18);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-mute);
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.attach-add:hover {
+  border-color: var(--type-color);
+  color: var(--type-color);
+  background: rgba(255,255,255,0.02);
+}
+
+.attach-hint {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  color: var(--text-soft);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-left: 4px;
+}
+
+/* ===== Calculator pad ===== */
+.calcpad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+  padding: 12px 14px 22px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.key {
+  height: 46px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-family: var(--font-mono), monospace;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--text);
+  cursor: pointer;
+  transition: background .12s, border-color .12s, transform .08s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.key:hover { background: #1F1F23; border-color: var(--border-strong); }
+.key:active { transform: scale(0.96); }
+
+.key.fn {
+  color: var(--text-mute);
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+.key.fn.icon { font-size: 18px; }
+
+.key.op {
+  color: var(--accent);
+  background: rgba(232, 220, 192, 0.04);
+  border-color: rgba(232, 220, 192, 0.16);
+  font-size: 22px;
+  font-weight: 500;
+}
+.key.op:hover {
+  background: rgba(232, 220, 192, 0.08);
+  border-color: rgba(232, 220, 192, 0.28);
+}
+
+.key.equals {
+  background: var(--accent);
+  color: #0A0A0B;
+  border-color: var(--accent);
+  font-weight: 600;
+  font-size: 22px;
+}
+.key.equals:hover {
+  background: #F0E4C8;
+  border-color: #F0E4C8;
+}
+
+.key.zero { grid-column: span 2; justify-content: flex-start; padding-left: 30%; }
+.key.dec { font-size: 24px; line-height: 0; padding-bottom: 4px; }
+
+/* Home indicator */
+.home-indicator {
+  position: absolute;
+  bottom: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  background: var(--text);
+  border-radius: 3px;
+  opacity: 0.4;
+  z-index: 40;
+}
+
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 02<br>
+  <em>Add Transaction — Full Screen</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Full-screen Add Transaction -->
+  <section class="sheet" data-type="expense">
+
+    <div class="sheet-header">
+      <button class="sheet-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18L9 12L15 6"/>
+        </svg>
+      </button>
+      <div class="sheet-title">New <span class="is-expense">expense</span><span class="is-income">income</span><span class="is-transfer">transfer</span></div>
+      <button class="sheet-save">Save</button>
+    </div>
+
+    <div class="sheet-tabs">
+      <button class="tab-btn active" data-tab="expense">Expense</button>
+      <button class="tab-btn" data-tab="income">Income</button>
+      <button class="tab-btn" data-tab="transfer">Transfer</button>
+    </div>
+
+    <!-- Expense amount -->
+    <div class="amount-display is-expense">
+      <div class="expr-line">
+        <span>2,400</span>
+        <span class="expr-op">÷</span>
+        <span>4</span>
+        <span class="expr-cursor"></span>
+      </div>
+      <div class="result-line">
+        <span class="amount-currency">Rs</span>
+        <span class="amount-value">600</span>
+        <span class="amount-decimal">.00</span>
+      </div>
+    </div>
+
+    <!-- Income amount -->
+    <div class="amount-display is-income">
+      <div class="expr-line">
+        <span style="opacity:0.5">December salary</span>
+        <span class="expr-cursor"></span>
+      </div>
+      <div class="result-line">
+        <span class="amount-currency">Rs</span>
+        <span class="amount-value">150,000</span>
+        <span class="amount-decimal">.00</span>
+      </div>
+    </div>
+
+    <!-- Transfer amount -->
+    <div class="amount-display is-transfer">
+      <div class="expr-line">
+        <span style="opacity:0.5">ATM withdrawal</span>
+        <span class="expr-cursor"></span>
+      </div>
+      <div class="result-line">
+        <span class="amount-currency">Rs</span>
+        <span class="amount-value">5,000</span>
+        <span class="amount-decimal">.00</span>
+      </div>
+    </div>
+
+    <div class="form">
+
+      <!-- EXPENSE: From + Category -->
+      <div class="form-row is-expense">
+        <div class="form-label">From</div>
+        <div class="form-value">
+          <div class="form-icon budget cat-food">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/>
+            </svg>
+          </div>
+          <span class="form-text">Food Budget</span>
+          <span class="form-aux">9,500</span>
+          <svg class="form-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M3 2L7 5L3 8"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="form-row is-expense">
+        <div class="form-label">Category</div>
+        <div class="form-value">
+          <div class="form-icon cat-food">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/>
+            </svg>
+          </div>
+          <span class="form-text">Food &amp; Dining</span>
+          <svg class="form-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M3 2L7 5L3 8"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- INCOME: To + Category -->
+      <div class="form-row is-income">
+        <div class="form-label">To</div>
+        <div class="form-value">
+          <div class="form-icon cat-bank">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+            </svg>
+          </div>
+          <span class="form-text">Bank Account</span>
+          <span class="form-aux">40,000</span>
+          <svg class="form-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M3 2L7 5L3 8"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="form-row is-income">
+        <div class="form-label">Source</div>
+        <div class="form-value">
+          <div class="form-icon cat-salary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <span class="form-text">Salary</span>
+          <svg class="form-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M3 2L7 5L3 8"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- TRANSFER: From + To -->
+      <div class="form-row is-transfer">
+        <div class="form-label">From</div>
+        <div class="form-value">
+          <div class="form-icon cat-bank">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+            </svg>
+          </div>
+          <span class="form-text">Bank Account</span>
+          <span class="form-aux">40,000</span>
+          <svg class="form-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M3 2L7 5L3 8"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="form-row is-transfer">
+        <div class="form-label">To</div>
+        <div class="form-value">
+          <div class="form-icon cat-cash">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/>
+              <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/>
+              <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+            </svg>
+          </div>
+          <span class="form-text">Cash</span>
+          <span class="form-aux">2,000</span>
+          <svg class="form-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M3 2L7 5L3 8"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- COMMON: Date + Note -->
+      <div class="form-row">
+        <div class="form-label">Date</div>
+        <div class="form-value">
+          <span class="form-text">Today, <span style="font-style:italic; color:var(--text-mute)">25 May 2026</span></span>
+          <svg class="form-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M3 2L7 5L3 8"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-label">Note</div>
+        <div class="form-value">
+          <span class="form-text placeholder is-expense">Split with 4 friends…</span>
+          <span class="form-text placeholder is-income">Monthly paycheck…</span>
+          <span class="form-text placeholder is-transfer">ATM withdrawal…</span>
+        </div>
+      </div>
+
+      <!-- Receipt attachment row -->
+      <div class="form-row form-row-attach">
+        <div class="form-label">Receipt</div>
+        <div class="form-value attach-strip">
+
+          <!-- Expense: shows attached receipt -->
+          <div class="receipt-thumb is-expense">
+            <svg width="44" height="60" viewBox="0 0 44 60" fill="none">
+              <defs>
+                <clipPath id="receipt-clip">
+                  <path d="M2 2 H42 V52 L38 56 L34 52 L30 56 L26 52 L22 56 L18 52 L14 56 L10 52 L6 56 L2 52 Z"/>
+                </clipPath>
+                <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#F4EDD8"/>
+                  <stop offset="1" stop-color="#E2D4B0"/>
+                </linearGradient>
+              </defs>
+              <path d="M2 2 H42 V52 L38 56 L34 52 L30 56 L26 52 L22 56 L18 52 L14 56 L10 52 L6 56 L2 52 Z" fill="url(#paper)"/>
+              <g clip-path="url(#receipt-clip)" opacity="0.45">
+                <rect x="6" y="10" width="24" height="2" rx="0.5" fill="#3A2E18"/>
+                <rect x="6" y="16" width="32" height="1" rx="0.5" fill="#5C4A2C"/>
+                <rect x="6" y="20" width="28" height="1" rx="0.5" fill="#5C4A2C"/>
+                <rect x="6" y="24" width="32" height="1" rx="0.5" fill="#5C4A2C"/>
+                <rect x="6" y="28" width="22" height="1" rx="0.5" fill="#5C4A2C"/>
+                <rect x="6" y="34" width="32" height="1" rx="0.5" fill="#5C4A2C"/>
+                <rect x="6" y="40" width="20" height="2" rx="0.5" fill="#3A2E18"/>
+                <rect x="30" y="40" width="8" height="2" rx="0.5" fill="#3A2E18"/>
+              </g>
+            </svg>
+          </div>
+
+          <!-- Add button (always visible) -->
+          <button class="attach-add" aria-label="Add attachment">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </button>
+
+          <span class="attach-hint is-expense">Tap to add more</span>
+          <span class="attach-hint is-income">Add receipt / photo</span>
+          <span class="attach-hint is-transfer">Add receipt / photo</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Calculator pad -->
+    <div class="calcpad">
+      <button class="key fn">C</button>
+      <button class="key fn icon" aria-label="Backspace">
+        <svg width="18" height="14" viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 4H8L2 10l6 6h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM12 9l5 5M17 9l-5 5"/>
+        </svg>
+      </button>
+      <button class="key op">%</button>
+      <button class="key op">÷</button>
+
+      <button class="key">7</button>
+      <button class="key">8</button>
+      <button class="key">9</button>
+      <button class="key op">×</button>
+
+      <button class="key">4</button>
+      <button class="key">5</button>
+      <button class="key">6</button>
+      <button class="key op">−</button>
+
+      <button class="key">1</button>
+      <button class="key">2</button>
+      <button class="key">3</button>
+      <button class="key op">+</button>
+
+      <button class="key zero">0</button>
+      <button class="key dec">·</button>
+      <button class="key equals">=</button>
+    </div>
+
+  </section>
+
+  <div class="home-indicator"></div>
+
+</div>
+
+<script>
+  (function() {
+    const sheet = document.querySelector('.sheet');
+    const tabs = document.querySelectorAll('.tab-btn');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const type = tab.dataset.tab;
+        sheet.dataset.type = type;
+        tabs.forEach(t => t.classList.toggle('active', t === tab));
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

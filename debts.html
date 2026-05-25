@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en" data-tab="i-owe">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Debts / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+
+  /* avatar tints — assigned per person */
+  --av-1: #82C5D4;
+  --av-2: #C98ED4;
+  --av-3: #E8A87B;
+  --av-4: #9CD4A2;
+  --av-5: #E89AB8;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+/* ===== Phone ===== */
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg); border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E,
+    0 0 0 12px #0A0A0C,
+    0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28),
+    0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Page header ===== */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px 8px; flex-shrink: 0;
+}
+.page-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-weight: 400;
+  font-size: 28px; letter-spacing: -0.02em; color: var(--text);
+}
+.header-actions { display: flex; gap: 4px; }
+.icon-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: var(--text-mute); cursor: pointer;
+  border-radius: 10px;
+  transition: color .15s, background .15s;
+}
+.icon-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+
+/* ===== Hero strip ===== */
+.hero {
+  padding: 4px 24px 18px;
+}
+.hero-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 500;
+}
+.hero-label::before { content: ''; width: 14px; height: 1px; background: var(--text-soft); }
+
+.hero-amount-row {
+  display: flex; align-items: baseline; gap: 8px;
+}
+.hero-sign {
+  font-family: var(--font-mono), monospace;
+  font-size: 38px; font-weight: 300;
+  letter-spacing: -0.02em; color: var(--pos);
+}
+.hero-amount {
+  font-family: var(--font-mono), monospace;
+  font-size: 38px; font-weight: 300;
+  letter-spacing: -0.04em; line-height: 1;
+  color: var(--text);
+}
+.hero-currency {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--text-mute);
+  letter-spacing: -0.02em;
+}
+.hero-decimal {
+  font-family: var(--font-mono), monospace;
+  font-size: 18px;
+  color: var(--text-mute);
+  font-weight: 400;
+}
+
+.hero-breakdown {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-strong);
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.hb-cell { display: flex; align-items: center; gap: 8px; }
+.hb-label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 9.5px;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+.hb-value { font-weight: 500; color: var(--text); }
+.hb-value.pos { color: var(--pos); }
+.hb-value.neg { color: var(--neg); }
+
+/* ===== Tab selector ===== */
+.debt-tabs {
+  margin: 0 20px 14px;
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.dt-item {
+  flex: 1;
+  padding: 10px 0;
+  text-align: center;
+  border-radius: 9px;
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  color: var(--text-soft);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  letter-spacing: -0.01em;
+  transition: all .15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.dt-item:hover { color: var(--text-mute); }
+.dt-item .count {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  background: rgba(255,255,255,0.06);
+  padding: 1px 7px;
+  border-radius: 8px;
+  color: var(--text-mute);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+:root[data-tab="i-owe"] .dt-item.i-owe {
+  background: rgba(232,182,110,0.10);
+  color: var(--text);
+  font-style: italic;
+  box-shadow: inset 0 0 0 1px rgba(232,182,110,0.22);
+}
+:root[data-tab="i-owe"] .dt-item.i-owe .count {
+  background: rgba(232,182,110,0.16);
+  color: var(--warn);
+}
+
+:root[data-tab="owe-me"] .dt-item.owe-me {
+  background: rgba(156,212,162,0.10);
+  color: var(--text);
+  font-style: italic;
+  box-shadow: inset 0 0 0 1px rgba(156,212,162,0.22);
+}
+:root[data-tab="owe-me"] .dt-item.owe-me .count {
+  background: rgba(156,212,162,0.16);
+  color: var(--pos);
+}
+
+/* ===== Scroll ===== */
+.scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 4px 20px 110px;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ===== List visibility per tab ===== */
+:root[data-tab="i-owe"]  .list-owe-me,
+:root[data-tab="owe-me"] .list-i-owe { display: none; }
+
+/* ===== Debt card ===== */
+.debt-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.debt-card:hover { border-color: var(--border-strong); }
+
+.dc-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.dc-avatar {
+  width: 40px; height: 40px;
+  border: 1px solid var(--av-color, var(--border-strong));
+  background: var(--av-bg, transparent);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--av-color, var(--text-mute));
+  letter-spacing: -0.02em;
+}
+.dc-avatar.av-1 { --av-color: var(--av-1); --av-bg: rgba(130,197,212,0.08); }
+.dc-avatar.av-2 { --av-color: var(--av-2); --av-bg: rgba(201,142,212,0.08); }
+.dc-avatar.av-3 { --av-color: var(--av-3); --av-bg: rgba(232,168,123,0.08); }
+.dc-avatar.av-4 { --av-color: var(--av-4); --av-bg: rgba(156,212,162,0.08); }
+.dc-avatar.av-5 { --av-color: var(--av-5); --av-bg: rgba(232,154,184,0.08); }
+
+.dc-info { flex: 1; min-width: 0; }
+.dc-name {
+  font-family: var(--font-serif), serif;
+  font-size: 17px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.dc-reason {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-mute);
+  margin-top: 3px;
+  letter-spacing: -0.01em;
+}
+.dc-reason::before { content: '"'; }
+.dc-reason::after { content: '"'; }
+
+.dc-amount {
+  text-align: right;
+  flex-shrink: 0;
+}
+.dc-amount-val {
+  font-family: var(--font-mono), monospace;
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.dc-amount-val .dec { color: var(--text-mute); font-weight: 400; }
+.dc-amount-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  color: var(--text-soft);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+/* progress + actions */
+.dc-progress { margin-bottom: 12px; }
+.progress-bar {
+  height: 5px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+.progress-fill.i-owe { background: var(--warn); }
+.progress-fill.owe-me { background: var(--pos); }
+
+.dc-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 8px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+.dc-progress-meta .left { color: var(--text-mute); }
+.dc-progress-meta .left strong { color: var(--text); font-weight: 500; }
+.dc-progress-meta .right {
+  color: var(--text-soft);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 500;
+}
+
+.dc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.dc-date {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.dc-action {
+  background: transparent;
+  border: none;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  transition: color .15s;
+}
+.dc-action.pay { color: var(--warn); }
+.dc-action.pay:hover { color: #F0CE8A; }
+.dc-action.receive { color: var(--pos); }
+.dc-action.receive:hover { color: #BCE4C2; }
+
+/* Empty / new debt card variant */
+.debt-card.fresh .dc-progress-meta .left strong { color: var(--text-soft); }
+.debt-card.fresh .progress-fill { width: 0% !important; }
+
+/* ===== Settled link ===== */
+.settled-link {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 16px;
+  padding: 14px;
+  background: transparent;
+  border: 1px dashed var(--border-strong);
+  border-radius: 12px;
+  font-family: var(--font-serif), serif;
+  font-size: 14px;
+  color: var(--text-mute);
+  cursor: pointer;
+  font-style: italic;
+  transition: color .15s, border-color .15s;
+}
+.settled-link:hover { color: var(--accent); border-color: rgba(232,220,192,0.4); }
+.settled-link .count {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-style: normal;
+  background: rgba(255,255,255,0.06);
+  padding: 2px 7px;
+  border-radius: 8px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ===== Tab bar ===== */
+.tab-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 88px;
+  background: rgba(8,8,10,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-around; align-items: flex-start;
+  padding: 14px 12px 0; z-index: 5;
+}
+.tab {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  color: var(--text-mute); background: transparent; border: none;
+  cursor: pointer; font-family: var(--font-mono), monospace;
+  font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase;
+  flex: 1; padding: 4px 0;
+}
+.tab.active { color: var(--text); }
+.tab.active .tab-icon { color: var(--text); }
+.tab-icon { color: var(--text-mute); transition: color .2s; }
+
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 6;
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 08<br>
+  <em>Debts — I Owe / Owe Me</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Page header -->
+  <div class="page-header">
+    <h1 class="page-title">Debts</h1>
+    <div class="header-actions">
+      <button class="icon-btn" aria-label="History">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 7v5l3 2"/>
+        </svg>
+      </button>
+      <button class="icon-btn" aria-label="Add">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Hero summary -->
+  <section class="hero">
+    <div class="hero-label">Net position</div>
+    <div class="hero-amount-row">
+      <span class="hero-sign">+</span>
+      <span class="hero-currency">Rs</span>
+      <span class="hero-amount">11,500</span>
+      <span class="hero-decimal">.00</span>
+    </div>
+    <div class="hero-breakdown">
+      <div class="hb-cell">
+        <span class="hb-label">Owe me</span>
+        <span class="hb-value pos">17,000</span>
+      </div>
+      <div class="hb-cell">
+        <span class="hb-label">I owe</span>
+        <span class="hb-value neg">5,500</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tabs -->
+  <div class="debt-tabs">
+    <button class="dt-item i-owe" data-tab="i-owe">
+      I Owe
+      <span class="count">2</span>
+    </button>
+    <button class="dt-item owe-me" data-tab="owe-me">
+      Owe Me
+      <span class="count">3</span>
+    </button>
+  </div>
+
+  <div class="scroll">
+
+    <!-- ═══ I OWE LIST ═══ -->
+    <div class="list-i-owe">
+
+      <div class="debt-card">
+        <div class="dc-header">
+          <div class="dc-avatar av-1">A</div>
+          <div class="dc-info">
+            <div class="dc-name">Ahmed</div>
+            <div class="dc-reason">Borrowed for rent</div>
+          </div>
+          <div class="dc-amount">
+            <div class="dc-amount-val">3,000<span class="dec">.00</span></div>
+            <div class="dc-amount-label">Remaining</div>
+          </div>
+        </div>
+        <div class="dc-progress">
+          <div class="progress-bar">
+            <div class="progress-fill i-owe" style="width: 40%"></div>
+          </div>
+          <div class="dc-progress-meta">
+            <div class="left"><strong>2,000</strong> paid of 5,000</div>
+            <div class="right">40%</div>
+          </div>
+        </div>
+        <div class="dc-footer">
+          <div class="dc-date">20 May · 6 days ago</div>
+          <button class="dc-action pay">
+            Record Payment
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="debt-card fresh">
+        <div class="dc-header">
+          <div class="dc-avatar av-2">H</div>
+          <div class="dc-info">
+            <div class="dc-name">Hassan</div>
+            <div class="dc-reason">Lunch split</div>
+          </div>
+          <div class="dc-amount">
+            <div class="dc-amount-val">2,500<span class="dec">.00</span></div>
+            <div class="dc-amount-label">Remaining</div>
+          </div>
+        </div>
+        <div class="dc-progress">
+          <div class="progress-bar">
+            <div class="progress-fill i-owe" style="width: 0%"></div>
+          </div>
+          <div class="dc-progress-meta">
+            <div class="left"><strong>0</strong> paid of 2,500</div>
+            <div class="right">0%</div>
+          </div>
+        </div>
+        <div class="dc-footer">
+          <div class="dc-date">24 May · 2 days ago</div>
+          <button class="dc-action pay">
+            Record Payment
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="settled-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <path d="M22 4L12 14.01l-3-3"/>
+        </svg>
+        View settled debts
+        <span class="count">3</span>
+      </button>
+
+    </div>
+
+    <!-- ═══ OWE ME LIST ═══ -->
+    <div class="list-owe-me">
+
+      <div class="debt-card fresh">
+        <div class="dc-header">
+          <div class="dc-avatar av-3">S</div>
+          <div class="dc-info">
+            <div class="dc-name">Sara</div>
+            <div class="dc-reason">Movie tickets</div>
+          </div>
+          <div class="dc-amount">
+            <div class="dc-amount-val">5,000<span class="dec">.00</span></div>
+            <div class="dc-amount-label">Owed</div>
+          </div>
+        </div>
+        <div class="dc-progress">
+          <div class="progress-bar">
+            <div class="progress-fill owe-me" style="width: 0%"></div>
+          </div>
+          <div class="dc-progress-meta">
+            <div class="left"><strong>0</strong> received of 5,000</div>
+            <div class="right">0%</div>
+          </div>
+        </div>
+        <div class="dc-footer">
+          <div class="dc-date">22 May · 4 days ago</div>
+          <button class="dc-action receive">
+            Record Receipt
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="debt-card">
+        <div class="dc-header">
+          <div class="dc-avatar av-4">A</div>
+          <div class="dc-info">
+            <div class="dc-name">Ali</div>
+            <div class="dc-reason">Birthday gift split</div>
+          </div>
+          <div class="dc-amount">
+            <div class="dc-amount-val">2,000<span class="dec">.00</span></div>
+            <div class="dc-amount-label">Owed</div>
+          </div>
+        </div>
+        <div class="dc-progress">
+          <div class="progress-bar">
+            <div class="progress-fill owe-me" style="width: 33%"></div>
+          </div>
+          <div class="dc-progress-meta">
+            <div class="left"><strong>1,000</strong> received of 3,000</div>
+            <div class="right">33%</div>
+          </div>
+        </div>
+        <div class="dc-footer">
+          <div class="dc-date">18 May · 8 days ago</div>
+          <button class="dc-action receive">
+            Record Receipt
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="debt-card fresh">
+        <div class="dc-header">
+          <div class="dc-avatar av-5">I</div>
+          <div class="dc-info">
+            <div class="dc-name">Imran</div>
+            <div class="dc-reason">Phone bill</div>
+          </div>
+          <div class="dc-amount">
+            <div class="dc-amount-val">10,000<span class="dec">.00</span></div>
+            <div class="dc-amount-label">Owed</div>
+          </div>
+        </div>
+        <div class="dc-progress">
+          <div class="progress-bar">
+            <div class="progress-fill owe-me" style="width: 0%"></div>
+          </div>
+          <div class="dc-progress-meta">
+            <div class="left"><strong>0</strong> received of 10,000</div>
+            <div class="right">0%</div>
+          </div>
+        </div>
+        <div class="dc-footer">
+          <div class="dc-date">15 May · 11 days ago</div>
+          <button class="dc-action receive">
+            Record Receipt
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="settled-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <path d="M22 4L12 14.01l-3-3"/>
+        </svg>
+        View settled debts
+        <span class="count">2</span>
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- Tab bar -->
+  <nav class="tab-bar">
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10z"/>
+      </svg>
+      Home
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="6" width="18" height="13" rx="2"/>
+        <path d="M3 10h18M7 15h3"/>
+      </svg>
+      Accounts
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>
+      </svg>
+      Recur
+    </button>
+    <button class="tab active">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 11a4 4 0 1 0-8 0M5 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/>
+        <circle cx="13" cy="7" r="4"/>
+      </svg>
+      Debts
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19V5M9 19V9M14 19v-6M19 19V3"/>
+      </svg>
+      Reports
+    </button>
+  </nav>
+
+  <div class="home-indicator"></div>
+</div>
+
+<script>
+  (function() {
+    const root = document.documentElement;
+    const tabs = document.querySelectorAll('.dt-item');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        root.dataset.tab = tab.dataset.tab;
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

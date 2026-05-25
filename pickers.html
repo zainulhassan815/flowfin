@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en" data-picker="account">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Pickers / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  --cat-bank: #82C5D4;
+  --cat-cash: #C5D982;
+  --cat-food: #E8A87B;
+  --cat-grocery: #A8D479;
+  --cat-transport: #8AB4E0;
+  --cat-fun: #C98ED4;
+  --cat-salary: #9CD4A2;
+  --cat-subs: #9A8AE0;
+  --cat-rent: #D89A82;
+  --cat-utilities: #E8CC7B;
+  --cat-shop: #E89AB8;
+  --cat-health: #DC8A8A;
+  --cat-edu: #8AC9D4;
+  --cat-care: #C9A8D4;
+  --cat-debt: #E08A8A;
+  --cat-other: #B4B4BC;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== Captions & switcher ===== */
+.caption {
+  position: fixed;
+  top: 28px;
+  left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 10;
+  font-weight: 500;
+}
+.caption em {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 400;
+  opacity: 0.85;
+}
+.caption-r {
+  position: fixed;
+  bottom: 28px;
+  left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 10;
+  font-weight: 500;
+}
+
+.picker-switcher {
+  position: fixed;
+  top: 28px;
+  right: 32px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 200px;
+}
+.ps-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 500;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ps-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+
+.ps-btn {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 11px 14px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text-mute);
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.ps-btn:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+.ps-btn.active {
+  background: rgba(232,220,192,0.08);
+  border-color: rgba(232,220,192,0.3);
+  color: var(--text);
+  font-style: italic;
+}
+
+/* ===== Phone frame ===== */
+.phone {
+  width: 390px;
+  height: 844px;
+  background: var(--bg);
+  border-radius: 52px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E,
+    0 0 0 12px #0A0A0C,
+    0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28),
+    0 6px 14px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+}
+.notch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 32px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 30;
+}
+
+.status-bar {
+  height: 50px;
+  padding: 18px 32px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+  z-index: 5;
+  flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Context peek (dimmed Add Transaction) ===== */
+.ctx-peek {
+  flex-shrink: 0;
+  opacity: 0.28;
+  filter: blur(0.4px);
+  pointer-events: none;
+}
+.ctx-header {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+}
+.ctx-back {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  color: var(--text-mute);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -8px;
+}
+.ctx-title {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-serif), serif;
+  font-size: 16px;
+  font-style: italic;
+  color: var(--text);
+}
+.ctx-save {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+}
+.ctx-amount {
+  text-align: center;
+  padding: 16px 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+}
+.ctx-amount .cur {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--text-mute);
+  margin-right: 6px;
+}
+
+/* ===== Backdrop ===== */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 4, 6, 0.65);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 10;
+}
+
+/* ===== Picker sheet ===== */
+.picker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--surface-2);
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  height: 720px;
+  box-shadow: 0 -20px 60px rgba(0,0,0,0.4);
+}
+
+.picker-handle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 22px;
+  padding-top: 8px;
+}
+.picker-handle::after {
+  content: '';
+  width: 40px;
+  height: 4px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 2px;
+}
+
+.picker-header {
+  display: flex;
+  align-items: center;
+  padding: 6px 16px;
+  height: 56px;
+  flex-shrink: 0;
+}
+.picker-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  color: var(--text-mute);
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.picker-close:hover { color: var(--text); border-color: var(--text-soft); }
+.picker-title {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-serif), serif;
+  font-size: 17px;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.picker-done {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px;
+}
+.picker-spacer { width: 36px; }
+
+/* ===== Picker content (switchable) ===== */
+.picker-content {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+:root[data-picker="account"]  .picker .account-content,
+:root[data-picker="category"] .picker .category-content,
+:root[data-picker="date"]     .picker .date-content { display: flex; }
+
+/* ===== Body / list ===== */
+.picker-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 0 12px;
+}
+.picker-body::-webkit-scrollbar { display: none; }
+
+.group-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  padding: 16px 20px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-weight: 500;
+}
+.group-total {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text);
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 500;
+}
+
+.picker-row {
+  display: flex;
+  align-items: center;
+  padding: 11px 20px;
+  gap: 14px;
+  cursor: pointer;
+  transition: background .12s;
+}
+.picker-row:hover { background: rgba(255,255,255,0.025); }
+.picker-row.selected { background: rgba(232,220,192,0.06); }
+
+.row-icon {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--icon-border, var(--border-strong));
+  background: var(--icon-bg, transparent);
+  border-radius: 10px;
+  color: var(--icon-color, var(--text-mute));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.row-icon.budget { border-style: dashed; }
+
+.row-icon.cat-bank      { --icon-color: var(--cat-bank);      --icon-border: rgba(130,197,212,0.32); --icon-bg: rgba(130,197,212,0.08); }
+.row-icon.cat-cash      { --icon-color: var(--cat-cash);      --icon-border: rgba(197,217,130,0.32); --icon-bg: rgba(197,217,130,0.08); }
+.row-icon.cat-food      { --icon-color: var(--cat-food);      --icon-border: rgba(232,168,123,0.36); --icon-bg: rgba(232,168,123,0.08); }
+.row-icon.cat-grocery   { --icon-color: var(--cat-grocery);   --icon-border: rgba(168,212,121,0.32); --icon-bg: rgba(168,212,121,0.08); }
+.row-icon.cat-transport { --icon-color: var(--cat-transport); --icon-border: rgba(138,180,224,0.36); --icon-bg: rgba(138,180,224,0.08); }
+.row-icon.cat-fun       { --icon-color: var(--cat-fun);       --icon-border: rgba(201,142,212,0.36); --icon-bg: rgba(201,142,212,0.08); }
+.row-icon.cat-subs      { --icon-color: var(--cat-subs);      --icon-border: rgba(154,138,224,0.36); --icon-bg: rgba(154,138,224,0.08); }
+.row-icon.cat-rent      { --icon-color: var(--cat-rent);      --icon-border: rgba(216,154,130,0.36); --icon-bg: rgba(216,154,130,0.08); }
+.row-icon.cat-utilities { --icon-color: var(--cat-utilities); --icon-border: rgba(232,204,123,0.36); --icon-bg: rgba(232,204,123,0.08); }
+.row-icon.cat-shop      { --icon-color: var(--cat-shop);      --icon-border: rgba(232,154,184,0.36); --icon-bg: rgba(232,154,184,0.08); }
+.row-icon.cat-health    { --icon-color: var(--cat-health);    --icon-border: rgba(220,138,138,0.32); --icon-bg: rgba(220,138,138,0.08); }
+.row-icon.cat-edu       { --icon-color: var(--cat-edu);       --icon-border: rgba(138,201,212,0.32); --icon-bg: rgba(138,201,212,0.08); }
+.row-icon.cat-care      { --icon-color: var(--cat-care);      --icon-border: rgba(201,168,212,0.32); --icon-bg: rgba(201,168,212,0.08); }
+.row-icon.cat-debt      { --icon-color: var(--cat-debt);      --icon-border: rgba(224,138,138,0.36); --icon-bg: rgba(224,138,138,0.08); }
+.row-icon.cat-other     { --icon-color: var(--cat-other);     --icon-border: rgba(180,180,188,0.32); --icon-bg: rgba(180,180,188,0.05); }
+
+.row-body { flex: 1; min-width: 0; }
+.row-name {
+  font-family: var(--font-serif), serif;
+  font-size: 17px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.row-meta {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  color: var(--text-mute);
+  margin-top: 4px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.row-amount {
+  font-family: var(--font-mono), monospace;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  margin-right: 4px;
+  letter-spacing: -0.01em;
+}
+
+.row-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--border-strong);
+  color: transparent;
+  transition: all .15s;
+}
+.picker-row.selected .row-check {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0A0A0B;
+}
+
+/* ===== Footer ===== */
+.picker-footer {
+  border-top: 1px solid var(--border);
+  padding: 14px 20px 28px;
+  flex-shrink: 0;
+  background: var(--surface-2);
+}
+.cta-create {
+  width: 100%;
+  background: transparent;
+  border: 1px dashed var(--border-strong);
+  border-radius: 12px;
+  padding: 14px;
+  color: var(--text-mute);
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: color .15s, border-color .15s;
+  font-style: italic;
+}
+.cta-create:hover {
+  color: var(--accent);
+  border-color: rgba(232,220,192,0.4);
+}
+.cta-create svg { flex-shrink: 0; }
+
+/* ===== Search bar ===== */
+.picker-search {
+  padding: 4px 20px 12px;
+  flex-shrink: 0;
+}
+.search-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.search-input svg { color: var(--text-soft); flex-shrink: 0; }
+.search-input .placeholder {
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  color: var(--text-soft);
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
+
+/* ===== Date picker specifics ===== */
+.quick-dates {
+  display: flex;
+  gap: 8px;
+  padding: 4px 20px 16px;
+}
+.quick-date {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-mute);
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.quick-date.selected {
+  background: rgba(232,220,192,0.08);
+  border-color: rgba(232,220,192,0.4);
+  color: var(--text);
+  font-style: italic;
+}
+.quick-date .qd-date {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  color: var(--text-soft);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-style: normal;
+}
+.quick-date.selected .qd-date { color: var(--text-mute); }
+
+.calendar {
+  padding: 8px 20px 0;
+  flex: 1;
+}
+.cal-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0 14px;
+}
+.cal-month {
+  font-family: var(--font-serif), serif;
+  font-size: 18px;
+  font-style: italic;
+  color: var(--text);
+}
+.cal-month-year {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  color: var(--text-mute);
+  margin-left: 6px;
+  font-style: normal;
+}
+.cal-arrow {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  border-radius: 50%;
+  color: var(--text-mute);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.cal-arrow:hover { color: var(--text); border-color: var(--text-soft); }
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  color: var(--text-soft);
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.cal-day {
+  aspect-ratio: 1;
+  width: 100%;
+  max-width: 44px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  color: var(--text);
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: 400;
+  transition: background .12s;
+  position: relative;
+}
+.cal-day.empty { color: transparent; cursor: default; }
+.cal-day.muted { color: var(--text-faint); }
+.cal-day:not(.empty):not(.selected):hover { background: rgba(255,255,255,0.06); }
+.cal-day.today {
+  position: relative;
+  color: var(--accent);
+  font-weight: 500;
+}
+.cal-day.today::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.cal-day.selected {
+  background: var(--accent);
+  color: #0A0A0B;
+  font-weight: 500;
+}
+.cal-day.selected.today { color: #0A0A0B; }
+.cal-day.selected.today::after { display: none; }
+
+/* Home indicator */
+.home-indicator {
+  position: absolute;
+  bottom: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  background: var(--text);
+  border-radius: 3px;
+  opacity: 0.4;
+  z-index: 40;
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 03<br>
+  <em>Picker Sheets — Account / Category / Date</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<aside class="picker-switcher">
+  <div class="ps-label">Picker</div>
+  <button class="ps-btn active" data-picker="account">Account</button>
+  <button class="ps-btn" data-picker="category">Category</button>
+  <button class="ps-btn" data-picker="date">Date</button>
+</aside>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Dimmed Add Transaction context -->
+  <div class="ctx-peek">
+    <div class="ctx-header">
+      <button class="ctx-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18L9 12L15 6"/>
+        </svg>
+      </button>
+      <div class="ctx-title">New expense</div>
+      <span class="ctx-save">Save</span>
+    </div>
+    <div class="ctx-amount">
+      <span class="cur">Rs</span>600.00
+    </div>
+  </div>
+
+  <div class="backdrop"></div>
+
+  <!-- Picker Sheet -->
+  <section class="picker">
+
+    <div class="picker-handle"></div>
+
+    <!-- ACCOUNT PICKER -->
+    <div class="picker-content account-content">
+      <div class="picker-header">
+        <button class="picker-close" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M6 6l12 12M18 6L6 18"/>
+          </svg>
+        </button>
+        <div class="picker-title">Select account</div>
+        <div class="picker-spacer"></div>
+      </div>
+
+      <div class="picker-body">
+
+        <div class="group-label">
+          <span>Real</span>
+          <span class="group-total">Rs 47,000</span>
+        </div>
+
+        <div class="picker-row selected">
+          <div class="row-icon cat-bank">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+            </svg>
+          </div>
+          <div class="row-body">
+            <div class="row-name">Bank</div>
+            <div class="row-meta">HBL · Primary</div>
+          </div>
+          <div class="row-amount">40,000</div>
+          <div class="row-check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="picker-row">
+          <div class="row-icon cat-cash">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/>
+              <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/>
+              <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+            </svg>
+          </div>
+          <div class="row-body">
+            <div class="row-name">Cash</div>
+            <div class="row-meta">Wallet</div>
+          </div>
+          <div class="row-amount">7,000</div>
+          <div class="row-check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          </div>
+        </div>
+
+        <div class="group-label">
+          <span>Budget</span>
+          <span class="group-total">Rs 16,000</span>
+        </div>
+
+        <div class="picker-row">
+          <div class="row-icon budget cat-food">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/>
+            </svg>
+          </div>
+          <div class="row-body">
+            <div class="row-name">Food Budget</div>
+            <div class="row-meta">Monthly · Dec</div>
+          </div>
+          <div class="row-amount">9,500</div>
+          <div class="row-check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          </div>
+        </div>
+
+        <div class="picker-row">
+          <div class="row-icon budget cat-transport">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 17h14M6 17V9l2-4h8l2 4v8M8 13h8M7 17v2M17 17v2"/>
+            </svg>
+          </div>
+          <div class="row-body">
+            <div class="row-name">Transport</div>
+            <div class="row-meta">Monthly · Dec</div>
+          </div>
+          <div class="row-amount">4,500</div>
+          <div class="row-check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          </div>
+        </div>
+
+        <div class="picker-row">
+          <div class="row-icon budget cat-fun">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="9 7 16 12 9 17 9 7"/>
+              <circle cx="12" cy="12" r="9"/>
+            </svg>
+          </div>
+          <div class="row-body">
+            <div class="row-name">Fun</div>
+            <div class="row-meta">Monthly · Dec</div>
+          </div>
+          <div class="row-amount">2,500</div>
+          <div class="row-check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="picker-footer">
+        <button class="cta-create">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          Create new account
+        </button>
+      </div>
+    </div>
+
+    <!-- CATEGORY PICKER -->
+    <div class="picker-content category-content">
+      <div class="picker-header">
+        <button class="picker-close" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M6 6l12 12M18 6L6 18"/>
+          </svg>
+        </button>
+        <div class="picker-title">Select category</div>
+        <div class="picker-spacer"></div>
+      </div>
+
+      <div class="picker-search">
+        <div class="search-input">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M21 21l-4.3-4.3"/>
+          </svg>
+          <span class="placeholder">Search categories…</span>
+        </div>
+      </div>
+
+      <div class="picker-body">
+
+        <div class="group-label"><span>Essentials</span></div>
+
+        <div class="picker-row selected">
+          <div class="row-icon cat-food">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/>
+            </svg>
+          </div>
+          <div class="row-body">
+            <div class="row-name">Food &amp; Dining</div>
+          </div>
+          <div class="row-check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          </div>
+        </div>
+
+        <div class="picker-row">
+          <div class="row-icon cat-grocery">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/>
+              <path d="M2 4h2.5l3 13h12L22 7H6"/>
+            </svg>
+          </div>
+          <div class="row-body"><div class="row-name">Groceries</div></div>
+          <div class="row-check"></div>
+        </div>
+
+        <div class="picker-row">
+          <div class="row-icon cat-rent">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9z"/>
+              <path d="M9 22V12h6v10"/>
+            </svg>
+          </div>
+          <div class="row-body"><div class="row-name">Rent</div></div>
+          <div class="row-check"></div>
+        </div>
+
+        <div class="picker-row">
+          <div class="row-icon cat-utilities">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+          </div>
+          <div class="row-body"><div class="row-name">Utilities</div></div>
+          <div class="row-check"></div>
+        </div>
+
+        <div class="picker-row">
+          <div class="row-icon cat-transport">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 17h14M6 17V9l2-4h8l2 4v8M8 13h8M7 17v2M17 17v2"/>
+            </svg>
+          </div>
+          <div class="row-body"><div class="row-name">Transport</div></div>
+          <div class="row-check"></div>
+        </div>
+
+        <div class="group-label"><span>Lifestyle</span></div>
+
+        <div class="picker-row">
+          <div class="row-icon cat-shop">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+              <path d="M3 6h18M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+          </div>
+          <div class="row-body"><div class="row-name">Shopping</div></div>
+          <div class="row-check"></div>
+        </div>
+
+        <div class="picker-row">
+          <div class="row-icon cat-fun">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="9 7 16 12 9 17 9 7"/>
+              <circle cx="12" cy="12" r="9"/>
+            </svg>
+          </div>
+          <div class="row-body"><div class="row-name">Entertainment</div></div>
+          <div class="row-check"></div>
+        </div>
+
+        <div class="picker-row">
+          <div class="row-icon cat-care">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </div>
+          <div class="row-body"><div class="row-name">Personal Care</div></div>
+          <div class="row-check"></div>
+        </div>
+
+        <div class="picker-row">
+          <div class="row-icon cat-subs">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>
+            </svg>
+          </div>
+          <div class="row-body"><div class="row-name">Subscriptions</div></div>
+          <div class="row-check"></div>
+        </div>
+
+        <div class="group-label"><span>Other</span></div>
+
+        <div class="picker-row">
+          <div class="row-icon cat-health">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4v16M4 12h16"/>
+            </svg>
+          </div>
+          <div class="row-body"><div class="row-name">Healthcare</div></div>
+          <div class="row-check"></div>
+        </div>
+
+        <div class="picker-row">
+          <div class="row-icon cat-edu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10L12 5 2 10l10 5 10-5z"/>
+              <path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/>
+            </svg>
+          </div>
+          <div class="row-body"><div class="row-name">Education</div></div>
+          <div class="row-check"></div>
+        </div>
+
+        <div class="picker-row">
+          <div class="row-icon cat-debt">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 3l4 4-4 4M3 7h18M7 13l-4 4 4 4M21 17H3"/>
+            </svg>
+          </div>
+          <div class="row-body"><div class="row-name">Debt Repayment</div></div>
+          <div class="row-check"></div>
+        </div>
+
+        <div class="picker-row">
+          <div class="row-icon cat-other">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/>
+            </svg>
+          </div>
+          <div class="row-body"><div class="row-name">Other</div></div>
+          <div class="row-check"></div>
+        </div>
+
+      </div>
+
+      <div class="picker-footer">
+        <button class="cta-create">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          Create custom category
+        </button>
+      </div>
+    </div>
+
+    <!-- DATE PICKER -->
+    <div class="picker-content date-content">
+      <div class="picker-header">
+        <button class="picker-close" aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M6 6l12 12M18 6L6 18"/>
+          </svg>
+        </button>
+        <div class="picker-title">Select date</div>
+        <button class="picker-done">Done</button>
+      </div>
+
+      <div class="quick-dates">
+        <button class="quick-date selected">
+          <span>Today</span>
+          <span class="qd-date">25 May 2026</span>
+        </button>
+        <button class="quick-date">
+          <span>Yesterday</span>
+          <span class="qd-date">24 May 2026</span>
+        </button>
+      </div>
+
+      <div class="calendar">
+        <div class="cal-nav">
+          <button class="cal-arrow" aria-label="Previous month">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 18L9 12L15 6"/>
+            </svg>
+          </button>
+          <div class="cal-month">May<span class="cal-month-year">2026</span></div>
+          <button class="cal-arrow" aria-label="Next month">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18L15 12L9 6"/>
+            </svg>
+          </button>
+        </div>
+        <div class="cal-weekdays">
+          <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+        </div>
+        <div class="cal-grid">
+          <!-- May 2026: starts on Friday (May 1 = Friday) -->
+          <div class="cal-day empty"></div>
+          <div class="cal-day empty"></div>
+          <div class="cal-day empty"></div>
+          <div class="cal-day empty"></div>
+          <div class="cal-day empty"></div>
+          <div class="cal-day">1</div>
+          <div class="cal-day">2</div>
+
+          <div class="cal-day">3</div>
+          <div class="cal-day">4</div>
+          <div class="cal-day">5</div>
+          <div class="cal-day">6</div>
+          <div class="cal-day">7</div>
+          <div class="cal-day">8</div>
+          <div class="cal-day">9</div>
+
+          <div class="cal-day">10</div>
+          <div class="cal-day">11</div>
+          <div class="cal-day">12</div>
+          <div class="cal-day">13</div>
+          <div class="cal-day">14</div>
+          <div class="cal-day">15</div>
+          <div class="cal-day">16</div>
+
+          <div class="cal-day">17</div>
+          <div class="cal-day">18</div>
+          <div class="cal-day">19</div>
+          <div class="cal-day">20</div>
+          <div class="cal-day">21</div>
+          <div class="cal-day">22</div>
+          <div class="cal-day">23</div>
+
+          <div class="cal-day">24</div>
+          <div class="cal-day selected today">25</div>
+          <div class="cal-day muted">26</div>
+          <div class="cal-day muted">27</div>
+          <div class="cal-day muted">28</div>
+          <div class="cal-day muted">29</div>
+          <div class="cal-day muted">30</div>
+
+          <div class="cal-day muted">31</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <div class="home-indicator"></div>
+</div>
+
+<script>
+  (function() {
+    const root = document.documentElement;
+    const buttons = document.querySelectorAll('.ps-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = btn.dataset.picker;
+        root.dataset.picker = p;
+        buttons.forEach(b => b.classList.toggle('active', b === btn));
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
