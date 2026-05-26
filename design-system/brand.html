@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brand — FlowFin Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* ═══════════════════════════════════════════
+     Brand mark — the reusable canonical lockup
+  ═══════════════════════════════════════════ */
+  .bm {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+  }
+  .bm-name {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    line-height: 1;
+  }
+  .bm-dot {
+    background: var(--accent);
+    border-radius: 50%;
+    align-self: center;
+    flex-shrink: 0;
+  }
+
+  /* size variants */
+  .bm.xs  .bm-name { font-size: 14px; }
+  .bm.xs  .bm-dot  { width: 3px;  height: 3px;  margin-bottom: 1px; }
+  .bm.sm  .bm-name { font-size: 20px; }
+  .bm.sm  .bm-dot  { width: 4px;  height: 4px;  margin-bottom: 2px; }
+  .bm.md  .bm-name { font-size: 32px; }
+  .bm.md  .bm-dot  { width: 6px;  height: 6px;  margin-bottom: 3px; }
+  .bm.lg  .bm-name { font-size: 56px; }
+  .bm.lg  .bm-dot  { width: 10px; height: 10px; margin-bottom: 6px; }
+  .bm.xl  .bm-name { font-size: 96px; }
+  .bm.xl  .bm-dot  { width: 16px; height: 16px; margin-bottom: 12px; }
+
+  /* color variants */
+  .bm.on-light .bm-name { color: #08080A; }
+  .bm.on-light .bm-dot  { background: #08080A; }
+  .bm.on-accent .bm-name { color: #0A0A0B; }
+  .bm.on-accent .bm-dot  { background: #0A0A0B; }
+  .bm.mono .bm-dot { background: currentColor; }
+  .bm.muted .bm-name { color: var(--text-mute); }
+  .bm.muted .bm-dot  { background: var(--text-mute); }
+
+  /* ═══════════════════════════════════════════
+     Monogram — the "f·" symbol
+  ═══════════════════════════════════════════ */
+  .mono-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    color: #0A0A0B;
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .mono-mark.sz-20 { width: 20px;  height: 20px;  font-size: 12px;  border-radius: 5px; }
+  .mono-mark.sz-28 { width: 28px;  height: 28px;  font-size: 17px;  border-radius: 7px; }
+  .mono-mark.sz-40 { width: 40px;  height: 40px;  font-size: 22px;  border-radius: 10px; }
+  .mono-mark.sz-56 { width: 56px;  height: 56px;  font-size: 32px;  border-radius: 14px; }
+  .mono-mark.sz-80 { width: 80px;  height: 80px;  font-size: 46px;  border-radius: 20px; }
+  .mono-mark.sz-120 { width: 120px; height: 120px; font-size: 70px; border-radius: 28px; }
+  .mono-mark.outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+  }
+  .mono-mark.dark {
+    background: var(--surface-2);
+    color: var(--accent);
+    border: 1px solid var(--border-strong);
+  }
+
+  /* ═══════════════════════════════════════════
+     App icon (iOS-style rounded square)
+  ═══════════════════════════════════════════ */
+  .app-icon {
+    width: 132px; height: 132px;
+    border-radius: 30px;
+    background: linear-gradient(160deg, #E8DCC0, #D8C49C 70%, #C9B383);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.5) inset,
+      0 -2px 0 rgba(0,0,0,0.04) inset,
+      0 18px 36px rgba(0,0,0,0.45),
+      0 6px 14px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .app-icon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 28% 22%, rgba(255,255,255,0.18), transparent 50%);
+    pointer-events: none;
+  }
+  .app-icon .glyph {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 80px;
+    letter-spacing: -0.06em;
+    color: #1A1A1F;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .app-icon .glyph::after {
+    content: '';
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #1A1A1F;
+    align-self: flex-end;
+    margin-bottom: 10px;
+  }
+  .app-icon.dark {
+    background: linear-gradient(160deg, #14141A, #0A0A0D 70%, #08080A);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.06) inset,
+      0 18px 36px rgba(0,0,0,0.55),
+      0 6px 14px rgba(0,0,0,0.35);
+  }
+  .app-icon.dark .glyph { color: var(--accent); }
+  .app-icon.dark .glyph::after { background: var(--accent); }
+  .app-icon.bw {
+    background: #08080A;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .app-icon.bw .glyph { color: #F2F2F4; }
+  .app-icon.bw .glyph::after { background: #F2F2F4; }
+
+  .app-icon-row {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .app-icon-stack { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .app-icon-label {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    font-weight: 500;
+  }
+
+  /* miniatures for size scale */
+  .icon-sizes {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .icon-size {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .icon-size-px {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    color: var(--text-soft);
+    letter-spacing: 0.1em;
+  }
+  .mini-app {
+    border-radius: 22%;
+    background: linear-gradient(160deg, #E8DCC0, #D8C49C 70%, #C9B383);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    color: #1A1A1F;
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    line-height: 1;
+    position: relative;
+  }
+  .mini-app::after {
+    content: '';
+    border-radius: 50%;
+    background: #1A1A1F;
+    align-self: flex-end;
+    position: absolute;
+  }
+  .mini-app.s-1024 { width: 96px; height: 96px; font-size: 58px; }
+  .mini-app.s-1024::after { width: 7px; height: 7px; right: 18%; bottom: 26%; }
+  .mini-app.s-180  { width: 60px; height: 60px; font-size: 36px; }
+  .mini-app.s-180::after { width: 5px; height: 5px; right: 20%; bottom: 28%; }
+  .mini-app.s-120  { width: 44px; height: 44px; font-size: 26px; }
+  .mini-app.s-120::after { width: 3.5px; height: 3.5px; right: 20%; bottom: 28%; }
+  .mini-app.s-60   { width: 30px; height: 30px; font-size: 18px; }
+  .mini-app.s-60::after { width: 2.5px; height: 2.5px; right: 20%; bottom: 28%; }
+  .mini-app.s-40   { width: 22px; height: 22px; font-size: 13px; }
+  .mini-app.s-40::after { width: 2px; height: 2px; right: 20%; bottom: 26%; }
+
+  /* ═══════════════════════════════════════════
+     Backdrop tiles
+  ═══════════════════════════════════════════ */
+  .surface-tile {
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 56px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .surface-tile.bg-dark   { background: var(--bg); }
+  .surface-tile.bg-surf   { background: var(--surface-2); }
+  .surface-tile.bg-accent { background: var(--accent); }
+  .surface-tile.bg-light  { background: #F2EFE7; }
+  .surface-tile-label {
+    position: absolute;
+    top: 14px; left: 16px;
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .surface-tile.bg-dark .surface-tile-label,
+  .surface-tile.bg-surf .surface-tile-label { color: var(--text-faint); }
+  .surface-tile.bg-accent .surface-tile-label,
+  .surface-tile.bg-light .surface-tile-label { color: rgba(0,0,0,0.45); }
+
+  /* ═══════════════════════════════════════════
+     Clear space diagram
+  ═══════════════════════════════════════════ */
+  .clearspace {
+    position: relative;
+    display: inline-flex;
+    padding: 36px;
+    border: 1px dashed rgba(232,220,192,0.3);
+    border-radius: 6px;
+  }
+  .clearspace::before {
+    content: '';
+    position: absolute;
+    inset: 18px;
+    border: 1px dotted rgba(232,220,192,0.18);
+    border-radius: 3px;
+  }
+  .clearspace-tag {
+    position: absolute;
+    top: -10px; left: 16px;
+    background: var(--bg);
+    padding: 0 8px;
+    font-family: var(--font-mono), monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .clearspace-x {
+    position: absolute;
+    bottom: -10px; right: 18px;
+    background: var(--bg);
+    padding: 0 8px;
+    font-family: var(--font-mono), monospace;
+    font-style: italic;
+    font-size: 11px;
+    color: var(--text-soft);
+  }
+  .clearspace-x em { color: var(--accent); font-style: normal; font-weight: 500; }
+
+  /* ═══════════════════════════════════════════
+     Misuse (don'ts)
+  ═══════════════════════════════════════════ */
+  .misuse-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+  .misuse {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .misuse-canvas {
+    height: 110px;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .misuse-x {
+    position: absolute;
+    top: 10px; right: 12px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: rgba(224,138,138,0.10);
+    border: 1px solid rgba(224,138,138,0.4);
+    color: var(--neg);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .misuse-info {
+    padding: 12px 14px 14px;
+    border-top: 1px solid var(--border);
+  }
+  .misuse-rule {
+    font-family: var(--font-serif), serif;
+    font-size: 14px;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .misuse-rule em { font-style: italic; color: var(--neg); }
+  .misuse-why {
+    font-family: var(--font-mono), monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-top: 5px;
+    font-weight: 500;
+  }
+
+  /* misuse-specific styles */
+  .misuse-stretch .bm-name { transform: scaleX(1.6); transform-origin: left; }
+  .misuse-rotate .bm        { transform: rotate(-12deg); }
+  .misuse-recolor .bm-name  { color: var(--neg); }
+  .misuse-recolor .bm-dot   { background: var(--neg); }
+  .misuse-bold .bm-name     { font-weight: 700; font-style: normal; }
+  .misuse-shadow .bm-name   { text-shadow: 0 0 12px rgba(232,220,192,0.6); }
+  .misuse-outline .bm-name  { -webkit-text-stroke: 1px var(--accent); color: transparent; }
+
+  /* ═══════════════════════════════════════════
+     Voice & tone
+  ═══════════════════════════════════════════ */
+  .voice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+  }
+  .voice-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 22px 24px;
+  }
+  .voice-quality {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .voice-axis {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  .voice-axis em { font-style: italic; color: var(--accent); text-transform: none; letter-spacing: -0.01em; }
+  .voice-line {
+    margin-top: 14px;
+    height: 1px;
+    background: var(--border);
+  }
+  .voice-desc {
+    margin-top: 14px;
+    font-family: var(--font-serif), serif;
+    font-size: 14.5px;
+    color: var(--text-mute);
+    line-height: 1.5;
+    letter-spacing: -0.005em;
+  }
+
+  .copy-pair {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-bottom: 10px;
+  }
+  .copy-row { display: flex; gap: 18px; align-items: flex-start; padding: 10px 0; }
+  .copy-row + .copy-row { border-top: 1px solid var(--border); }
+  .copy-tag {
+    width: 64px; flex-shrink: 0;
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-top: 4px;
+  }
+  .copy-tag.yes { color: var(--pos); }
+  .copy-tag.no  { color: var(--neg); }
+  .copy-text {
+    font-family: var(--font-serif), serif;
+    font-size: 16px;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+  }
+  .copy-text.no { color: var(--text-mute); text-decoration: line-through; text-decoration-color: rgba(224,138,138,0.5); text-decoration-thickness: 1px; }
+
+  /* ═══════════════════════════════════════════
+     Tagline display
+  ═══════════════════════════════════════════ */
+  .tagline-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 64px 48px;
+    text-align: center;
+  }
+  .tagline {
+    font-family: var(--font-serif), serif;
+    font-weight: 300;
+    font-size: 44px;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+  .tagline em { font-style: italic; color: var(--accent); }
+  .tagline-meta {
+    margin-top: 22px;
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    font-weight: 500;
+  }
+
+  /* ═══════════════════════════════════════════
+     Hero (overrides ds-page-header for brand page)
+  ═══════════════════════════════════════════ */
+  .brand-hero {
+    display: flex;
+    align-items: center;
+    gap: 64px;
+    padding: 28px 0 64px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 56px;
+  }
+  .brand-hero-mark { flex-shrink: 0; }
+  .brand-hero-text { flex: 1; min-width: 0; }
+</style>
+</head>
+<body>
+
+<nav class="ds-nav">
+  <a href="index.html" class="ds-brand">
+    <span class="ds-brand-mark">flowfin</span>
+    <span class="ds-brand-dot"></span>
+    <span class="ds-brand-tag">Design System</span>
+  </a>
+  <div class="ds-nav-links">
+    <a href="index.html" class="ds-nav-link">Overview</a>
+    <a href="brand.html" class="ds-nav-link active">Brand</a>
+    <a href="foundations.html" class="ds-nav-link">Foundations</a>
+    <a href="components.html" class="ds-nav-link">Components</a>
+    <a href="icons.html" class="ds-nav-link">Icons</a>
+  </div>
+</nav>
+
+<main class="ds-page">
+
+  <header class="ds-page-header" style="margin-bottom: 24px;">
+    <div class="ds-eyebrow">00 — Brand</div>
+    <h1 class="ds-page-title">Brand.</h1>
+    <p class="ds-page-lede">
+      A wordmark that ends in a small cream period — a quiet declarative sentence,
+      not a slogan. The mark, its companion monogram, the app icon, and the rules
+      that hold them together.
+    </p>
+  </header>
+
+  <section class="brand-hero">
+    <div class="brand-hero-mark">
+      <div class="bm xl"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+    </div>
+    <div class="brand-hero-text">
+      <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--text-soft); font-weight: 500; margin-bottom: 12px;">
+        Wordmark · Primary
+      </div>
+      <p style="font-family: var(--font-serif); font-size: 18px; color: var(--text-mute); line-height: 1.55; letter-spacing: -0.005em;">
+        Set in Literata italic at weight 300, the wordmark whispers rather than shouts.
+        The cream period is its own word: a quiet stop. It reads as <em>"flowfin."</em>
+        — full stop, not <em>"flowfin!"</em>
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ TAGLINE ═══ -->
+  <section class="ds-section" style="padding-top: 0;">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">00.1</div>
+      <h2 class="ds-section-title">Tagline</h2>
+      <p class="ds-section-desc">
+        A single line that names the product's posture toward money — slow, deliberate,
+        attentive. Used on splash screens, marketing pages and the about row.
+      </p>
+    </div>
+
+    <div class="tagline-card">
+      <div class="tagline">Spend with <em>attention</em>.<br>Account for the rest.</div>
+      <div class="tagline-meta">Primary tagline · 2026</div>
+    </div>
+  </section>
+
+  <!-- ═══ WORDMARK ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">00.2</div>
+      <h2 class="ds-section-title">Wordmark</h2>
+      <p class="ds-section-desc">
+        The full lockup is the wordmark and its dot. The dot sits centered on the
+        x-height — never on the baseline. Together they form a single object;
+        the gap between them is part of the mark.
+      </p>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">Size scale</div>
+      <div class="demo-block" style="display: flex; flex-direction: column; gap: 38px; align-items: flex-start;">
+        <div style="display: flex; align-items: center; gap: 28px;">
+          <span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-soft); width: 60px; letter-spacing: 0.16em;">XS · 14</span>
+          <div class="bm xs"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 28px;">
+          <span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-soft); width: 60px; letter-spacing: 0.16em;">SM · 20</span>
+          <div class="bm sm"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 28px;">
+          <span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-soft); width: 60px; letter-spacing: 0.16em;">MD · 32</span>
+          <div class="bm md"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 28px;">
+          <span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-soft); width: 60px; letter-spacing: 0.16em;">LG · 56</span>
+          <div class="bm lg"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 28px;">
+          <span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-soft); width: 60px; letter-spacing: 0.16em;">XL · 96</span>
+          <div class="bm xl"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">Color application</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="surface-tile bg-dark">
+          <div class="surface-tile-label">On dark · primary</div>
+          <div class="bm lg"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+        <div class="surface-tile bg-surf">
+          <div class="surface-tile-label">On surface</div>
+          <div class="bm lg"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+        <div class="surface-tile bg-light">
+          <div class="surface-tile-label">On light</div>
+          <div class="bm lg on-light"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+        <div class="surface-tile bg-accent">
+          <div class="surface-tile-label">On accent (inverted)</div>
+          <div class="bm lg on-accent"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">Clear space</div>
+      <p style="font-family: var(--font-serif); font-size: 14px; color: var(--text-mute); line-height: 1.55; max-width: 580px; margin-bottom: 22px;">
+        Reserve clear space equal to the cap height of the lowercase letters — call this
+        <em>x</em>. Nothing crosses inside this margin: no rules, no other type,
+        no image edges. The dot has the same clearance as the letters.
+      </p>
+      <div class="demo-block center" style="padding: 56px;">
+        <div class="clearspace">
+          <div class="clearspace-tag">Clear space</div>
+          <div class="bm lg"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+          <div class="clearspace-x"><em>x</em> = cap height</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">Minimum size</div>
+      <p style="font-family: var(--font-serif); font-size: 14px; color: var(--text-mute); line-height: 1.55; max-width: 580px; margin-bottom: 22px;">
+        Below 14px, the dot becomes a single pixel and the italic stops resolving.
+        For sizes smaller than that, use the monogram instead.
+      </p>
+      <div class="demo-block center" style="gap: 40px;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+          <div class="bm xs"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+          <span style="font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em; color: var(--pos);">14 PX · MIN</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+          <div class="bm" style="opacity: 0.5;"><span class="bm-name" style="font-size: 11px;">flowfin</span><span class="bm-dot" style="width: 2px; height: 2px; margin-bottom: 1px;"></span></div>
+          <span style="font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em; color: var(--neg);">11 PX · TOO SMALL</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ MONOGRAM ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">00.3</div>
+      <h2 class="ds-section-title">Monogram</h2>
+      <p class="ds-section-desc">
+        The <em>f·</em> mark — the wordmark compressed into a single tile. Used wherever
+        the full lockup can't fit: notification icons, app launcher, favicon,
+        social avatars.
+      </p>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">Sizes</div>
+      <div class="demo-block">
+        <div class="icon-sizes" style="justify-content: flex-start;">
+          <div class="icon-size">
+            <span class="mono-mark sz-20">f·</span>
+            <span class="icon-size-px">20</span>
+          </div>
+          <div class="icon-size">
+            <span class="mono-mark sz-28">f·</span>
+            <span class="icon-size-px">28</span>
+          </div>
+          <div class="icon-size">
+            <span class="mono-mark sz-40">f·</span>
+            <span class="icon-size-px">40</span>
+          </div>
+          <div class="icon-size">
+            <span class="mono-mark sz-56">f·</span>
+            <span class="icon-size-px">56</span>
+          </div>
+          <div class="icon-size">
+            <span class="mono-mark sz-80">f·</span>
+            <span class="icon-size-px">80</span>
+          </div>
+          <div class="icon-size">
+            <span class="mono-mark sz-120">f·</span>
+            <span class="icon-size-px">120</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">Variants</div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+        <div class="demo-block tile" style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
+          <span class="mono-mark sz-80">f·</span>
+          <span class="icon-size-px">Filled · accent</span>
+        </div>
+        <div class="demo-block tile" style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
+          <span class="mono-mark sz-80 outline">f·</span>
+          <span class="icon-size-px">Outline</span>
+        </div>
+        <div class="demo-block tile" style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
+          <span class="mono-mark sz-80 dark">f·</span>
+          <span class="icon-size-px">Dark / inverted</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ APP ICON ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">00.4</div>
+      <h2 class="ds-section-title">App icon</h2>
+      <p class="ds-section-desc">
+        The home-screen icon is the monogram lifted onto a brushed cream tile.
+        The radius follows iOS-style continuous corners. A dark variant exists
+        for system tinting and the splash sequence.
+      </p>
+    </div>
+
+    <div class="demo-block center" style="padding: 56px 32px; gap: 56px;">
+      <div class="app-icon-stack">
+        <div class="app-icon"><span class="glyph">f</span></div>
+        <span class="app-icon-label">Primary</span>
+      </div>
+      <div class="app-icon-stack">
+        <div class="app-icon dark"><span class="glyph">f</span></div>
+        <span class="app-icon-label">Dark</span>
+      </div>
+      <div class="app-icon-stack">
+        <div class="app-icon bw"><span class="glyph">f</span></div>
+        <span class="app-icon-label">Mono · system tint</span>
+      </div>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">Export sizes</div>
+      <div class="demo-block">
+        <div class="icon-sizes">
+          <div class="icon-size">
+            <div class="mini-app s-1024">f</div>
+            <span class="icon-size-px">1024 · store</span>
+          </div>
+          <div class="icon-size">
+            <div class="mini-app s-180">f</div>
+            <span class="icon-size-px">180 · iOS</span>
+          </div>
+          <div class="icon-size">
+            <div class="mini-app s-120">f</div>
+            <span class="icon-size-px">120 · iOS @2x</span>
+          </div>
+          <div class="icon-size">
+            <div class="mini-app s-60">f</div>
+            <span class="icon-size-px">60 · notif</span>
+          </div>
+          <div class="icon-size">
+            <div class="mini-app s-40">f</div>
+            <span class="icon-size-px">40 · spotlight</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ MISUSE ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">00.5</div>
+      <h2 class="ds-section-title">Don't</h2>
+      <p class="ds-section-desc">
+        Six ways the mark loses its voice. The wordmark is set, not assembled —
+        weight, slant, color, and proportion are fixed.
+      </p>
+    </div>
+
+    <div class="misuse-grid">
+
+      <div class="misuse">
+        <div class="misuse-canvas misuse-stretch">
+          <span class="misuse-x">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </span>
+          <div class="bm md"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+        <div class="misuse-info">
+          <div class="misuse-rule">Don't <em>stretch</em> or condense the letterforms.</div>
+          <div class="misuse-why">Why · breaks Literata's optical balance</div>
+        </div>
+      </div>
+
+      <div class="misuse">
+        <div class="misuse-canvas misuse-rotate">
+          <span class="misuse-x">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </span>
+          <div class="bm md"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+        <div class="misuse-info">
+          <div class="misuse-rule">Don't <em>rotate</em> or set on a curve.</div>
+          <div class="misuse-why">Why · the italic already does that work</div>
+        </div>
+      </div>
+
+      <div class="misuse">
+        <div class="misuse-canvas misuse-recolor">
+          <span class="misuse-x">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </span>
+          <div class="bm md"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+        <div class="misuse-info">
+          <div class="misuse-rule">Don't <em>recolor</em> the mark with semantic hues.</div>
+          <div class="misuse-why">Why · category colors mean something</div>
+        </div>
+      </div>
+
+      <div class="misuse">
+        <div class="misuse-canvas misuse-bold">
+          <span class="misuse-x">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </span>
+          <div class="bm md"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+        <div class="misuse-info">
+          <div class="misuse-rule">Don't <em>bold</em> or upright the wordmark.</div>
+          <div class="misuse-why">Why · the brand whispers — never shouts</div>
+        </div>
+      </div>
+
+      <div class="misuse">
+        <div class="misuse-canvas misuse-shadow">
+          <span class="misuse-x">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </span>
+          <div class="bm md"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+        <div class="misuse-info">
+          <div class="misuse-rule">Don't add <em>glows</em>, shadows or effects.</div>
+          <div class="misuse-why">Why · paper, not neon</div>
+        </div>
+      </div>
+
+      <div class="misuse">
+        <div class="misuse-canvas misuse-outline">
+          <span class="misuse-x">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </span>
+          <div class="bm md"><span class="bm-name">flowfin</span><span class="bm-dot"></span></div>
+        </div>
+        <div class="misuse-info">
+          <div class="misuse-rule">Don't <em>outline</em> the letterforms.</div>
+          <div class="misuse-why">Why · serif has no skeleton</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ VOICE & TONE ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">00.6</div>
+      <h2 class="ds-section-title">Voice &amp; tone</h2>
+      <p class="ds-section-desc">
+        How FlowFin speaks — quiet, declarative, never moralizing about money.
+        It surfaces facts, lets the reader draw conclusions, and uses italic only
+        when the prose itself wants emphasis.
+      </p>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">The four axes</div>
+      <div class="voice-grid">
+        <div class="voice-card">
+          <div class="voice-quality">Quiet</div>
+          <div class="voice-axis">not <em>loud</em></div>
+          <div class="voice-line"></div>
+          <p class="voice-desc">
+            One number, one verb. No exclamations, no emoji, no "you've got this!".
+            The interface should feel like a librarian, not a coach.
+          </p>
+        </div>
+        <div class="voice-card">
+          <div class="voice-quality">Declarative</div>
+          <div class="voice-axis">not <em>chatty</em></div>
+          <div class="voice-line"></div>
+          <p class="voice-desc">
+            State the fact. <em>"Rent is due in three days."</em> Not
+            <em>"Looks like rent's coming up soon — wanted to give you a heads up!"</em>
+          </p>
+        </div>
+        <div class="voice-card">
+          <div class="voice-quality">Honest</div>
+          <div class="voice-axis">not <em>cheerful</em></div>
+          <div class="voice-line"></div>
+          <p class="voice-desc">
+            A bad number is a bad number. We don't dress it up or apologize for it.
+            Empty states say <em>"Nothing here yet"</em> — not <em>"Adventure awaits!"</em>
+          </p>
+        </div>
+        <div class="voice-card">
+          <div class="voice-quality">Specific</div>
+          <div class="voice-axis">not <em>generic</em></div>
+          <div class="voice-line"></div>
+          <p class="voice-desc">
+            <em>"Spent Rs 6,000 on food"</em> beats <em>"Some spending happened."</em>
+            Numbers, dates, categories — never <em>"items"</em> or <em>"things"</em>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-subsection">
+      <div class="ds-subsection-title">Copy in practice</div>
+      <div class="copy-pair">
+        <div class="copy-row">
+          <span class="copy-tag yes">Say</span>
+          <span class="copy-text">Rent is due in 3 days.</span>
+        </div>
+        <div class="copy-row">
+          <span class="copy-tag no">Avoid</span>
+          <span class="copy-text no">⚠️ Heads up! Don't forget — rent's coming up soon!</span>
+        </div>
+      </div>
+      <div class="copy-pair">
+        <div class="copy-row">
+          <span class="copy-tag yes">Say</span>
+          <span class="copy-text">You've spent Rs 6,000 on food. That's 40% of this month's budget.</span>
+        </div>
+        <div class="copy-row">
+          <span class="copy-tag no">Avoid</span>
+          <span class="copy-text no">Whoa! Food spending is getting wild this month 🍔</span>
+        </div>
+      </div>
+      <div class="copy-pair">
+        <div class="copy-row">
+          <span class="copy-tag yes">Say</span>
+          <span class="copy-text">Nothing here yet. Add a recurring to get started.</span>
+        </div>
+        <div class="copy-row">
+          <span class="copy-tag no">Avoid</span>
+          <span class="copy-text no">Looks a little empty in here! Let's add your first recurring ✨</span>
+        </div>
+      </div>
+      <div class="copy-pair">
+        <div class="copy-row">
+          <span class="copy-tag yes">Say</span>
+          <span class="copy-text">Reset all data. Permanent · cannot be undone.</span>
+        </div>
+        <div class="copy-row">
+          <span class="copy-tag no">Avoid</span>
+          <span class="copy-text no">Uh oh! Are you sure you want to do this? This is super risky!</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PERSONALITY ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">00.7</div>
+      <h2 class="ds-section-title">Personality</h2>
+      <p class="ds-section-desc">
+        Three words to test design and copy against. If a decision doesn't pass
+        all three, reconsider it.
+      </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+      <div class="demo-block tile" style="padding: 32px 28px;">
+        <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.22em; color: var(--text-faint); font-weight: 500; margin-bottom: 14px;">01</div>
+        <div style="font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 28px; letter-spacing: -0.02em; color: var(--text); margin-bottom: 14px;">Editorial</div>
+        <p style="font-family: var(--font-serif); font-size: 14px; color: var(--text-mute); line-height: 1.5;">
+          Reads like a printed weekly — generous margins, restrained color,
+          a serif holding the long-form, mono holding the numbers.
+        </p>
+      </div>
+      <div class="demo-block tile" style="padding: 32px 28px;">
+        <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.22em; color: var(--text-faint); font-weight: 500; margin-bottom: 14px;">02</div>
+        <div style="font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 28px; letter-spacing: -0.02em; color: var(--text); margin-bottom: 14px;">Attentive</div>
+        <p style="font-family: var(--font-serif); font-size: 14px; color: var(--text-mute); line-height: 1.5;">
+          Notices the small things — that you paid rent late, that subscriptions
+          crept up, that this Sunday was quieter than usual.
+        </p>
+      </div>
+      <div class="demo-block tile" style="padding: 32px 28px;">
+        <div style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.22em; color: var(--text-faint); font-weight: 500; margin-bottom: 14px;">03</div>
+        <div style="font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 28px; letter-spacing: -0.02em; color: var(--text); margin-bottom: 14px;">Unhurried</div>
+        <p style="font-family: var(--font-serif); font-size: 14px; color: var(--text-mute); line-height: 1.5;">
+          Never urgent. Animations are short and functional. Charts don't
+          dance. The user is the one in charge of pace.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="ds-footer">
+    <div><a href="index.html" style="color: var(--text-mute);">← Back to overview</a></div>
+    <div>00 · Brand</div>
+  </footer>
+
+</main>
+
+</body>
+</html>

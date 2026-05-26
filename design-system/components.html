@@ -452,6 +452,781 @@
     text-transform: uppercase; letter-spacing: 0.18em;
     text-align: center; font-style: normal;
   }
+
+  /* ═══ NEW: Toggle switch ═══ */
+  .toggle {
+    width: 46px; height: 28px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    position: relative;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  .toggle::after {
+    content: ''; position: absolute;
+    top: 3px; left: 3px;
+    width: 20px; height: 20px;
+    background: var(--text-mute);
+    border-radius: 50%;
+    transition: transform .2s, background .2s;
+  }
+  .toggle.on {
+    background: rgba(232,220,192,0.12);
+    border-color: rgba(232,220,192,0.4);
+  }
+  .toggle.on::after {
+    background: var(--accent);
+    transform: translateX(18px);
+  }
+
+  /* ═══ NEW: Underlined tab control ═══ */
+  .scope-tabs {
+    display: flex; gap: 32px;
+    border-bottom: 1px solid var(--border);
+    padding: 0 4px;
+  }
+  .scope-tab {
+    padding: 12px 2px 14px;
+    background: transparent; border: none;
+    font-family: var(--font-serif), serif;
+    font-size: 16px;
+    color: var(--text-soft);
+    cursor: pointer;
+    position: relative;
+    letter-spacing: -0.01em;
+    transition: color .15s;
+  }
+  .scope-tab:hover { color: var(--text-mute); }
+  .scope-tab.active {
+    color: var(--text); font-style: italic;
+  }
+  .scope-tab.active::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 1px;
+  }
+  .scope-tab.active.income::after   { background: var(--pos); }
+  .scope-tab.active.transfer::after { background: var(--transfer); }
+
+  /* ═══ NEW: Calculator pad ═══ */
+  .calcpad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 7px;
+    padding: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    width: 320px;
+  }
+  .key {
+    height: 46px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-family: var(--font-mono), monospace;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text);
+    cursor: pointer;
+    transition: background .12s, border-color .12s, transform .08s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .key:hover { background: #1F1F23; border-color: var(--border-strong); }
+  .key:active { transform: scale(.96); }
+  .key.fn {
+    color: var(--text-mute);
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+  .key.fn.icon { font-size: 18px; }
+  .key.op {
+    color: var(--accent);
+    background: rgba(232,220,192,0.04);
+    border-color: rgba(232,220,192,0.16);
+    font-size: 22px;
+    font-weight: 500;
+  }
+  .key.op:hover {
+    background: rgba(232,220,192,0.08);
+    border-color: rgba(232,220,192,0.28);
+  }
+  .key.equals {
+    background: var(--accent);
+    color: #0A0A0B;
+    border-color: var(--accent);
+    font-weight: 600;
+    font-size: 22px;
+  }
+  .key.zero { grid-column: span 2; }
+  .key.dec { font-size: 24px; line-height: 0; padding-bottom: 4px; }
+
+  /* ═══ NEW: Hero amount display ═══ */
+  .amount-display {
+    padding: 14px 20px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .expr-line {
+    font-family: var(--font-mono), monospace;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text-mute);
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 22px;
+  }
+  .expr-op { color: var(--accent); padding: 0 2px; }
+  .expr-cursor {
+    display: inline-block;
+    width: 2px; height: 14px;
+    background: var(--accent);
+    border-radius: 1px;
+    animation: blink 1s infinite;
+    margin-left: 1px;
+  }
+  .result-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+  }
+  .amount-currency {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--text-mute);
+    letter-spacing: -0.02em;
+  }
+  .amount-value {
+    font-family: var(--font-mono), monospace;
+    font-size: 52px;
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--text);
+  }
+  .amount-decimal {
+    font-family: var(--font-mono), monospace;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--text-mute);
+  }
+
+  /* ═══ NEW: Page header (back + title + action) ═══ */
+  .page-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-header-back {
+    width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+    color: var(--text-mute);
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+  }
+  .page-header-back:hover { color: var(--text); border-color: var(--text-soft); }
+  .page-header-title {
+    flex: 1;
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 18px;
+    text-align: center;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .page-header-action {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: transparent;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 8px 4px;
+  }
+
+  /* ═══ NEW: Calendar grid ═══ */
+  .calendar-mini {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px 16px;
+    width: 100%;
+    max-width: 320px;
+  }
+  .cal-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 12px;
+  }
+  .cal-month {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--text);
+  }
+  .cal-month-year {
+    font-family: var(--font-mono), monospace;
+    font-size: 12px;
+    color: var(--text-mute);
+    margin-left: 6px;
+    font-style: normal;
+  }
+  .cal-arrow {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    border-radius: 50%;
+    color: var(--text-mute);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .cal-weekdays {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    color: var(--text-soft);
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono), monospace;
+    font-size: 13px;
+    color: var(--text);
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+  }
+  .cal-day.empty { color: transparent; }
+  .cal-day.muted { color: var(--text-faint); }
+  .cal-day.today {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .cal-day.today::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .cal-day.selected {
+    background: var(--accent);
+    color: #0A0A0B;
+    font-weight: 500;
+  }
+
+  /* ═══ NEW: Month strip (reports nav) ═══ */
+  .month-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 4px 18px;
+  }
+  .month-nav {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-mute);
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .month-label { text-align: center; flex: 1; }
+  .month-name {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+  }
+  .month-year {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-top: 2px;
+  }
+
+  /* ═══ NEW: Settings list rows ═══ */
+  .settings-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    width: 100%;
+  }
+  .settings-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row .row-body { flex: 1; min-width: 0; }
+  .settings-row .row-name {
+    font-family: var(--font-serif), serif;
+    font-size: 16px;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .settings-row .row-sub {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    color: var(--text-soft);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 3px;
+    font-weight: 500;
+  }
+  .settings-row .row-right {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .settings-row .row-value {
+    font-family: var(--font-mono), monospace;
+    font-size: 12px;
+    color: var(--text);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .settings-row .row-value-mute { color: var(--text-soft); font-weight: 400; }
+  .settings-row .row-pill {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+    padding: 3px 8px;
+    border-radius: 7px;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+  .settings-row .row-pill.warn {
+    background: rgba(232,182,110,0.10);
+    color: var(--warn);
+  }
+  .settings-row .row-chev { color: var(--text-faint); display: flex; }
+
+  /* Danger row */
+  .danger-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    border: 1px dashed rgba(224,138,138,0.32);
+    background: rgba(224,138,138,0.03);
+    border-radius: 14px;
+    margin-top: 12px;
+  }
+  .danger-icon {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 10px;
+    border: 1px solid rgba(224,138,138,0.28);
+    background: rgba(224,138,138,0.06);
+    color: var(--neg);
+    flex-shrink: 0;
+  }
+  .danger-body { flex: 1; }
+  .danger-name {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--neg);
+    letter-spacing: -0.01em;
+  }
+  .danger-sub {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    color: var(--text-soft);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 3px;
+    font-weight: 500;
+  }
+  .danger-chev { color: var(--text-faint); display: flex; }
+
+  /* ═══ NEW: Insight card ═══ */
+  .ins {
+    display: flex; gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .ins:last-child { border-bottom: none; }
+  .ins-glyph {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--glyph-color, var(--text-mute));
+    background: var(--glyph-bg, transparent);
+    border: 1px solid var(--glyph-border, var(--border-strong));
+  }
+  .ins.warn  .ins-glyph { --glyph-color: var(--warn);     --glyph-bg: rgba(232,182,110,0.08); --glyph-border: rgba(232,182,110,0.28); }
+  .ins.pos   .ins-glyph { --glyph-color: var(--pos);      --glyph-bg: rgba(156,212,162,0.08); --glyph-border: rgba(156,212,162,0.28); }
+  .ins.neg   .ins-glyph { --glyph-color: var(--neg);      --glyph-bg: rgba(224,138,138,0.08); --glyph-border: rgba(224,138,138,0.28); }
+  .ins.info  .ins-glyph { --glyph-color: var(--transfer); --glyph-bg: rgba(130,197,212,0.08); --glyph-border: rgba(130,197,212,0.28); }
+  .ins.ai    .ins-glyph { --glyph-color: var(--accent);   --glyph-bg: rgba(232,220,192,0.06); --glyph-border: rgba(232,220,192,0.24); }
+  .ins-body { flex: 1; min-width: 0; }
+  .ins-eyebrow {
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+  .ins.warn .ins-eyebrow { color: var(--warn); }
+  .ins.pos  .ins-eyebrow { color: var(--pos); }
+  .ins.neg  .ins-eyebrow { color: var(--neg); }
+  .ins.info .ins-eyebrow { color: var(--transfer); }
+  .ins.ai   .ins-eyebrow { color: var(--accent); }
+  .ins-title {
+    font-family: var(--font-serif), serif;
+    font-size: 15.5px;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .ins-title em { font-style: italic; }
+  .ins.warn .ins-title em { color: var(--warn); }
+  .ins.pos  .ins-title em { color: var(--pos); }
+  .ins.neg  .ins-title em { color: var(--neg); }
+  .ins.info .ins-title em { color: var(--transfer); }
+  .ins.ai   .ins-title em { color: var(--accent); }
+  .ins-meta {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-soft);
+    margin-top: 8px;
+  }
+
+  /* ═══ NEW: Person avatar ═══ */
+  .person-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--av-border, var(--border-strong));
+    background: var(--av-bg, transparent);
+    color: var(--av-color, var(--text-mute));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+  }
+  .person-avatar.av-1 { --av-color: var(--av-1); --av-bg: rgba(130,197,212,0.08); --av-border: rgba(130,197,212,0.28); }
+  .person-avatar.av-2 { --av-color: var(--av-2); --av-bg: rgba(201,142,212,0.08); --av-border: rgba(201,142,212,0.28); }
+  .person-avatar.av-3 { --av-color: var(--av-3); --av-bg: rgba(232,168,123,0.08); --av-border: rgba(232,168,123,0.28); }
+  .person-avatar.av-4 { --av-color: var(--av-4); --av-bg: rgba(156,212,162,0.08); --av-border: rgba(156,212,162,0.28); }
+  .person-avatar.av-5 { --av-color: var(--av-5); --av-bg: rgba(232,154,184,0.08); --av-border: rgba(232,154,184,0.28); }
+
+  /* ═══ NEW: Hint banner ═══ */
+  .hint {
+    display: flex; gap: 12px;
+    padding: 14px 16px;
+    background: rgba(232,220,192,0.04);
+    border: 1px solid rgba(232,220,192,0.16);
+    border-radius: 12px;
+  }
+  .hint.warn  { background: rgba(232,182,110,0.04); border-color: rgba(232,182,110,0.18); }
+  .hint.info  { background: rgba(130,197,212,0.04); border-color: rgba(130,197,212,0.18); }
+  .hint-icon {
+    width: 22px; height: 22px;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .hint.warn .hint-icon { color: var(--warn); }
+  .hint.info .hint-icon { color: var(--transfer); }
+  .hint-text {
+    font-family: var(--font-serif), serif;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--text-mute);
+    letter-spacing: -0.01em;
+  }
+  .hint-text strong { color: var(--text); font-weight: 500; }
+
+  /* ═══ NEW: Quick actions grid ═══ */
+  .quick-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+  .qa-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 10px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 7px;
+    color: var(--text);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .qa-btn:hover { border-color: var(--border-strong); background: var(--surface-2); }
+  .qa-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--qa-border, var(--border-strong));
+    background: var(--qa-bg, transparent);
+    color: var(--qa-color, var(--text-mute));
+  }
+  .qa-btn.income .qa-icon  { --qa-color: var(--pos);      --qa-bg: rgba(156,212,162,0.08); --qa-border: rgba(156,212,162,0.28); }
+  .qa-btn.expense .qa-icon { --qa-color: var(--neg);      --qa-bg: rgba(224,138,138,0.06); --qa-border: rgba(224,138,138,0.24); }
+  .qa-btn.move .qa-icon    { --qa-color: var(--transfer); --qa-bg: rgba(130,197,212,0.08); --qa-border: rgba(130,197,212,0.28); }
+  .qa-label {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .qa-sub {
+    font-family: var(--font-serif), serif;
+    font-size: 11px;
+    color: var(--text-soft);
+    font-style: italic;
+    letter-spacing: -0.005em;
+  }
+
+  /* ═══ NEW: Timeline ═══ */
+  .timeline {
+    position: relative;
+    padding-left: 22px;
+    border-left: 1px dashed var(--border-strong);
+  }
+  .tl-item {
+    position: relative;
+    padding: 0 0 18px 4px;
+  }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-dot {
+    position: absolute;
+    left: -28px; top: 4px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--accent);
+  }
+  .tl-item.origin .tl-dot { border-color: var(--warn); }
+  .tl-item.payment .tl-dot { border-color: var(--pos); }
+  .tl-date {
+    font-family: var(--font-mono), monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .tl-name {
+    font-family: var(--font-serif), serif;
+    font-size: 15px;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .tl-amount {
+    font-family: var(--font-mono), monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--pos);
+    margin-top: 2px;
+  }
+  .tl-amount.origin { color: var(--warn); }
+
+  /* ═══ NEW: Progress dots (onboarding) ═══ */
+  .progress-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .pdot {
+    width: 24px; height: 3px;
+    background: rgba(255,255,255,0.10);
+    border-radius: 2px;
+    transition: background .2s;
+  }
+  .pdot.done   { background: rgba(232,220,192,0.3); }
+  .pdot.active { background: var(--accent); }
+
+  /* ═══ NEW: Receipt thumbnail ═══ */
+  .receipt-thumb {
+    width: 48px; height: 60px;
+    background: linear-gradient(180deg, #16161A, #101013);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .receipt-thumb::before {
+    content: '';
+    position: absolute;
+    inset: 8px 8px auto 8px;
+    height: 1px;
+    background: rgba(255,255,255,0.10);
+    box-shadow: 0 6px 0 rgba(255,255,255,0.08), 0 12px 0 rgba(255,255,255,0.06);
+  }
+  .receipt-thumb::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 6px;
+    background: radial-gradient(circle at 3px 6px, transparent 3px, var(--bg) 3.5px) repeat-x;
+    background-size: 6px 6px;
+  }
+
+  /* ═══ NEW: Notification preview ═══ */
+  .notif-card {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px);
+    border-radius: 14px;
+    width: 100%;
+  }
+  .notif-icon {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    color: #0A0A0B;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: -0.04em;
+    flex-shrink: 0;
+  }
+  .notif-body { flex: 1; min-width: 0; }
+  .notif-app {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-mute);
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .notif-text {
+    font-family: var(--font-serif), serif;
+    font-size: 13.5px;
+    color: var(--text);
+    line-height: 1.35;
+  }
+  .notif-time {
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--text-soft);
+  }
+
+  /* ═══ NEW: Section head with link ═══ */
+  .section-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-title-sample {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+  }
+  .section-link {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* ═══ NEW: Donut & trend chart wrappers ═══ */
+  .donut-demo {
+    position: relative;
+    width: 180px; height: 180px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .donut-demo svg { transform: rotate(-90deg); }
+  .donut-demo .donut-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .donut-demo .lbl {
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-mute);
+    font-weight: 500;
+  }
+  .donut-demo .val {
+    font-family: var(--font-mono), monospace;
+    font-size: 22px;
+    margin-top: 4px;
+  }
+  .donut-demo .val .cur {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--text-mute);
+    margin-right: 2px;
+  }
+
+  .trend-demo {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 12px 10px;
+    width: 100%;
+  }
+  .trend-demo svg { width: 100%; height: 80px; display: block; }
+  .trend-axis {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    font-weight: 500;
+  }
 </style>
 </head>
 <body>
@@ -464,6 +1239,7 @@
   </a>
   <div class="ds-nav-links">
     <a href="index.html" class="ds-nav-link">Overview</a>
+    <a href="brand.html" class="ds-nav-link">Brand</a>
     <a href="foundations.html" class="ds-nav-link">Foundations</a>
     <a href="components.html" class="ds-nav-link active">Components</a>
     <a href="icons.html" class="ds-nav-link">Icons</a>
@@ -618,10 +1394,33 @@
     </div>
   </section>
 
-  <!-- ═══ INPUTS ═══ -->
+  <!-- ═══ TOGGLE ═══ -->
   <section class="ds-section">
     <div class="ds-section-header">
       <div class="ds-section-eyebrow">02.4</div>
+      <h2 class="ds-section-title">Toggle switch</h2>
+      <p class="ds-section-desc">
+        iOS-style pill toggle. Off uses muted surface; on tints cream and slides
+        the knob right.
+      </p>
+    </div>
+
+    <div class="demo-block center" style="gap: 32px;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <button class="toggle" aria-label="Toggle off"></button>
+        <span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-soft);">Off</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <button class="toggle on" aria-label="Toggle on"></button>
+        <span style="font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-soft);">On</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ INPUTS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.5</div>
       <h2 class="ds-section-title">Inputs &amp; controls</h2>
       <p class="ds-section-desc">
         Text inputs use an underline pattern with a blinking cream cursor.
@@ -653,7 +1452,7 @@
       </div>
 
       <div class="demo-block tile" style="grid-column: span 2;">
-        <div class="demo-label">Segmented control</div>
+        <div class="demo-label">Segmented control (pill)</div>
         <div class="segmented" style="max-width: 360px;">
           <button class="seg-item">Weekly</button>
           <button class="seg-item active">Monthly</button>
@@ -661,13 +1460,172 @@
         </div>
       </div>
 
+      <div class="demo-block tile" style="grid-column: span 2;">
+        <div class="demo-label">Underlined tabs · scope (Expense / Income / Transfer)</div>
+        <div class="scope-tabs" style="width: 100%;">
+          <button class="scope-tab active">Expense</button>
+          <button class="scope-tab">Income</button>
+          <button class="scope-tab">Transfer</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ CALCULATOR ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.6</div>
+      <h2 class="ds-section-title">Calculator pad</h2>
+      <p class="ds-section-desc">
+        4-column grid. <code style="font-family: var(--font-mono); font-size: 13px; color: var(--text-mute);">.key.fn</code>
+        for clear &amp; backspace, <code style="font-family: var(--font-mono); font-size: 13px; color: var(--text-mute);">.key.op</code>
+        for operators (tinted by transaction type), and <code style="font-family: var(--font-mono); font-size: 13px; color: var(--text-mute);">.key.equals</code>
+        as the filled primary.
+      </p>
+    </div>
+
+    <div class="demo-block center">
+      <div class="calcpad">
+        <button class="key fn">C</button>
+        <button class="key fn icon" aria-label="Backspace">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4H8L2 10l6 6h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM12 9l5 5M17 9l-5 5"/></svg>
+        </button>
+        <button class="key op">%</button>
+        <button class="key op">÷</button>
+        <button class="key">7</button>
+        <button class="key">8</button>
+        <button class="key">9</button>
+        <button class="key op">×</button>
+        <button class="key">4</button>
+        <button class="key">5</button>
+        <button class="key">6</button>
+        <button class="key op">−</button>
+        <button class="key">1</button>
+        <button class="key">2</button>
+        <button class="key">3</button>
+        <button class="key op">+</button>
+        <button class="key zero">0</button>
+        <button class="key dec">.</button>
+        <button class="key equals">=</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ HERO AMOUNT ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.7</div>
+      <h2 class="ds-section-title">Hero amount display</h2>
+      <p class="ds-section-desc">
+        The large editable amount used on add-transaction, add-debt and record-payment.
+        Optional expression line above shows the live calculator state with a blinking
+        cream cursor. "Rs" sits in italic serif, the number in big mono.
+      </p>
+    </div>
+
+    <div class="demo-block center" style="background: var(--surface);">
+      <div class="amount-display">
+        <div class="expr-line">
+          <span>1,800</span>
+          <span class="expr-op">÷</span>
+          <span>3</span>
+          <span class="expr-cursor"></span>
+        </div>
+        <div class="result-line">
+          <span class="amount-currency">Rs</span>
+          <span class="amount-value">600</span>
+          <span class="amount-decimal">.00</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PAGE HEADER ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.8</div>
+      <h2 class="ds-section-title">Page header</h2>
+      <p class="ds-section-desc">
+        Used on every detail/add screen. 38px circular back button (left), italic
+        serif title (centered), and a ghost mono action (right) that adopts the
+        appropriate semantic tint.
+      </p>
+    </div>
+
+    <div class="demo-block" style="padding: 0; max-width: 400px; margin: 0 auto;">
+      <div class="page-header">
+        <button class="page-header-back" aria-label="Back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <h1 class="page-header-title">New transaction</h1>
+        <button class="page-header-action">Save</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ DATE PICKER ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.9</div>
+      <h2 class="ds-section-title">Calendar &amp; month nav</h2>
+      <p class="ds-section-desc">
+        The full calendar grid sits inside date pickers. Today gets a cream dot, the
+        selected day fills cream. The month strip is the report screen's prev/next
+        month nav.
+      </p>
+    </div>
+
+    <div class="demo-grid-2">
+      <div class="demo-block tile">
+        <div class="demo-label">Calendar grid</div>
+        <div class="calendar-mini">
+          <div class="cal-nav">
+            <button class="cal-arrow" aria-label="Previous">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div><span class="cal-month">May</span><span class="cal-month-year">2026</span></div>
+            <button class="cal-arrow" aria-label="Next">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+          <div class="cal-weekdays">
+            <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-day empty"></div><div class="cal-day empty"></div><div class="cal-day empty"></div><div class="cal-day empty"></div><div class="cal-day empty"></div>
+            <div class="cal-day">1</div><div class="cal-day">2</div>
+            <div class="cal-day">3</div><div class="cal-day">4</div><div class="cal-day">5</div><div class="cal-day">6</div><div class="cal-day">7</div><div class="cal-day">8</div><div class="cal-day">9</div>
+            <div class="cal-day">10</div><div class="cal-day">11</div><div class="cal-day">12</div><div class="cal-day">13</div><div class="cal-day">14</div><div class="cal-day">15</div><div class="cal-day">16</div>
+            <div class="cal-day">17</div><div class="cal-day">18</div><div class="cal-day">19</div><div class="cal-day">20</div><div class="cal-day">21</div><div class="cal-day">22</div><div class="cal-day">23</div>
+            <div class="cal-day">24</div><div class="cal-day selected">25</div><div class="cal-day today">26</div><div class="cal-day">27</div><div class="cal-day">28</div><div class="cal-day">29</div><div class="cal-day">30</div>
+            <div class="cal-day">31</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Month strip (reports nav)</div>
+        <div class="month-strip" style="width: 100%; max-width: 320px;">
+          <button class="month-nav" aria-label="Previous">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="month-label">
+            <div class="month-name">December</div>
+            <div class="month-year">2026</div>
+          </div>
+          <button class="month-nav" aria-label="Next">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- ═══ CARDS ═══ -->
   <section class="ds-section">
     <div class="ds-section-header">
-      <div class="ds-section-eyebrow">02.5</div>
+      <div class="ds-section-eyebrow">02.10</div>
       <h2 class="ds-section-title">Cards</h2>
       <p class="ds-section-desc">
         Three card patterns: the account card (with optional budget progress),
@@ -759,7 +1717,7 @@
   <!-- ═══ LIST ROWS ═══ -->
   <section class="ds-section">
     <div class="ds-section-header">
-      <div class="ds-section-eyebrow">02.6</div>
+      <div class="ds-section-eyebrow">02.11</div>
       <h2 class="ds-section-title">List rows</h2>
       <p class="ds-section-desc">
         Transaction rows and picker rows. Selected picker rows get a soft
@@ -855,10 +1813,257 @@
     </div>
   </section>
 
+  <!-- ═══ SETTINGS ROWS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.12</div>
+      <h2 class="ds-section-title">Settings list</h2>
+      <p class="ds-section-desc">
+        Grouped rows used across Settings and account-detail. Each row pairs a serif
+        name + mono subtitle on the left with a value, pill, or toggle on the right.
+        Danger row uses a dashed red border and is reserved for destructive actions.
+      </p>
+    </div>
+
+    <div class="demo-block tile">
+      <div class="settings-card" style="max-width: 460px;">
+        <div class="settings-row">
+          <div class="row-body">
+            <div class="row-name">Currency</div>
+            <div class="row-sub">Default display symbol</div>
+          </div>
+          <div class="row-right">
+            <span class="row-value">Rs <span class="row-value-mute">· PKR</span></span>
+            <span class="row-chev">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="row-body">
+            <div class="row-name">Daily reminder</div>
+            <div class="row-sub">9:00 PM · every evening</div>
+          </div>
+          <div class="row-right">
+            <button class="toggle on" aria-label="Toggle"></button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="row-body">
+            <div class="row-name">Archived accounts</div>
+            <div class="row-sub">Hidden, history preserved</div>
+          </div>
+          <div class="row-right">
+            <span class="row-pill warn">2</span>
+            <span class="row-chev">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="row-body">
+            <div class="row-name">Categories</div>
+            <div class="row-sub">Income &amp; expense tags</div>
+          </div>
+          <div class="row-right">
+            <span class="row-pill">14 active</span>
+            <span class="row-chev">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="danger-row" style="max-width: 460px;">
+        <div class="danger-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="danger-body">
+          <div class="danger-name">Reset all data</div>
+          <div class="danger-sub">Permanent · cannot be undone</div>
+        </div>
+        <div class="danger-chev">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ QUICK ACTIONS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.13</div>
+      <h2 class="ds-section-title">Quick actions</h2>
+      <p class="ds-section-desc">
+        Three-tile grid for account-detail. Each button pairs a tinted icon
+        (income · pos, expense · neg, move · transfer) with a mono label and an
+        italic serif descriptor.
+      </p>
+    </div>
+
+    <div class="demo-block center">
+      <div class="quick-actions" style="max-width: 360px;">
+        <button class="qa-btn income">
+          <div class="qa-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          </div>
+          <div class="qa-label">Income</div>
+          <div class="qa-sub">received</div>
+        </button>
+        <button class="qa-btn expense">
+          <div class="qa-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+          </div>
+          <div class="qa-label">Expense</div>
+          <div class="qa-sub">spent</div>
+        </button>
+        <button class="qa-btn move">
+          <div class="qa-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h14M14 5l3 3-3 3M21 16H7M10 13l-3 3 3 3"/></svg>
+          </div>
+          <div class="qa-label">Move</div>
+          <div class="qa-sub">transfer</div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ INSIGHTS ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.14</div>
+      <h2 class="ds-section-title">Insight cards</h2>
+      <p class="ds-section-desc">
+        Used on the Insights sheet. Five semantic variants — <em>warn</em>,
+        <em>pos</em>, <em>neg</em>, <em>info</em>, <em>ai</em> — each tinting the
+        glyph tile, the eyebrow, and any italic <code style="font-family: var(--font-mono); font-size: 13px; color: var(--text-mute);">&lt;em&gt;</code>
+        within the title.
+      </p>
+    </div>
+
+    <div class="demo-block tile" style="max-width: 520px;">
+      <div class="ins warn">
+        <div class="ins-glyph">!</div>
+        <div class="ins-body">
+          <div class="ins-eyebrow">Spending alert</div>
+          <div class="ins-title">You've spent <em>40% more on Food</em> than usual this month.</div>
+          <div class="ins-meta">Dec 1 – 27 · 22 transactions</div>
+        </div>
+      </div>
+      <div class="ins pos">
+        <div class="ins-glyph">✓</div>
+        <div class="ins-body">
+          <div class="ins-eyebrow">On track</div>
+          <div class="ins-title">Transport is <em>under budget by Rs 1,200</em> — your slowest month all year.</div>
+          <div class="ins-meta">vs Rs 3,400 average</div>
+        </div>
+      </div>
+      <div class="ins ai">
+        <div class="ins-glyph">✨</div>
+        <div class="ins-body">
+          <div class="ins-eyebrow">Pattern detected</div>
+          <div class="ins-title">Most of your <em>Sunday spend</em> goes to subscriptions and dining out.</div>
+          <div class="ins-meta">12 weeks observed</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ HINT / NOTIF / TIMELINE / AVATAR ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.15</div>
+      <h2 class="ds-section-title">Hints, banners &amp; people</h2>
+      <p class="ds-section-desc">
+        Helper banners (onboarding, tooltips), lockscreen-style notification preview,
+        the avatar set used for debts &amp; receivables, and the vertical timeline
+        for payment history.
+      </p>
+    </div>
+
+    <div class="demo-grid-2">
+
+      <div class="demo-block tile">
+        <div class="demo-label">Hint banner — accent</div>
+        <div class="hint" style="width: 100%;">
+          <div class="hint-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="hint-text">
+            <strong>Tip:</strong> Real accounts hold money. Budgets are how you'd
+            like to spend it.
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Hint banner — warn</div>
+        <div class="hint warn" style="width: 100%;">
+          <div class="hint-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="hint-text">
+            <strong>Heads up:</strong> Two budgets are over for the month.
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-block tile" style="grid-column: span 2;">
+        <div class="demo-label">Notification preview (lockscreen)</div>
+        <div class="notif-card">
+          <div class="notif-icon">f·</div>
+          <div class="notif-body">
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <span class="notif-app">FlowFin</span>
+              <span class="notif-time">9:00 pm</span>
+            </div>
+            <div class="notif-text">Don't forget — log today's spending before bed.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Person avatars (5 tints)</div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <div class="person-avatar av-1">A</div>
+          <div class="person-avatar av-2">H</div>
+          <div class="person-avatar av-3">S</div>
+          <div class="person-avatar av-4">M</div>
+          <div class="person-avatar av-5">I</div>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Timeline (payment history)</div>
+        <div class="timeline" style="width: 100%;">
+          <div class="tl-item payment">
+            <div class="tl-dot"></div>
+            <div class="tl-date">Today · 27 Dec</div>
+            <div class="tl-name">Payment received</div>
+            <div class="tl-amount">+ Rs 5,000</div>
+          </div>
+          <div class="tl-item payment">
+            <div class="tl-dot"></div>
+            <div class="tl-date">14 Dec · Sat</div>
+            <div class="tl-name">Partial payment</div>
+            <div class="tl-amount">+ Rs 3,000</div>
+          </div>
+          <div class="tl-item origin">
+            <div class="tl-dot"></div>
+            <div class="tl-date">1 Dec · Sun</div>
+            <div class="tl-name">Lent to Aisha</div>
+            <div class="tl-amount origin">Rs 15,000</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- ═══ PROGRESS ═══ -->
   <section class="ds-section">
     <div class="ds-section-header">
-      <div class="ds-section-eyebrow">02.7</div>
+      <div class="ds-section-eyebrow">02.16</div>
       <h2 class="ds-section-title">Progress bars</h2>
       <p class="ds-section-desc">
         5px slim bars filled with the relevant category color. Used in budget
@@ -887,7 +2092,7 @@
   <!-- ═══ NAVIGATION ═══ -->
   <section class="ds-section">
     <div class="ds-section-header">
-      <div class="ds-section-eyebrow">02.8</div>
+      <div class="ds-section-eyebrow">02.17</div>
       <h2 class="ds-section-title">Navigation</h2>
       <p class="ds-section-desc">
         Five-tab bottom bar. Active tab gets full-contrast text; others stay
@@ -921,10 +2126,122 @@
     </div>
   </section>
 
+  <!-- ═══ PROGRESS DOTS (ONBOARDING) ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.18</div>
+      <h2 class="ds-section-title">Progress dots</h2>
+      <p class="ds-section-desc">
+        Onboarding step indicator. Past steps fade to a soft cream
+        (<code style="font-family: var(--font-mono); font-size: 13px; color: var(--text-mute);">.done</code>),
+        the current step is solid (<code style="font-family: var(--font-mono); font-size: 13px; color: var(--text-mute);">.active</code>),
+        future steps stay muted.
+      </p>
+    </div>
+
+    <div class="demo-block center">
+      <div class="progress-dots">
+        <span class="pdot done"></span>
+        <span class="pdot done"></span>
+        <span class="pdot active"></span>
+        <span class="pdot"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ DATA VIZ ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.19</div>
+      <h2 class="ds-section-title">Charts</h2>
+      <p class="ds-section-desc">
+        Two chart patterns power the reports screens. A daily-spend bar chart with
+        a today-marker, and a category donut with a central total. Both are inline
+        SVG — no chart library.
+      </p>
+    </div>
+
+    <div class="demo-grid-2">
+
+      <div class="demo-block tile">
+        <div class="demo-label">Donut · spending breakdown</div>
+        <div class="donut-demo">
+          <svg width="180" height="180" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="14"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#E8A87B" stroke-width="14" stroke-dasharray="82.93 251.33" stroke-dashoffset="0"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#D89A82" stroke-width="14" stroke-dasharray="67.86 251.33" stroke-dashoffset="-82.93"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#8AB4E0" stroke-width="14" stroke-dasharray="27.65 251.33" stroke-dashoffset="-150.79"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#E8CC7B" stroke-width="14" stroke-dasharray="25.13 251.33" stroke-dashoffset="-178.44"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#9A8AE0" stroke-width="14" stroke-dasharray="17.59 251.33" stroke-dashoffset="-203.57"/>
+          </svg>
+          <div class="donut-center">
+            <div class="lbl">Total spent</div>
+            <div class="val"><span class="cur">Rs</span>45,000</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Trend · daily spend bars</div>
+        <div class="trend-demo">
+          <svg viewBox="0 0 326 86" preserveAspectRatio="none">
+            <line x1="0" y1="80" x2="326" y2="80" stroke="rgba(255,255,255,0.06)" stroke-width="0.6"/>
+            <rect x="2"   y="68" width="7" height="12" rx="1.3" fill="rgba(232,168,123,0.55)"/>
+            <rect x="12"  y="60" width="7" height="20" rx="1.3" fill="rgba(232,168,123,0.55)"/>
+            <rect x="22"  y="64" width="7" height="16" rx="1.3" fill="rgba(232,168,123,0.55)"/>
+            <rect x="32"  y="56" width="7" height="24" rx="1.3" fill="rgba(232,168,123,0.55)"/>
+            <rect x="42"  y="50" width="7" height="30" rx="1.3" fill="rgba(232,168,123,0.55)"/>
+            <rect x="52"  y="40" width="7" height="40" rx="1.3" fill="rgba(232,168,123,0.65)"/>
+            <rect x="62"  y="14" width="7" height="66" rx="1.3" fill="var(--warn)"/>
+            <circle cx="65.5" cy="11" r="1.6" fill="var(--warn)"/>
+            <rect x="72"  y="58" width="7" height="22" rx="1.3" fill="rgba(232,168,123,0.55)"/>
+            <rect x="82"  y="62" width="7" height="18" rx="1.3" fill="rgba(232,168,123,0.55)"/>
+            <rect x="92"  y="56" width="7" height="24" rx="1.3" fill="rgba(232,168,123,0.55)"/>
+            <rect x="102" y="38" width="7" height="42" rx="1.3" fill="rgba(232,168,123,0.65)"/>
+            <rect x="112" y="60" width="7" height="20" rx="1.3" fill="rgba(232,168,123,0.55)"/>
+            <rect x="122" y="54" width="7" height="26" rx="1.3" fill="rgba(232,168,123,0.55)"/>
+            <rect x="132" y="46" width="7" height="34" rx="1.3" fill="rgba(232,168,123,0.55)"/>
+            <rect x="142" y="0"  width="7" height="80" rx="1.3" fill="#D89A82"/>
+            <rect x="152" y="58" width="7" height="22" rx="1.3" fill="rgba(232,168,123,0.55)"/>
+            <rect x="162" y="60" width="7" height="20" rx="1.3" fill="var(--accent)"/>
+            <line x1="165.5" y1="80" x2="165.5" y2="86" stroke="var(--accent)" stroke-width="1"/>
+            <rect x="172" y="74" width="7" height="6" rx="1.3" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" stroke-dasharray="1 1.5"/>
+            <rect x="182" y="74" width="7" height="6" rx="1.3" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" stroke-dasharray="1 1.5"/>
+            <rect x="192" y="74" width="7" height="6" rx="1.3" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" stroke-dasharray="1 1.5"/>
+          </svg>
+          <div class="trend-axis">
+            <span>Dec 1</span>
+            <span style="color: var(--accent);">Today · 27</span>
+            <span>31</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ RECEIPT THUMB ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.20</div>
+      <h2 class="ds-section-title">Receipt thumbnail</h2>
+      <p class="ds-section-desc">
+        Decorative receipt tile used in the add-transaction attachment strip.
+        Pure CSS — gradient paper, faint line rules, torn bottom edge.
+      </p>
+    </div>
+
+    <div class="demo-block center">
+      <div class="receipt-thumb"></div>
+      <div class="receipt-thumb"></div>
+      <div class="receipt-thumb"></div>
+    </div>
+  </section>
+
   <!-- ═══ SHEETS ═══ -->
   <section class="ds-section">
     <div class="ds-section-header">
-      <div class="ds-section-eyebrow">02.9</div>
+      <div class="ds-section-eyebrow">02.21</div>
       <h2 class="ds-section-title">Bottom sheets</h2>
       <p class="ds-section-desc">
         Used for pickers and confirmations. Anatomy: drag handle (top), header

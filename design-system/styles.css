@@ -45,6 +45,16 @@
   --cat-debt:      #E08A8A;
   --cat-other:     #B4B4BC;
 
+  /* avatars (debts) */
+  --av-1: #82C5D4;
+  --av-2: #C98ED4;
+  --av-3: #E8A87B;
+  --av-4: #9CD4A2;
+  --av-5: #E89AB8;
+
+  /* page canvas (used as outer phone-frame background) */
+  --page-bg: #1C1C20;
+
   --font-serif: 'Literata';
   --font-mono: 'Geist Mono';
 }
