@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Onboarding · Real Accounts / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --transfer: #82C5D4;
+
+  --cat-bank: #82C5D4;
+  --cat-cash: #C5D982;
+  --cat-mobile: #C98ED4;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 20px; min-height: 100vh; overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+/* ===== Phone ===== */
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg); border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E, 0 0 0 12px #0A0A0C, 0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28), 0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Top bar: back + progress dots + skip ===== */
+.top-bar {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  padding: 10px 16px 8px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.icon-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: var(--text); cursor: pointer;
+  border-radius: 10px;
+  transition: background .15s;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.04); }
+
+.progress-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+.pdot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border-strong);
+  transition: all .2s;
+}
+.pdot.active {
+  background: var(--accent);
+  width: 22px;
+  border-radius: 3px;
+}
+.pdot.done { background: var(--text-soft); }
+
+.skip {
+  background: transparent; border: none;
+  color: var(--text-soft);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 6px;
+  transition: color .15s;
+}
+.skip:hover { color: var(--text); }
+
+/* ===== Body ===== */
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 28px 28px;
+}
+
+.eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--cat-bank);
+  font-weight: 500;
+  margin-bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.eyebrow .num {
+  background: rgba(130,197,212,0.12);
+  color: var(--cat-bank);
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.06em;
+}
+
+.headline {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 28px;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--text);
+}
+.headline .accent { color: var(--accent); }
+
+.sub {
+  margin-top: 12px;
+  font-family: var(--font-serif), serif;
+  font-size: 14.5px;
+  letter-spacing: -0.005em;
+  color: var(--text-mute);
+  line-height: 1.45;
+}
+
+/* ===== Account list ===== */
+.acct-list {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+}
+.acct-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: opacity .15s, padding .15s;
+}
+.acct-row:hover { padding-left: 4px; }
+.acct-row.off { opacity: 0.5; }
+
+.acct-icon {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--icon-border, var(--border-strong));
+  background: var(--icon-bg, transparent);
+  color: var(--icon-color, var(--text-mute));
+  flex-shrink: 0;
+}
+.acct-icon.bank   { --icon-color: var(--cat-bank);   --icon-border: rgba(130,197,212,0.32); --icon-bg: rgba(130,197,212,0.08); }
+.acct-icon.cash   { --icon-color: var(--cat-cash);   --icon-border: rgba(197,217,130,0.32); --icon-bg: rgba(197,217,130,0.08); }
+.acct-icon.mobile { --icon-color: var(--cat-mobile); --icon-border: rgba(201,142,212,0.32); --icon-bg: rgba(201,142,212,0.08); }
+
+.acct-body { flex: 1; min-width: 0; }
+.acct-name {
+  font-family: var(--font-serif), serif;
+  font-size: 16px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.acct-examples {
+  margin-top: 3px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--text-soft);
+  letter-spacing: -0.005em;
+}
+
+/* checkbox-style toggle (circle with check) */
+.acct-check {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color .15s, background .15s;
+  color: transparent;
+}
+.acct-check.on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #0A0A0B;
+}
+
+/* ===== Helper note ===== */
+.hint {
+  margin-top: auto;
+  padding: 12px 14px;
+  background: transparent;
+  border: 1px dashed var(--border-strong);
+  border-radius: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.hint-icon { color: var(--accent); margin-top: 1px; flex-shrink: 0; }
+.hint-text {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--text-mute);
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+}
+.hint-text strong {
+  font-family: var(--font-mono), monospace;
+  font-style: normal;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ===== CTA ===== */
+.cta-area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cta-primary {
+  padding: 16px;
+  background: var(--accent);
+  color: #0A0A0B;
+  border: none;
+  border-radius: 14px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: filter .15s, transform .15s;
+}
+.cta-primary:hover { filter: brightness(0.96); }
+.cta-primary:active { transform: translateY(1px); }
+
+/* Home indicator */
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 6;
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 15b<br>
+  <em>Onboarding — Step 1 · Real accounts</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <button class="icon-btn" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <div class="progress-dots">
+      <span class="pdot active"></span>
+      <span class="pdot"></span>
+      <span class="pdot"></span>
+    </div>
+    <button class="skip">Skip</button>
+  </div>
+
+  <div class="body">
+
+    <div class="eyebrow">
+      <span class="num">Step 1 of 3</span>
+      <span>Real accounts</span>
+    </div>
+
+    <h1 class="headline">
+      Where does your money <span class="accent">actually live</span>?
+    </h1>
+    <p class="sub">
+      These are the places money physically sits — your bank, the cash in your wallet, a mobile wallet. Pick the ones you use.
+    </p>
+
+    <!-- Account list -->
+    <div class="acct-list">
+
+      <div class="acct-row">
+        <div class="acct-icon bank">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+          </svg>
+        </div>
+        <div class="acct-body">
+          <div class="acct-name">Bank</div>
+          <div class="acct-examples">current, savings, payroll account</div>
+        </div>
+        <div class="acct-check on">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12l5 5L20 7"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="acct-row">
+        <div class="acct-icon cash">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/>
+            <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/>
+            <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+          </svg>
+        </div>
+        <div class="acct-body">
+          <div class="acct-name">Cash / Wallet</div>
+          <div class="acct-examples">physical money you carry</div>
+        </div>
+        <div class="acct-check on">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12l5 5L20 7"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="acct-row off">
+        <div class="acct-icon mobile">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="6" y="2" width="12" height="20" rx="2"/>
+            <line x1="11" y1="18" x2="13" y2="18"/>
+          </svg>
+        </div>
+        <div class="acct-body">
+          <div class="acct-name">Mobile wallet</div>
+          <div class="acct-examples">JazzCash, EasyPaisa, Sadapay</div>
+        </div>
+        <div class="acct-check">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12l5 5L20 7"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Helper hint -->
+    <div class="hint">
+      <div class="hint-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <div class="hint-text">
+        <strong>Just pick what applies.</strong> Balances and extra accounts can be added anytime from Settings — no need to figure it all out now.
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-area">
+      <button class="cta-primary">
+        Continue
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>

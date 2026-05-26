@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en" data-scope="expense">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Categories / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  /* expense category palette */
+  --cat-food:      #E8A87B;
+  --cat-grocery:   #A8D479;
+  --cat-transport: #8AB4E0;
+  --cat-utilities: #E8CC7B;
+  --cat-rent:      #D89A82;
+  --cat-shop:      #E89AB8;
+  --cat-fun:       #C98ED4;
+  --cat-health:    #DC8A8A;
+  --cat-edu:       #8AC9D4;
+  --cat-care:      #C9A8D4;
+  --cat-subs:      #9A8AE0;
+  --cat-debt:      #E08A8A;
+  --cat-other:     #B4B4BC;
+
+  /* income palette */
+  --inc-salary:    #9CD4A2;
+  --inc-freelance: #82C5D4;
+  --inc-business:  #C5D982;
+  --inc-gift:      #C98ED4;
+  --inc-refund:    #E8CC7B;
+  --inc-other:     #B4B4BC;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 20px; min-height: 100vh; overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+/* ===== Phone ===== */
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg); border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E, 0 0 0 12px #0A0A0C, 0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28), 0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Header ===== */
+.page-header {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  padding: 12px 20px 8px;
+  flex-shrink: 0;
+}
+.icon-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: var(--text); cursor: pointer;
+  border-radius: 10px;
+  transition: background .15s;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.04); }
+.icon-btn.muted { color: var(--text-mute); }
+.icon-btn.muted:hover { color: var(--text); }
+.page-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+/* ===== Scope tabs ===== */
+.scope-tabs {
+  display: flex;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 14px 0 15px;
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  color: var(--text-soft);
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  position: relative;
+  transition: color .2s;
+}
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 2px;
+  background: var(--accent);
+  transition: width .2s ease;
+  border-radius: 2px;
+}
+[data-scope="expense"] .tab-btn[data-tab="expense"],
+[data-scope="income"]  .tab-btn[data-tab="income"] {
+  color: var(--text);
+  font-style: italic;
+}
+[data-scope="expense"] .tab-btn[data-tab="expense"]::after,
+[data-scope="income"]  .tab-btn[data-tab="income"]::after {
+  width: 50%;
+}
+
+/* show/hide based on scope */
+[data-scope="expense"] .is-income,
+[data-scope="income"]  .is-expense { display: none; }
+
+/* ===== Scroll ===== */
+.scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 14px 20px 40px;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ===== Summary caption ===== */
+.summary-line {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.summary-line .sep {
+  display: inline-block;
+  margin: 0 6px;
+  color: var(--text-faint);
+}
+.summary-line .v { color: var(--text); }
+
+/* ===== Section label ===== */
+.section-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+  margin: 22px 2px 4px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label:first-of-type { margin-top: 0; }
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.section-label .count {
+  color: var(--text-mute);
+  letter-spacing: 0.04em;
+}
+
+/* ===== Category row ===== */
+.cat-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 4px;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: padding .15s;
+}
+.cat-row:last-of-type { border-bottom: none; }
+.cat-row:hover { padding-left: 8px; }
+
+.cat-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--icon-border, var(--border-strong));
+  background: var(--icon-bg, transparent);
+  color: var(--icon-color, var(--text-mute));
+  flex-shrink: 0;
+}
+
+/* expense palette */
+.cat-icon.food      { --icon-color: var(--cat-food);      --icon-border: rgba(232,168,123,0.32); --icon-bg: rgba(232,168,123,0.08); }
+.cat-icon.grocery   { --icon-color: var(--cat-grocery);   --icon-border: rgba(168,212,121,0.32); --icon-bg: rgba(168,212,121,0.08); }
+.cat-icon.transport { --icon-color: var(--cat-transport); --icon-border: rgba(138,180,224,0.32); --icon-bg: rgba(138,180,224,0.08); }
+.cat-icon.utilities { --icon-color: var(--cat-utilities); --icon-border: rgba(232,204,123,0.32); --icon-bg: rgba(232,204,123,0.08); }
+.cat-icon.rent      { --icon-color: var(--cat-rent);      --icon-border: rgba(216,154,130,0.32); --icon-bg: rgba(216,154,130,0.08); }
+.cat-icon.shop      { --icon-color: var(--cat-shop);      --icon-border: rgba(232,154,184,0.32); --icon-bg: rgba(232,154,184,0.08); }
+.cat-icon.fun       { --icon-color: var(--cat-fun);       --icon-border: rgba(201,142,212,0.32); --icon-bg: rgba(201,142,212,0.08); }
+.cat-icon.health    { --icon-color: var(--cat-health);    --icon-border: rgba(220,138,138,0.32); --icon-bg: rgba(220,138,138,0.08); }
+.cat-icon.edu       { --icon-color: var(--cat-edu);       --icon-border: rgba(138,201,212,0.32); --icon-bg: rgba(138,201,212,0.08); }
+.cat-icon.care      { --icon-color: var(--cat-care);      --icon-border: rgba(201,168,212,0.32); --icon-bg: rgba(201,168,212,0.08); }
+.cat-icon.subs      { --icon-color: var(--cat-subs);      --icon-border: rgba(154,138,224,0.32); --icon-bg: rgba(154,138,224,0.08); }
+.cat-icon.debt      { --icon-color: var(--cat-debt);      --icon-border: rgba(224,138,138,0.32); --icon-bg: rgba(224,138,138,0.08); }
+.cat-icon.other     { --icon-color: var(--cat-other);     --icon-border: rgba(180,180,188,0.32); --icon-bg: rgba(180,180,188,0.08); }
+
+/* income palette */
+.cat-icon.salary    { --icon-color: var(--inc-salary);    --icon-border: rgba(156,212,162,0.32); --icon-bg: rgba(156,212,162,0.08); }
+.cat-icon.freelance { --icon-color: var(--inc-freelance); --icon-border: rgba(130,197,212,0.32); --icon-bg: rgba(130,197,212,0.08); }
+.cat-icon.business  { --icon-color: var(--inc-business);  --icon-border: rgba(197,217,130,0.32); --icon-bg: rgba(197,217,130,0.08); }
+.cat-icon.gift      { --icon-color: var(--inc-gift);      --icon-border: rgba(201,142,212,0.32); --icon-bg: rgba(201,142,212,0.08); }
+.cat-icon.refund    { --icon-color: var(--inc-refund);    --icon-border: rgba(232,204,123,0.32); --icon-bg: rgba(232,204,123,0.08); }
+
+/* custom dashed border */
+.cat-icon.custom { border-style: dashed; }
+
+.cat-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.cat-name {
+  font-family: var(--font-serif), serif;
+  font-size: 16px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.cat-meta {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-soft);
+}
+.cat-meta .lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-right: 6px;
+}
+
+.cat-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.cat-pill {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+}
+.cat-pill.empty { color: var(--text-soft); }
+.cat-chev {
+  color: var(--text-soft);
+  display: flex;
+  align-items: center;
+}
+.cat-menu {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-soft);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color .15s, background .15s;
+}
+.cat-menu:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+
+/* ===== Add custom CTA ===== */
+.add-cta {
+  margin-top: 16px;
+  padding: 16px;
+  background: transparent;
+  border: 1px dashed var(--border-strong);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-mute);
+  cursor: pointer;
+  width: 100%;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: -0.005em;
+  transition: color .15s, border-color .15s;
+}
+.add-cta:hover { color: var(--accent); border-color: rgba(232,220,192,0.4); }
+.add-cta svg { color: inherit; }
+
+/* ===== Archived link ===== */
+.archived-link {
+  margin-top: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.archived-link:hover { border-color: var(--border-strong); }
+.archived-left {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--text-mute);
+}
+.archived-count {
+  font-family: var(--font-mono), monospace;
+  font-style: normal;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  background: rgba(255,255,255,0.05);
+  padding: 2px 7px;
+  border-radius: 6px;
+  color: var(--text);
+  font-weight: 500;
+}
+.archived-link .cat-chev { color: var(--text-soft); }
+
+/* Home indicator */
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 6;
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 14<br>
+  <em>Categories Manager</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <button class="icon-btn" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <h1 class="page-title">Categories</h1>
+    <button class="icon-btn" aria-label="Add custom">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Scope tabs -->
+  <div class="scope-tabs">
+    <button class="tab-btn" data-tab="expense">Expense</button>
+    <button class="tab-btn" data-tab="income">Income</button>
+  </div>
+
+  <div class="scroll">
+
+    <!-- ============== EXPENSE ============== -->
+    <div class="is-expense">
+
+      <div class="summary-line">
+        <span class="v">13</span> default
+        <span class="sep">·</span>
+        <span class="v">2</span> custom
+        <span class="sep">·</span>
+        <span class="v">47</span> txns this month
+      </div>
+
+      <div class="section-label">Default <span class="count">· 13</span></div>
+
+      <div class="cat-row">
+        <div class="cat-icon food">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Food &amp; Dining</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">14</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon grocery">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3h2l2.4 12.5a2 2 0 0 0 2 1.5h9.2a2 2 0 0 0 2-1.6L23 6H6"/>
+            <circle cx="9" cy="20" r="1.5"/>
+            <circle cx="18" cy="20" r="1.5"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Groceries</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">5</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon transport">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 17h14M6 17V9l2-4h8l2 4v8M8 13h8M7 17v2M17 17v2"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Transport</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">22</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon utilities">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Utilities</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">3</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon rent">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12L12 3l9 9M5 10v10h14V10"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Rent</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">1</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon shop">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <path d="M3 6h18M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Shopping</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">2</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon fun">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="9 7 16 12 9 17 9 7"/>
+            <circle cx="12" cy="12" r="9"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Entertainment</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">1</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon health">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Healthcare</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill empty">0</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon edu">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10L12 5 2 10l10 5 10-5z"/>
+            <path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Education</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill empty">0</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon care">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 21v-1a7 7 0 0 1 14 0v1"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Personal Care</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">1</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon subs">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Subscriptions</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">4</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon debt">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 11a4 4 0 1 0-8 0M5 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/>
+            <circle cx="13" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Debt Repayment</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">3</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon other">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5" cy="12" r="1.5"/>
+            <circle cx="12" cy="12" r="1.5"/>
+            <circle cx="19" cy="12" r="1.5"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Other</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">2</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="section-label">Custom <span class="count">· 2</span></div>
+
+      <div class="cat-row">
+        <div class="cat-icon food custom">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+            <line x1="6" y1="2" x2="6" y2="4"/>
+            <line x1="10" y1="2" x2="10" y2="4"/>
+            <line x1="14" y1="2" x2="14" y2="4"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Daily Chai</div>
+          <div class="cat-meta">Created Dec 12 · last used today</div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">8</span>
+          <button class="cat-menu" aria-label="Edit">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="5" r="1.4"/>
+              <circle cx="12" cy="12" r="1.4"/>
+              <circle cx="12" cy="19" r="1.4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon edu custom">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Course Books</div>
+          <div class="cat-meta">Created Nov 2 · last used 9 days ago</div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">2</span>
+          <button class="cat-menu" aria-label="Edit">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="5" r="1.4"/>
+              <circle cx="12" cy="12" r="1.4"/>
+              <circle cx="12" cy="19" r="1.4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Add custom CTA -->
+      <button class="add-cta">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        Add a custom category
+      </button>
+
+      <!-- Archived link -->
+      <div class="archived-link">
+        <div class="archived-left">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/>
+          </svg>
+          Archived categories
+          <span class="archived-count">3</span>
+        </div>
+        <span class="cat-chev">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </span>
+      </div>
+
+    </div>
+
+    <!-- ============== INCOME ============== -->
+    <div class="is-income">
+
+      <div class="summary-line">
+        <span class="v">6</span> default
+        <span class="sep">·</span>
+        <span class="v">0</span> custom
+        <span class="sep">·</span>
+        <span class="v">5</span> txns this month
+      </div>
+
+      <div class="section-label">Default <span class="count">· 6</span></div>
+
+      <div class="cat-row">
+        <div class="cat-icon salary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Salary</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">1</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon freelance">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Freelance</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">2</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon business">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M5 21V8M19 21V8M9 21V13h6v8M9 8V4h6v4"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Business</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">1</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon gift">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="8" width="18" height="13" rx="1"/>
+            <path d="M12 8v13M21 12H3M12 8a3.5 3.5 0 1 0-3.5-3.5c0 1.94 1 3.5 3.5 3.5 2.5 0 3.5-1.56 3.5-3.5A3.5 3.5 0 1 0 12 8z"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Gift</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">1</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon refund">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7v6h6M21 17a9 9 0 0 0-15-6.7L3 13"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Refund</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill">1</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-icon other">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5" cy="12" r="1.5"/>
+            <circle cx="12" cy="12" r="1.5"/>
+            <circle cx="19" cy="12" r="1.5"/>
+          </svg>
+        </div>
+        <div class="cat-body">
+          <div class="cat-name">Other</div>
+          <div class="cat-meta"><span class="lock"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Default</span></div>
+        </div>
+        <div class="cat-right">
+          <span class="cat-pill empty">0</span>
+          <span class="cat-chev">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <!-- Add custom CTA -->
+      <button class="add-cta">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        Add a custom income source
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>

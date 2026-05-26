@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Settings / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+/* ===== Phone ===== */
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg); border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E,
+    0 0 0 12px #0A0A0C,
+    0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28),
+    0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Page header ===== */
+.page-header {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  padding: 12px 20px 8px;
+  flex-shrink: 0;
+}
+.back-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: var(--text); cursor: pointer;
+  border-radius: 10px;
+  transition: background .15s;
+}
+.back-btn:hover { background: rgba(255,255,255,0.04); }
+.page-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-weight: 400;
+  font-size: 22px; letter-spacing: -0.02em;
+  text-align: center;
+}
+.page-spacer { width: 36px; }
+
+/* ===== Scroll ===== */
+.scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 6px 20px 40px;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ===== Reminder hero ===== */
+.reminder-hero {
+  background: linear-gradient(180deg, rgba(232,220,192,0.06), rgba(232,220,192,0.02));
+  border: 1px solid rgba(232,220,192,0.18);
+  border-radius: 16px;
+  padding: 18px 18px 6px;
+  margin: 10px 0 26px;
+}
+.rh-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rh-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.rh-name {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.15;
+}
+.rh-name em {
+  color: var(--accent);
+  font-style: italic;
+}
+.rh-body { flex: 1; }
+.rh-toggle-wrap { flex-shrink: 0; }
+
+.rh-row {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(232,220,192,0.16);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  cursor: pointer;
+}
+.rh-row-left {
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.rh-row-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rh-row-value {
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+}
+.rh-row-chev {
+  color: var(--text-soft);
+}
+
+/* ===== Toggle ===== */
+.toggle {
+  width: 46px; height: 28px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  position: relative;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 20px; height: 20px;
+  background: var(--text-mute);
+  border-radius: 50%;
+  transition: transform .2s, background .2s;
+}
+.toggle.on {
+  background: rgba(232,220,192,0.12);
+  border-color: rgba(232,220,192,0.4);
+}
+.toggle.on::after {
+  background: var(--accent);
+  transform: translateX(18px);
+}
+
+/* ===== Section ===== */
+.section { margin-bottom: 28px; }
+.section-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 2px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.section-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .15s;
+  gap: 14px;
+}
+.row:last-child { border-bottom: none; }
+.row:hover { background: rgba(255,255,255,0.02); }
+
+.row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.row-name {
+  font-family: var(--font-serif), serif;
+  font-size: 16px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.row-sub {
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--text-soft);
+}
+
+.row-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.row-value {
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.row-value-mute {
+  color: var(--text-mute);
+  font-weight: 400;
+}
+.row-pill {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+}
+.row-pill.warn {
+  background: rgba(232,182,110,0.12);
+  color: var(--warn);
+}
+.row-chev {
+  color: var(--text-soft);
+  display: flex;
+  align-items: center;
+}
+
+/* ===== Destructive row ===== */
+.danger-row {
+  margin-top: 18px;
+  background: transparent;
+  border: 1px dashed rgba(224,138,138,0.28);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.danger-row:hover {
+  background: rgba(224,138,138,0.04);
+  border-color: rgba(224,138,138,0.4);
+}
+.danger-icon {
+  color: var(--neg);
+  flex-shrink: 0;
+}
+.danger-body { flex: 1; }
+.danger-name {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--neg);
+  letter-spacing: -0.01em;
+}
+.danger-sub {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: rgba(224,138,138,0.55);
+  margin-top: 3px;
+}
+.danger-chev { color: rgba(224,138,138,0.5); }
+
+/* ===== Footer ===== */
+.foot {
+  text-align: center;
+  margin-top: 38px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.foot-brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.foot-mark {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.foot-dot {
+  width: 4px; height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+  align-self: center;
+  margin-bottom: 3px;
+}
+.foot-version {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-top: 8px;
+}
+.foot-links {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+.foot-links a {
+  cursor: pointer;
+  transition: color .15s;
+}
+.foot-links a:hover { color: var(--text); }
+.foot-links .sep {
+  width: 3px; height: 3px;
+  background: var(--text-faint);
+  border-radius: 50%;
+  align-self: center;
+}
+
+/* Home indicator */
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 6;
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 10<br>
+  <em>Settings — preferences & data</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <button class="back-btn" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <h1 class="page-title">Settings</h1>
+    <div class="page-spacer"></div>
+  </div>
+
+  <div class="scroll">
+
+    <!-- REMINDER HERO -->
+    <div class="reminder-hero">
+      <div class="rh-top">
+        <div class="rh-body">
+          <div class="rh-eyebrow">Daily ritual</div>
+          <div class="rh-name">A nudge at <em>8:00 PM</em><br>to log today's spend.</div>
+        </div>
+        <div class="rh-toggle-wrap">
+          <button class="toggle on" aria-label="Toggle reminder"></button>
+        </div>
+      </div>
+      <div class="rh-row">
+        <div class="rh-row-left">Reminder time</div>
+        <div class="rh-row-right">
+          <span class="rh-row-value">8:00 PM</span>
+          <span class="rh-row-chev">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GENERAL -->
+    <div class="section">
+      <div class="section-label">General</div>
+      <div class="section-card">
+        <div class="row">
+          <div class="row-body">
+            <div class="row-name">Currency</div>
+            <div class="row-sub">Default display symbol</div>
+          </div>
+          <div class="row-right">
+            <span class="row-value">Rs <span class="row-value-mute">· PKR</span></span>
+            <span class="row-chev">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="row-body">
+            <div class="row-name">Appearance</div>
+            <div class="row-sub">Theme &amp; contrast</div>
+          </div>
+          <div class="row-right">
+            <span class="row-value">Dark</span>
+            <span class="row-chev">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="row-body">
+            <div class="row-name">Month starts on</div>
+            <div class="row-sub">Used for reports &amp; budgets</div>
+          </div>
+          <div class="row-right">
+            <span class="row-value">1st</span>
+            <span class="row-chev">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORGANIZATION -->
+    <div class="section">
+      <div class="section-label">Organize</div>
+      <div class="section-card">
+        <div class="row">
+          <div class="row-body">
+            <div class="row-name">Categories</div>
+            <div class="row-sub">Income &amp; expense tags</div>
+          </div>
+          <div class="row-right">
+            <span class="row-pill">14 active</span>
+            <span class="row-chev">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="row-body">
+            <div class="row-name">Archived accounts</div>
+            <div class="row-sub">Hidden, history preserved</div>
+          </div>
+          <div class="row-right">
+            <span class="row-pill warn">2</span>
+            <span class="row-chev">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="row-body">
+            <div class="row-name">Recurring payments</div>
+            <div class="row-sub">Templates &amp; cadence</div>
+          </div>
+          <div class="row-right">
+            <span class="row-pill">5</span>
+            <span class="row-chev">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA -->
+    <div class="section">
+      <div class="section-label">Data</div>
+      <div class="section-card">
+        <div class="row">
+          <div class="row-body">
+            <div class="row-name">Export to CSV</div>
+            <div class="row-sub">All transactions · 248 rows</div>
+          </div>
+          <div class="row-right">
+            <span class="row-chev">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="row-body">
+            <div class="row-name">Backup data</div>
+            <div class="row-sub">Encrypted .flowfin file</div>
+          </div>
+          <div class="row-right">
+            <span class="row-chev">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="row-body">
+            <div class="row-name">Restore from file</div>
+            <div class="row-sub">Replaces current data</div>
+          </div>
+          <div class="row-right">
+            <span class="row-chev">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="danger-row">
+        <div class="danger-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <div class="danger-body">
+          <div class="danger-name">Reset all data</div>
+          <div class="danger-sub">Permanent · cannot be undone</div>
+        </div>
+        <div class="danger-chev">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="section">
+      <div class="section-label">About</div>
+      <div class="section-card">
+        <div class="row">
+          <div class="row-body">
+            <div class="row-name">Help &amp; feedback</div>
+            <div class="row-sub">Docs, contact, report bugs</div>
+          </div>
+          <div class="row-right">
+            <span class="row-chev">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-body">
+            <div class="row-name">What's new</div>
+            <div class="row-sub">Release notes</div>
+          </div>
+          <div class="row-right">
+            <span class="row-pill">v1.0</span>
+            <span class="row-chev">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="foot">
+      <div class="foot-brand">
+        <span class="foot-mark">flowfin</span>
+        <span class="foot-dot"></span>
+      </div>
+      <div class="foot-version">Version 1.0.0 · Build 27</div>
+      <div class="foot-links">
+        <a>Privacy</a>
+        <span class="sep"></span>
+        <a>Terms</a>
+        <span class="sep"></span>
+        <a>Licenses</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>

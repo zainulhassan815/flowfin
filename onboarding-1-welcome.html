@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Welcome / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --transfer: #82C5D4;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 20px; min-height: 100vh; overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+/* ===== Phone ===== */
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg);
+  border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E, 0 0 0 12px #0A0A0C, 0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28), 0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+/* subtle ambient glow at top of welcome screen */
+.glow {
+  position: absolute;
+  top: -100px; left: 50%;
+  width: 380px; height: 380px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(232,220,192,0.10) 0%, rgba(232,220,192,0) 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Body layout ===== */
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 32px 40px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ===== Brand block ===== */
+.brand-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 38px;
+}
+.brand-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand-eyebrow::before,
+.brand-eyebrow::after {
+  content: '';
+  width: 14px; height: 1px;
+  background: var(--text-faint);
+}
+.brand-mark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+}
+.brand-name {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 44px;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+.brand-dot {
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-bottom: 6px;
+  align-self: center;
+}
+
+/* ===== Headline ===== */
+.headline {
+  margin-top: 38px;
+  text-align: center;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 30px;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--text);
+}
+.headline .accent { color: var(--accent); }
+
+/* ===== Steps ===== */
+.steps {
+  margin-top: 36px;
+  padding: 22px 4px;
+  border-top: 1px dashed var(--border-strong);
+  border-bottom: 1px dashed var(--border-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.step-num {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--step-border, rgba(130,197,212,0.32));
+  background: var(--step-bg, rgba(130,197,212,0.06));
+  color: var(--step-color, var(--transfer));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.step:nth-child(1) .step-num { --step-color: var(--transfer); --step-border: rgba(130,197,212,0.32); --step-bg: rgba(130,197,212,0.06); }
+.step:nth-child(2) .step-num { --step-color: var(--warn);     --step-border: rgba(232,182,110,0.32); --step-bg: rgba(232,182,110,0.06); }
+.step:nth-child(3) .step-num { --step-color: var(--pos);      --step-border: rgba(156,212,162,0.32); --step-bg: rgba(156,212,162,0.06); }
+
+.step-body { flex: 1; min-width: 0; }
+.step-name {
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+.step-name em { font-style: italic; color: var(--accent); }
+.step-name .blue { color: var(--transfer); font-style: italic; }
+.step-name .yellow { color: var(--warn); font-style: italic; }
+.step-name .green { color: var(--pos); font-style: italic; }
+
+/* ===== Footer caption ===== */
+.foot-caption {
+  margin-top: 22px;
+  text-align: center;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-soft);
+  letter-spacing: -0.005em;
+}
+.foot-caption .dot {
+  display: inline-block;
+  width: 4px; height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin: 0 8px;
+  vertical-align: middle;
+}
+
+/* ===== CTA area ===== */
+.cta-area {
+  margin-top: auto;
+  padding-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+}
+.cta-primary {
+  padding: 18px 16px;
+  background: var(--accent);
+  color: #0A0A0B;
+  border: none;
+  border-radius: 14px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: filter .15s, transform .15s;
+}
+.cta-primary:hover { filter: brightness(0.96); }
+.cta-primary:active { transform: translateY(1px); }
+.cta-primary svg { color: #0A0A0B; }
+
+.cta-secondary {
+  background: transparent;
+  border: none;
+  color: var(--text-mute);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: color .15s;
+}
+.cta-secondary:hover { color: var(--text); }
+
+/* Home indicator */
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 6;
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 15a<br>
+  <em>Onboarding — Welcome</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="glow"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <div class="brand-block">
+      <div class="brand-eyebrow">Welcome</div>
+      <div class="brand-mark">
+        <span class="brand-name">flowfin</span>
+        <span class="brand-dot"></span>
+      </div>
+    </div>
+
+    <h1 class="headline">
+      Track your money<br>
+      the way it <span class="accent">actually flows</span>.
+    </h1>
+
+    <!-- The mental model in 3 simple steps -->
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-name">
+            Your money lives in <span class="blue">real accounts</span> — bank, cash, wallet.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-name">
+            Move some into <span class="yellow">budgets</span> — pools for food, transport, fun.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-name">
+            <span class="green">Spend from budgets</span> and always know exactly what's left.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot-caption">
+      Three quick steps<span class="dot"></span>about a minute to set up
+    </div>
+
+    <div class="cta-area">
+      <button class="cta-primary">
+        Let's begin
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
+      </button>
+      <button class="cta-secondary">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        Restore from backup
+      </button>
+    </div>
+
+  </div>
+
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>

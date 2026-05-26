@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en" data-type="owe-me">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Add Debt (Owe Me) / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+/* Type-aware accent — drives tab underline + save button + amount color */
+[data-type="i-owe"]  { --type-color: var(--warn); --type-soft: rgba(232,182,110,0.16); --type-tint: rgba(232,182,110,0.08); }
+[data-type="owe-me"] { --type-color: var(--pos);  --type-soft: rgba(156,212,162,0.16); --type-tint: rgba(156,212,162,0.08); }
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 20px; min-height: 100vh; overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+/* ===== Phone ===== */
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg); border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E, 0 0 0 12px #0A0A0C, 0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28), 0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Header ===== */
+.sheet-header {
+  height: 56px;
+  padding: 0 16px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sheet-back {
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: var(--text-mute); cursor: pointer;
+  margin-left: -8px;
+  transition: color .15s;
+}
+.sheet-back:hover { color: var(--text); }
+.sheet-title {
+  font-family: var(--font-serif), serif;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.sheet-save {
+  background: transparent;
+  border: none;
+  color: var(--type-color);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 4px;
+}
+
+/* ===== Type tabs ===== */
+.type-tabs {
+  display: flex;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 14px 0 15px;
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  color: var(--text-soft);
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  position: relative;
+  transition: color .2s;
+}
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 2px;
+  background: var(--type-color);
+  transition: width .2s ease;
+  border-radius: 2px;
+}
+[data-type="i-owe"]  .tab-btn[data-tab="i-owe"],
+[data-type="owe-me"] .tab-btn[data-tab="owe-me"] {
+  color: var(--text);
+  font-style: italic;
+}
+[data-type="i-owe"]  .tab-btn[data-tab="i-owe"]::after,
+[data-type="owe-me"] .tab-btn[data-tab="owe-me"]::after {
+  width: 50%;
+}
+
+/* ===== Scroll body ===== */
+.body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 40px;
+}
+.body::-webkit-scrollbar { display: none; }
+
+/* ===== Direction stamp + amount ===== */
+.amount-block {
+  text-align: center;
+  padding: 30px 20px 30px;
+  border-bottom: 1px solid var(--border);
+}
+.direction-stamp {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--type-color);
+  font-weight: 500;
+  margin-bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.direction-stamp::before,
+.direction-stamp::after {
+  content: '';
+  width: 14px; height: 1px;
+  background: var(--type-color);
+  opacity: 0.4;
+}
+
+.amount-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+}
+.amount-currency {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 24px;
+  color: var(--text-mute);
+  letter-spacing: -0.02em;
+}
+.amount-value {
+  font-family: var(--font-mono), monospace;
+  font-size: 56px;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text);
+}
+.amount-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 38px;
+  background: var(--type-color);
+  border-radius: 1px;
+  animation: blink 1s infinite;
+  margin-left: 2px;
+  align-self: center;
+}
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.amount-decimal {
+  font-family: var(--font-mono), monospace;
+  font-size: 24px;
+  font-weight: 300;
+  color: var(--text-mute);
+}
+
+.amount-hint {
+  margin-top: 10px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--text-soft);
+  letter-spacing: -0.005em;
+}
+
+/* ===== Form ===== */
+.form {
+  padding: 6px 20px 0;
+  display: flex;
+  flex-direction: column;
+}
+.form-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 0;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: padding .15s;
+}
+.form-row:hover { padding-left: 4px; }
+.form-row:last-of-type { border-bottom: none; }
+.form-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  width: 70px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+.form-value {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.form-text {
+  flex: 1;
+  font-family: var(--font-serif), serif;
+  font-size: 16px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.form-text.placeholder { color: var(--text-soft); font-style: italic; }
+.form-text.italic { font-style: italic; color: var(--text); }
+.form-chev {
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+/* avatar inline (person row) */
+.person-avatar-sm {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--av-border, rgba(130,197,212,0.28));
+  background: var(--av-bg, rgba(130,197,212,0.08));
+  color: var(--av, #82C5D4);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+}
+.person-avatar-sm.empty {
+  border: 1px dashed var(--border-strong);
+  background: transparent;
+  color: var(--text-faint);
+}
+
+/* ===== Optional account link ===== */
+.optional-section {
+  margin: 28px 20px 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.opt-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+.opt-body { flex: 1; min-width: 0; }
+.opt-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.opt-text {
+  font-family: var(--font-serif), serif;
+  font-size: 14.5px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  line-height: 1.4;
+}
+.opt-text em {
+  font-style: italic;
+  color: var(--type-color);
+}
+
+/* toggle */
+.toggle {
+  width: 42px; height: 26px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 13px;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .15s, border-color .15s;
+}
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2.5px; left: 2.5px;
+  width: 19px; height: 19px;
+  background: var(--text-mute);
+  border-radius: 50%;
+  transition: transform .2s, background .2s;
+}
+.toggle.on {
+  background: var(--type-soft);
+  border-color: var(--type-color);
+}
+.toggle.on::after {
+  background: var(--type-color);
+  transform: translateX(16px);
+}
+
+.opt-detail {
+  display: none;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-strong);
+}
+.optional-section.expanded .opt-detail { display: block; }
+
+.opt-row {
+  display: flex; align-items: center;
+  padding: 8px 0;
+  gap: 12px;
+}
+.opt-row-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  width: 70px; flex-shrink: 0;
+  font-weight: 500;
+}
+.opt-row-value {
+  flex: 1;
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+}
+.opt-icon {
+  width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(197,217,130,0.32);
+  background: rgba(197,217,130,0.08);
+  color: #C5D982;
+  border-radius: 7px;
+  flex-shrink: 0;
+}
+
+/* ===== Tip footer ===== */
+.tip {
+  margin: 22px 20px 0;
+  padding: 14px 16px;
+  background: transparent;
+  border: 1px dashed var(--border-strong);
+  border-radius: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.tip-icon {
+  color: var(--accent);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.tip-text {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-mute);
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+}
+.tip-text strong {
+  font-style: normal;
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Home indicator */
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 6;
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 13b<br>
+  <em>Add Debt — Owe Me variant</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Sheet header -->
+  <div class="sheet-header">
+    <button class="sheet-back" aria-label="Back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 6l12 12M18 6L6 18"/>
+      </svg>
+    </button>
+    <div class="sheet-title">New debt</div>
+    <button class="sheet-save">Save</button>
+  </div>
+
+  <!-- Type tabs -->
+  <div class="type-tabs">
+    <button class="tab-btn" data-tab="i-owe">I Owe</button>
+    <button class="tab-btn" data-tab="owe-me">Owe Me</button>
+  </div>
+
+  <div class="body">
+
+    <!-- Amount block -->
+    <div class="amount-block">
+      <div class="direction-stamp">Lent to</div>
+      <div class="amount-row">
+        <span class="amount-currency">Rs</span>
+        <span class="amount-value">6,000</span>
+        <span class="amount-cursor"></span>
+        <span class="amount-decimal">.00</span>
+      </div>
+      <div class="amount-hint">Tap to edit amount</div>
+    </div>
+
+    <!-- Form -->
+    <div class="form">
+
+      <div class="form-row">
+        <div class="form-label">Person</div>
+        <div class="form-value">
+          <div class="person-avatar-sm" style="--av: #E89AB8; --av-bg: rgba(232,154,184,0.08); --av-border: rgba(232,154,184,0.28);">S</div>
+          <span class="form-text">Sara</span>
+          <svg class="form-chev" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M3 2L7 5L3 8"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-label">Reason</div>
+        <div class="form-value">
+          <span class="form-text italic">Lent for laptop repair</span>
+          <svg class="form-chev" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M3 2L7 5L3 8"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-label">Date</div>
+        <div class="form-value">
+          <span class="form-text">5 Dec 2025 · Fri</span>
+          <svg class="form-chev" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M3 2L7 5L3 8"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Optional account link -->
+    <div class="optional-section expanded">
+      <div class="opt-head">
+        <div class="opt-body">
+          <div class="opt-eyebrow">Optional · Account link</div>
+          <div class="opt-text">Cash went out from your <em>Bank</em> — log it as outflow too.</div>
+        </div>
+        <button class="toggle on" aria-label="Toggle"></button>
+      </div>
+
+      <div class="opt-detail">
+        <div class="opt-row">
+          <div class="opt-row-label">From</div>
+          <div class="opt-row-value">
+            <div class="opt-icon" style="border-color: rgba(130,197,212,0.32); background: rgba(130,197,212,0.08); color: #82C5D4;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+              </svg>
+            </div>
+            <span style="flex:1">Bank</span>
+            <span style="font-family: var(--font-mono), monospace; font-size: 11px; color: var(--text-mute);">40,000</span>
+            <svg class="form-chev" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M3 2L7 5L3 8"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tip footer -->
+    <div class="tip">
+      <div class="tip-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <div class="tip-text">
+        <strong>Tip ·</strong> Record receipts later from the debt detail screen — they'll auto-update the balance and (optionally) log income to your account.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>
