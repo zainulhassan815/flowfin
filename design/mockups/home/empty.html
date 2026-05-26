@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en" data-pair="literata">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Home (empty) / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+.caption {
+  position: fixed;
+  top: 28px;
+  left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 10;
+  font-weight: 500;
+}
+.caption em {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 300;
+  opacity: 0.85;
+}
+.caption-r {
+  position: fixed;
+  bottom: 28px;
+  left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 10;
+  font-weight: 500;
+}
+
+/* ------- Phone frame ------- */
+.phone {
+  width: 390px;
+  height: 844px;
+  background: var(--bg);
+  border-radius: 52px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E,
+    0 0 0 12px #0A0A0C,
+    0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28),
+    0 6px 14px rgba(0,0,0,0.18);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.notch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 32px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 20;
+}
+
+/* ------- Status bar ------- */
+.status-bar {
+  height: 50px;
+  padding: 18px 32px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  font-weight: 500;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 5;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ------- App header ------- */
+.app-header {
+  padding: 8px 24px 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.brand-mark {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.brand-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-left: 2px;
+  align-self: center;
+  margin-bottom: 4px;
+}
+.header-actions { display: flex; gap: 4px; }
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-mute);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color .2s;
+}
+.icon-btn:hover { color: var(--text); }
+
+/* ------- Body ------- */
+.scroll {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ------- Hero (muted for empty state) ------- */
+.hero {
+  padding: 16px 24px 24px;
+}
+.hero-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-label::before {
+  content: '';
+  width: 14px;
+  height: 1px;
+  background: var(--text-soft);
+}
+.hero-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.hero-currency {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 24px;
+  color: var(--text-faint);
+  letter-spacing: -0.02em;
+}
+.hero-amount {
+  font-family: var(--font-mono), monospace;
+  font-size: 56px;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text-soft);
+}
+.hero-decimal {
+  font-family: var(--font-mono), monospace;
+  font-size: 24px;
+  font-weight: 300;
+  color: var(--text-faint);
+  letter-spacing: -0.02em;
+}
+.hero-meta {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border-strong);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-meta-dot {
+  width: 3px; height: 3px;
+  background: var(--text-faint);
+  border-radius: 50%;
+}
+
+/* ═══════════════════════════════════════════
+   Empty-state block (the editorial moment)
+═══════════════════════════════════════════ */
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 40px 120px;
+  text-align: center;
+  position: relative;
+}
+
+/* faint horizontal rule that frames the moment */
+.empty::before,
+.empty::after {
+  content: '';
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
+}
+.empty::before { margin-bottom: 38px; }
+.empty::after  { margin-top: 38px; }
+
+.empty-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.empty-eyebrow::before,
+.empty-eyebrow::after {
+  content: '';
+  width: 10px;
+  height: 1px;
+  background: rgba(232,220,192,0.4);
+}
+
+.empty-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 34px;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+.empty-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.empty-body {
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-mute);
+  letter-spacing: -0.005em;
+  max-width: 300px;
+}
+.empty-body strong {
+  font-family: var(--font-mono), monospace;
+  font-weight: 500;
+  color: var(--accent);
+  font-size: 14px;
+  padding: 0 2px;
+}
+
+.empty-cta {
+  margin-top: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: #0A0A0B;
+  padding: 14px 22px 14px 24px;
+  border-radius: 14px;
+  border: 1px solid var(--accent);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow:
+    0 12px 28px rgba(232,220,192,0.18),
+    0 4px 10px rgba(232,220,192,0.10);
+  transition: transform .15s, background .15s;
+}
+.empty-cta:hover {
+  background: #F0E4C8;
+  transform: translateY(-1px);
+}
+.empty-cta svg { transition: transform .15s; }
+.empty-cta:hover svg { transform: translateX(3px); }
+
+/* ------- Tab bar ------- */
+.tab-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 88px;
+  background: rgba(8,8,10,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding: 14px 12px 0;
+  z-index: 5;
+}
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-mute);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  flex: 1;
+  padding: 4px 0;
+}
+.tab.active { color: var(--text); }
+.tab.active .tab-icon { color: var(--text); }
+.tab-icon { color: var(--text-mute); transition: color .2s; }
+
+/* Home indicator */
+.home-indicator {
+  position: absolute;
+  bottom: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  background: var(--text);
+  border-radius: 3px;
+  opacity: 0.4;
+  z-index: 6;
+}
+
+@media (max-width: 480px) {
+  body { padding: 0; }
+  .phone {
+    width: 100%;
+    height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .caption, .caption-r { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 01b<br>
+  <em>Home — empty state · fresh install</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="app-header">
+    <div class="brand">
+      <span class="brand-mark">flowfin</span>
+      <span class="brand-dot"></span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" title="Search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="M21 21l-4.3-4.3"/>
+        </svg>
+      </button>
+      <button class="icon-btn" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="scroll">
+
+    <!-- HERO — muted, no accounts yet -->
+    <section class="hero">
+      <div class="hero-label">Available balance</div>
+      <div class="hero-row">
+        <span class="hero-currency">Rs</span>
+        <span class="hero-amount">0</span>
+        <span class="hero-decimal">.00</span>
+      </div>
+      <div class="hero-meta">
+        <span>No accounts yet</span>
+        <span class="hero-meta-dot"></span>
+        <span>day one</span>
+      </div>
+    </section>
+
+    <!-- EMPTY STATE — the editorial moment -->
+    <section class="empty">
+      <div class="empty-eyebrow">Begin</div>
+      <h2 class="empty-title">Money lives <em>somewhere.</em><br>Tell us where.</h2>
+      <p class="empty-body">
+        Add the first place — your bank, the cash in your wallet, a mobile
+        wallet. Every transaction starts from an account.
+      </p>
+      <a href="#" class="empty-cta">
+        Add an account
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </section>
+
+  </div>
+
+  <!-- No FAB — without an account there's nothing to log -->
+
+  <!-- Tab bar -->
+  <nav class="tab-bar">
+    <button class="tab active">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10z"/>
+      </svg>
+      Home
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="6" width="18" height="13" rx="2"/>
+        <path d="M3 10h18M7 15h3"/>
+      </svg>
+      Accounts
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>
+      </svg>
+      Recur
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 11a4 4 0 1 0-8 0M5 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/>
+        <circle cx="13" cy="7" r="4"/>
+      </svg>
+      Debts
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19V5M9 19V9M14 19v-6M19 19V3"/>
+      </svg>
+      Reports
+    </button>
+  </nav>
+
+  <div class="home-indicator"></div>
+
+</div>
+
+</body>
+</html>

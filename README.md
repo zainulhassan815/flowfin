@@ -21,9 +21,9 @@ flowfin/
     │   ├── icons.html        Line icon library (55+)
     │   └── styles.css        Token definitions + DS layout
     │
-    └── mockups/            Live HTML screen mockups (22 screens)
+    └── mockups/            Live HTML screen mockups
         ├── index.html        Gallery of every screen
-        ├── home.html
+        ├── home/
         ├── onboarding/
         ├── accounts/
         ├── transactions/

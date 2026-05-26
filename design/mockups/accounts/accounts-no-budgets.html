@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Accounts (no budgets) / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  --cat-bank: #82C5D4;
+  --cat-cash: #C5D982;
+  --cat-food: #E8A87B;
+  --cat-transport: #8AB4E0;
+  --cat-fun: #C98ED4;
+  --cat-salary: #9CD4A2;
+  --cat-subs: #9A8AE0;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.caption {
+  position: fixed;
+  top: 28px;
+  left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 10;
+  font-weight: 500;
+}
+.caption em {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 400;
+  opacity: 0.85;
+}
+.caption-r {
+  position: fixed;
+  bottom: 28px;
+  left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 10;
+  font-weight: 500;
+}
+
+/* ===== Phone ===== */
+.phone {
+  width: 390px;
+  height: 844px;
+  background: var(--bg);
+  border-radius: 52px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E,
+    0 0 0 12px #0A0A0C,
+    0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28),
+    0 6px 14px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+}
+.notch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 32px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 30;
+}
+
+.status-bar {
+  height: 50px;
+  padding: 18px 32px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+  z-index: 5;
+  flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Page header ===== */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px 8px;
+  flex-shrink: 0;
+}
+.page-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.header-actions {
+  display: flex;
+  gap: 4px;
+}
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-mute);
+  cursor: pointer;
+  border-radius: 10px;
+  transition: color .15s, background .15s;
+}
+.icon-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+
+/* ===== Scroll ===== */
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 110px;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ===== Hero ===== */
+.hero {
+  padding: 4px 20px 16px;
+}
+.hero-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-label::before { content: ''; width: 14px; height: 1px; background: var(--text-soft); }
+
+.hero-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.hero-currency {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-mute);
+  letter-spacing: -0.02em;
+}
+.hero-amount {
+  font-family: var(--font-mono), monospace;
+  font-size: 44px;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text);
+}
+.hero-decimal {
+  font-family: var(--font-mono), monospace;
+  font-size: 22px;
+  color: var(--text-mute);
+  font-weight: 400;
+}
+
+.hero-breakdown {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border-strong);
+  display: flex;
+  gap: 16px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.04em;
+}
+.hb-item { display: flex; gap: 6px; align-items: baseline; }
+.hb-item .label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-soft);
+  font-size: 9.5px;
+  font-weight: 500;
+}
+.hb-item .value { color: var(--text); font-weight: 500; }
+.hb-divider { color: var(--text-faint); }
+
+/* ===== Section ===== */
+.section {
+  padding: 0 20px;
+  margin-top: 24px;
+}
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+.section-title {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+.section-total {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.section-total .cur {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  color: var(--text-mute);
+  font-size: 11px;
+  margin-right: 3px;
+}
+
+/* ===== Account card ===== */
+.account-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 14px 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.account-card:hover { border-color: var(--border-strong); }
+
+.acct-row-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.acct-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--icon-border, var(--border-strong));
+  background: var(--icon-bg, transparent);
+  border-radius: 12px;
+  color: var(--icon-color, var(--text-mute));
+  flex-shrink: 0;
+}
+.acct-icon.budget { border-style: dashed; }
+
+.acct-icon.cat-bank      { --icon-color: var(--cat-bank);      --icon-border: rgba(130,197,212,0.32); --icon-bg: rgba(130,197,212,0.08); }
+.acct-icon.cat-cash      { --icon-color: var(--cat-cash);      --icon-border: rgba(197,217,130,0.32); --icon-bg: rgba(197,217,130,0.08); }
+.acct-icon.cat-food      { --icon-color: var(--cat-food);      --icon-border: rgba(232,168,123,0.36); --icon-bg: rgba(232,168,123,0.08); }
+.acct-icon.cat-transport { --icon-color: var(--cat-transport); --icon-border: rgba(138,180,224,0.36); --icon-bg: rgba(138,180,224,0.08); }
+.acct-icon.cat-fun       { --icon-color: var(--cat-fun);       --icon-border: rgba(201,142,212,0.36); --icon-bg: rgba(201,142,212,0.08); }
+
+.acct-info { flex: 1; min-width: 0; }
+.acct-name {
+  font-family: var(--font-serif), serif;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.acct-meta {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  color: var(--text-mute);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.acct-balance {
+  text-align: right;
+  flex-shrink: 0;
+}
+.balance-amount {
+  font-family: var(--font-mono), monospace;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.balance-amount .dec { color: var(--text-mute); font-weight: 400; }
+
+.acct-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-end;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  margin-top: 4px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.acct-trend.up { color: var(--pos); }
+.acct-trend.down { color: var(--neg); }
+.acct-trend .label {
+  color: var(--text-soft);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 9px;
+  margin-left: 2px;
+}
+
+/* ===== Budget progress ===== */
+.acct-progress {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+.progress-meta .left {
+  color: var(--text-mute);
+  letter-spacing: 0.04em;
+}
+.progress-meta .left strong {
+  color: var(--text);
+  font-weight: 500;
+}
+.progress-meta .right {
+  color: var(--text-soft);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.progress-bar {
+  height: 5px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .3s;
+}
+.account-card.cat-food .progress-fill      { background: var(--cat-food); }
+.account-card.cat-transport .progress-fill { background: var(--cat-transport); }
+.account-card.cat-fun .progress-fill       { background: var(--cat-fun); }
+
+/* Warning state (>80% spent) */
+.account-card.warn .progress-fill { background: var(--warn); }
+
+/* ===== Archived link ===== */
+.archived-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 24px 20px 0;
+  padding: 14px;
+  background: transparent;
+  border: 1px dashed var(--border-strong);
+  border-radius: 12px;
+  font-family: var(--font-serif), serif;
+  font-size: 14px;
+  color: var(--text-mute);
+  cursor: pointer;
+  font-style: italic;
+  transition: color .15s, border-color .15s;
+}
+.archived-link:hover { color: var(--accent); border-color: rgba(232,220,192,0.4); }
+.archived-link .count {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-style: normal;
+  background: rgba(255,255,255,0.06);
+  padding: 2px 7px;
+  border-radius: 8px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ===== Tab bar (same as home) ===== */
+.tab-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 88px;
+  background: rgba(8,8,10,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding: 14px 12px 0;
+  z-index: 5;
+}
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-mute);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  flex: 1;
+  padding: 4px 0;
+}
+.tab.active { color: var(--text); }
+.tab.active .tab-icon { color: var(--text); }
+.tab-icon { color: var(--text-mute); transition: color .2s; }
+
+.home-indicator {
+  position: absolute;
+  bottom: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  background: var(--text);
+  border-radius: 3px;
+  opacity: 0.4;
+  z-index: 6;
+}
+
+/* ═══ Section-empty hint (reusable inline pattern) ═══ */
+.empty-hint {
+  margin-top: 4px;
+  padding: 38px 24px 32px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  position: relative;
+}
+.empty-hint::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+.empty-hint-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 500;
+}
+.empty-hint-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.2;
+  margin-top: 2px;
+}
+.empty-hint-body {
+  font-family: var(--font-serif), serif;
+  font-size: 13.5px;
+  color: var(--text-mute);
+  letter-spacing: -0.005em;
+  line-height: 1.5;
+  max-width: 260px;
+  margin-top: 4px;
+}
+.empty-hint-link {
+  margin-top: 14px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  border: 1px solid rgba(232,220,192,0.32);
+  padding: 9px 14px;
+  border-radius: 10px;
+  transition: background .15s, border-color .15s;
+}
+.empty-hint-link:hover {
+  background: rgba(232,220,192,0.06);
+  border-color: rgba(232,220,192,0.5);
+}
+.empty-hint.warn { border-color: rgba(232,182,110,0.32); }
+.empty-hint.warn::before { background: linear-gradient(90deg, transparent, var(--warn), transparent); }
+.empty-hint.warn .empty-hint-eyebrow { color: var(--warn); }
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 04b<br>
+  <em>Accounts — real, no budgets</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Page header -->
+  <div class="page-header">
+    <h1 class="page-title">Accounts</h1>
+    <div class="header-actions">
+      <button class="icon-btn" aria-label="Sort">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18M6 12h12M10 18h4"/>
+        </svg>
+      </button>
+      <button class="icon-btn" aria-label="Add">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="scroll">
+
+    <!-- Hero summary -->
+    <section class="hero">
+      <div class="hero-label">Total holdings</div>
+      <div class="hero-row">
+        <span class="hero-currency">Rs</span>
+        <span class="hero-amount">47,000</span>
+        <span class="hero-decimal">.00</span>
+      </div>
+      <div class="hero-breakdown">
+        <div class="hb-item">
+          <span class="label">Real</span>
+          <span class="value">47,000</span>
+        </div>
+        <span class="hb-divider">·</span>
+        <div class="hb-item">
+          <span class="label">Accts</span>
+          <span class="value">2</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- REAL ACCOUNTS -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-title">Real</div>
+        <div class="section-total"><span class="cur">Rs</span>47,000.00</div>
+      </div>
+
+      <div class="account-card">
+        <div class="acct-row-main">
+          <div class="acct-icon cat-bank">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+            </svg>
+          </div>
+          <div class="acct-info">
+            <div class="acct-name">Bank</div>
+            <div class="acct-meta">HBL · Primary</div>
+          </div>
+          <div class="acct-balance">
+            <div class="balance-amount">40,000<span class="dec">.00</span></div>
+            <div class="acct-trend up">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 7L8 3M8 3H4M8 3V7"/>
+              </svg>
+              <span>+12,500</span>
+              <span class="label">mo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="account-card">
+        <div class="acct-row-main">
+          <div class="acct-icon cat-cash">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/>
+              <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/>
+              <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+            </svg>
+          </div>
+          <div class="acct-info">
+            <div class="acct-name">Cash</div>
+            <div class="acct-meta">Wallet</div>
+          </div>
+          <div class="acct-balance">
+            <div class="balance-amount">7,000<span class="dec">.00</span></div>
+            <div class="acct-trend down">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3L8 7M8 7H4M8 7V3"/>
+              </svg>
+              <span>−800</span>
+              <span class="label">mo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUDGET ACCOUNTS — section empty -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-title">Budget</div>
+        <div class="section-total" style="color: var(--text-faint);">empty</div>
+      </div>
+
+      <div class="empty-hint">
+        <span class="empty-hint-eyebrow">Optional</span>
+        <h3 class="empty-hint-title">No budgets set.</h3>
+        <p class="empty-hint-body">
+          Pick a category and set a monthly cap — Food, Transport, anything
+          you want to keep an eye on.
+        </p>
+        <a href="#" class="empty-hint-link">
+          Set a budget
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- No archived link -->
+
+  </div>
+
+  <!-- Tab bar -->
+  <nav class="tab-bar">
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10z"/>
+      </svg>
+      Home
+    </button>
+    <button class="tab active">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="6" width="18" height="13" rx="2"/>
+        <path d="M3 10h18M7 15h3"/>
+      </svg>
+      Accounts
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>
+      </svg>
+      Recur
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 11a4 4 0 1 0-8 0M5 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/>
+        <circle cx="13" cy="7" r="4"/>
+      </svg>
+      Debts
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19V5M9 19V9M14 19v-6M19 19V3"/>
+      </svg>
+      Reports
+    </button>
+  </nav>
+
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>
