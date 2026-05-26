@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockups — FlowFin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../system/styles.css">
+<style>
+  /* Mockup gallery */
+  .group-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .group-num {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    color: var(--text-faint);
+    font-weight: 500;
+  }
+  .group-name {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 26px;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .group-count {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-left: auto;
+    font-weight: 500;
+  }
+
+  .mock-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+  }
+
+  .mock-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color .15s, background .15s, transform .15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .mock-card:hover {
+    border-color: rgba(232,220,192,0.3);
+    background: var(--surface-2);
+    transform: translateY(-2px);
+  }
+  .mock-num {
+    font-family: var(--font-mono), monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-weight: 500;
+  }
+  .mock-title {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  .mock-desc {
+    font-family: var(--font-serif), serif;
+    font-size: 13.5px;
+    color: var(--text-mute);
+    line-height: 1.5;
+    margin-top: 4px;
+    flex: 1;
+  }
+  .mock-path {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: var(--text-faint);
+    margin-top: 6px;
+  }
+  .mock-cta {
+    margin-top: 4px;
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mock-cta svg { transition: transform .15s; }
+  .mock-card:hover .mock-cta svg { transform: translateX(4px); }
+
+  .ds-section.first { padding-top: 0; border-top: none; }
+</style>
+</head>
+<body>
+
+<nav class="ds-nav">
+  <a href="../system/index.html" class="ds-brand">
+    <span class="ds-brand-mark">flowfin</span>
+    <span class="ds-brand-dot"></span>
+    <span class="ds-brand-tag">Mockups</span>
+  </a>
+  <div class="ds-nav-links">
+    <a href="../system/index.html" class="ds-nav-link">Design system</a>
+    <a href="index.html" class="ds-nav-link active">Mockups</a>
+  </div>
+</nav>
+
+<main class="ds-page">
+
+  <header class="ds-page-header">
+    <div class="ds-eyebrow">22 screens · live HTML</div>
+    <h1 class="ds-page-title">Every screen,<br>in one place.</h1>
+    <p class="ds-page-lede">
+      Click any tile to open the mockup in its phone frame. These are static HTML
+      renders — the source of truth for visual decisions until the real app is built.
+    </p>
+  </header>
+
+  <!-- ═══ HOME ═══ -->
+  <section class="ds-section first">
+    <div class="group-head">
+      <span class="group-num">01</span>
+      <span class="group-name">Home</span>
+      <span class="group-count">1 screen</span>
+    </div>
+    <div class="mock-grid">
+      <a href="home.html" class="mock-card">
+        <span class="mock-num">01.1</span>
+        <span class="mock-title">Home</span>
+        <span class="mock-desc">The default landing — hero balance, pending payments, recent activity.</span>
+        <span class="mock-path">home.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ ONBOARDING ═══ -->
+  <section class="ds-section">
+    <div class="group-head">
+      <span class="group-num">02</span>
+      <span class="group-name">Onboarding</span>
+      <span class="group-count">4 screens</span>
+    </div>
+    <div class="mock-grid">
+      <a href="onboarding/1-welcome.html" class="mock-card">
+        <span class="mock-num">02.1</span>
+        <span class="mock-title">Welcome</span>
+        <span class="mock-desc">First impression. Brand mark, posture statement, "get started" CTA.</span>
+        <span class="mock-path">onboarding/1-welcome.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="onboarding/2-real-accounts.html" class="mock-card">
+        <span class="mock-num">02.2</span>
+        <span class="mock-title">Real accounts</span>
+        <span class="mock-desc">Pick the buckets that hold actual money — Bank, Cash, more.</span>
+        <span class="mock-path">onboarding/2-real-accounts.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="onboarding/3-budgets.html" class="mock-card">
+        <span class="mock-num">02.3</span>
+        <span class="mock-title">Budgets</span>
+        <span class="mock-desc">Optional category targets. Food, Transport, Subscriptions and friends.</span>
+        <span class="mock-path">onboarding/3-budgets.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="onboarding/4-reminder.html" class="mock-card">
+        <span class="mock-num">02.4</span>
+        <span class="mock-title">Reminder</span>
+        <span class="mock-desc">The quiet evening nudge — opt-in, with a notification preview.</span>
+        <span class="mock-path">onboarding/4-reminder.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ ACCOUNTS ═══ -->
+  <section class="ds-section">
+    <div class="group-head">
+      <span class="group-num">03</span>
+      <span class="group-name">Accounts</span>
+      <span class="group-count">3 screens</span>
+    </div>
+    <div class="mock-grid">
+      <a href="accounts/index.html" class="mock-card">
+        <span class="mock-num">03.1</span>
+        <span class="mock-title">Accounts</span>
+        <span class="mock-desc">List of real accounts and budgets, with balances and progress.</span>
+        <span class="mock-path">accounts/index.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="accounts/detail-real.html" class="mock-card">
+        <span class="mock-num">03.2</span>
+        <span class="mock-title">Account · real</span>
+        <span class="mock-desc">Bank or Cash detail — hero balance, monthly flow strip, quick actions, transactions.</span>
+        <span class="mock-path">accounts/detail-real.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="accounts/detail.html" class="mock-card">
+        <span class="mock-num">03.3</span>
+        <span class="mock-title">Account · budget</span>
+        <span class="mock-desc">Budget detail — allocation, progress, category transactions.</span>
+        <span class="mock-path">accounts/detail.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ TRANSACTIONS ═══ -->
+  <section class="ds-section">
+    <div class="group-head">
+      <span class="group-num">04</span>
+      <span class="group-name">Transactions</span>
+      <span class="group-count">1 screen</span>
+    </div>
+    <div class="mock-grid">
+      <a href="transactions/add.html" class="mock-card">
+        <span class="mock-num">04.1</span>
+        <span class="mock-title">Add transaction</span>
+        <span class="mock-desc">The calculator pad, scope tabs (expense/income/transfer), hero amount, attachments.</span>
+        <span class="mock-path">transactions/add.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ RECURRING ═══ -->
+  <section class="ds-section">
+    <div class="group-head">
+      <span class="group-num">05</span>
+      <span class="group-name">Recurring</span>
+      <span class="group-count">2 screens</span>
+    </div>
+    <div class="mock-grid">
+      <a href="recurring/index.html" class="mock-card">
+        <span class="mock-num">05.1</span>
+        <span class="mock-title">Recurring</span>
+        <span class="mock-desc">Pending payments + the full schedule. Status badges for due, late, soon.</span>
+        <span class="mock-path">recurring/index.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="recurring/add.html" class="mock-card">
+        <span class="mock-num">05.2</span>
+        <span class="mock-title">Add recurring</span>
+        <span class="mock-desc">Configure a repeating payment — name, amount, cadence, optional advanced.</span>
+        <span class="mock-path">recurring/add.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ DEBTS ═══ -->
+  <section class="ds-section">
+    <div class="group-head">
+      <span class="group-num">06</span>
+      <span class="group-name">Debts &amp; receivables</span>
+      <span class="group-count">6 screens</span>
+    </div>
+    <div class="mock-grid">
+      <a href="debts/index.html" class="mock-card">
+        <span class="mock-num">06.1</span>
+        <span class="mock-title">Debts</span>
+        <span class="mock-desc">Combined list — what you owe vs. what's owed to you, with avatars.</span>
+        <span class="mock-path">debts/index.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="debts/detail.html" class="mock-card">
+        <span class="mock-num">06.2</span>
+        <span class="mock-title">Debt · I owe</span>
+        <span class="mock-desc">Single debt detail — payments timeline, remaining balance, record payment.</span>
+        <span class="mock-path">debts/detail.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="debts/detail-receivable.html" class="mock-card">
+        <span class="mock-num">06.3</span>
+        <span class="mock-title">Debt · owed to me</span>
+        <span class="mock-desc">Receivable detail — repayment history, contact reminder, mark settled.</span>
+        <span class="mock-path">debts/detail-receivable.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="debts/add.html" class="mock-card">
+        <span class="mock-num">06.4</span>
+        <span class="mock-title">Add debt</span>
+        <span class="mock-desc">Record money borrowed — person, amount, date, optional account &amp; due date.</span>
+        <span class="mock-path">debts/add.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="debts/add-receivable.html" class="mock-card">
+        <span class="mock-num">06.5</span>
+        <span class="mock-title">Add receivable</span>
+        <span class="mock-desc">Record money lent — same form, inverse direction stamp.</span>
+        <span class="mock-path">debts/add-receivable.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="debts/record-payment.html" class="mock-card">
+        <span class="mock-num">06.6</span>
+        <span class="mock-title">Record payment</span>
+        <span class="mock-desc">Log a payment against an existing debt — partial or full, with remaining-balance preview.</span>
+        <span class="mock-path">debts/record-payment.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ REPORTS ═══ -->
+  <section class="ds-section">
+    <div class="group-head">
+      <span class="group-num">07</span>
+      <span class="group-name">Reports</span>
+      <span class="group-count">3 screens</span>
+    </div>
+    <div class="mock-grid">
+      <a href="reports/index.html" class="mock-card">
+        <span class="mock-num">07.1</span>
+        <span class="mock-title">Reports · spending</span>
+        <span class="mock-desc">Monthly trend bars, donut by category, breakdown list.</span>
+        <span class="mock-path">reports/index.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="reports/income.html" class="mock-card">
+        <span class="mock-num">07.2</span>
+        <span class="mock-title">Reports · income</span>
+        <span class="mock-desc">The same chart system flipped for income sources.</span>
+        <span class="mock-path">reports/income.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="reports/insights.html" class="mock-card">
+        <span class="mock-num">07.3</span>
+        <span class="mock-title">Reports · insights</span>
+        <span class="mock-desc">Five-variant insight cards (warn / pos / neg / info / ai) in a full sheet.</span>
+        <span class="mock-path">reports/insights.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══ SETTINGS ═══ -->
+  <section class="ds-section">
+    <div class="group-head">
+      <span class="group-num">08</span>
+      <span class="group-name">Settings &amp; pickers</span>
+      <span class="group-count">3 screens</span>
+    </div>
+    <div class="mock-grid">
+      <a href="settings/index.html" class="mock-card">
+        <span class="mock-num">08.1</span>
+        <span class="mock-title">Settings</span>
+        <span class="mock-desc">Reminder, currency, appearance, archive, categories, danger zone.</span>
+        <span class="mock-path">settings/index.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="settings/categories.html" class="mock-card">
+        <span class="mock-num">08.2</span>
+        <span class="mock-title">Categories</span>
+        <span class="mock-desc">Manage the income &amp; expense tags — color pills, bars, kebab menu.</span>
+        <span class="mock-path">settings/categories.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+      <a href="settings/pickers.html" class="mock-card">
+        <span class="mock-num">08.3</span>
+        <span class="mock-title">Pickers gallery</span>
+        <span class="mock-desc">Account, category, date and other picker variants used in forms.</span>
+        <span class="mock-path">settings/pickers.html</span>
+        <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <footer class="ds-footer">
+    <div><a href="../system/index.html" style="color: var(--text-mute);">← Design system</a></div>
+    <div>22 screens · 2026</div>
+  </footer>
+
+</main>
+
+</body>
+</html>
