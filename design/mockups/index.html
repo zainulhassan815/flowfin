@@ -114,6 +114,108 @@
   .mock-card:hover .mock-cta svg { transform: translateX(4px); }
 
   .ds-section.first { padding-top: 0; border-top: none; }
+
+  /* ═══ Empty-state variant pills ═══ */
+  .states-strip {
+    margin-top: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .states-strip-label {
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .states-strip-label::before {
+    content: '';
+    width: 14px; height: 1px;
+    background: var(--text-faint);
+  }
+  .states-strip-label em {
+    color: var(--text-mute);
+    text-transform: none;
+    letter-spacing: -0.01em;
+    font-style: italic;
+    font-family: var(--font-serif), serif;
+    font-size: 13px;
+  }
+  .state-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .state-pill {
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-mute);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-strong);
+    padding: 7px 12px 7px 10px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: color .15s, border-color .15s, background .15s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .state-pill::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--pill-dot, var(--text-faint));
+    flex-shrink: 0;
+  }
+  .state-pill:hover {
+    color: var(--text);
+    border-color: rgba(232,220,192,0.32);
+    background: rgba(232,220,192,0.04);
+  }
+  /* Category dot colors: F · S · Q · N */
+  .state-pill.f::before { background: var(--accent); }
+  .state-pill.s::before { background: var(--transfer); }
+  .state-pill.q::before { background: var(--warn); }
+  .state-pill.n::before { background: var(--text-mute); }
+
+  /* Legend strip — a one-line key for the dots */
+  .states-legend {
+    margin-top: 28px;
+    padding: 14px 20px;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px;
+    font-family: var(--font-mono), monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    font-weight: 500;
+  }
+  .states-legend-title { color: var(--text-faint); }
+  .states-legend-item { display: inline-flex; align-items: center; gap: 7px; }
+  .states-legend-item .d {
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+  .states-legend-item .d.f { background: var(--accent); }
+  .states-legend-item .d.s { background: var(--transfer); }
+  .states-legend-item .d.q { background: var(--warn); }
+  .states-legend-item .d.n { background: var(--text-mute); }
 </style>
 </head>
 <body>
@@ -133,12 +235,20 @@
 <main class="ds-page">
 
   <header class="ds-page-header">
-    <div class="ds-eyebrow">22 screens · live HTML</div>
+    <div class="ds-eyebrow">22 screens · 7 empty variants · live HTML</div>
     <h1 class="ds-page-title">Every screen,<br>in one place.</h1>
     <p class="ds-page-lede">
       Click any tile to open the mockup in its phone frame. These are static HTML
       renders — the source of truth for visual decisions until the real app is built.
     </p>
+
+    <div class="states-legend">
+      <span class="states-legend-title">Empty-state categories</span>
+      <span class="states-legend-item"><span class="d f"></span>Full</span>
+      <span class="states-legend-item"><span class="d s"></span>Section</span>
+      <span class="states-legend-item"><span class="d q"></span>Filter</span>
+      <span class="states-legend-item"><span class="d n"></span>Not-enough-yet</span>
+    </div>
   </header>
 
   <!-- ═══ HOME ═══ -->
@@ -146,7 +256,7 @@
     <div class="group-head">
       <span class="group-num">01</span>
       <span class="group-name">Home</span>
-      <span class="group-count">1 screen</span>
+      <span class="group-count">1 screen · 5 states</span>
     </div>
     <div class="mock-grid">
       <a href="home/index.html" class="mock-card">
@@ -156,6 +266,17 @@
         <span class="mock-path">home/index.html</span>
         <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
       </a>
+    </div>
+
+    <div class="states-strip">
+      <span class="states-strip-label">Home <em>· empty states</em></span>
+      <div class="state-pills">
+        <a href="home/empty.html" class="state-pill f">No accounts</a>
+        <a href="home/no-transactions.html" class="state-pill s">No transactions</a>
+        <a href="home/no-recent-activity.html" class="state-pill s">Quiet week</a>
+        <a href="home/no-recurring.html" class="state-pill s">No recurring</a>
+        <a href="home/early-data.html" class="state-pill n">Early data</a>
+      </div>
     </div>
   </section>
 
@@ -203,7 +324,7 @@
     <div class="group-head">
       <span class="group-num">03</span>
       <span class="group-name">Accounts</span>
-      <span class="group-count">3 screens</span>
+      <span class="group-count">3 screens · 2 states</span>
     </div>
     <div class="mock-grid">
       <a href="accounts/index.html" class="mock-card">
@@ -227,6 +348,14 @@
         <span class="mock-path">accounts/detail.html</span>
         <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
       </a>
+    </div>
+
+    <div class="states-strip">
+      <span class="states-strip-label">Accounts <em>· empty states</em></span>
+      <div class="state-pills">
+        <a href="accounts/accounts-empty.html" class="state-pill f">No real, no budgets</a>
+        <a href="accounts/accounts-no-budgets.html" class="state-pill s">No budgets</a>
+      </div>
     </div>
   </section>
 
