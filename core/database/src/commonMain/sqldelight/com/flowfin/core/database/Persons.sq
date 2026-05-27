@@ -1,0 +1,67 @@
+import com.flowfin.core.database.PersonId;
+import kotlinx.datetime.Instant;
+
+-- Contacts referenced by debts. Free text; no system-contact integration.
+
+CREATE TABLE persons (
+  id                BLOB    AS PersonId  NOT NULL PRIMARY KEY,
+  name              TEXT                 NOT NULL,
+  avatar_tint_index INTEGER              NOT NULL DEFAULT 1,
+  created_at        INTEGER AS Instant   NOT NULL,
+  updated_at        INTEGER AS Instant   NOT NULL,
+  archived_at       INTEGER AS Instant,
+  CHECK (avatar_tint_index BETWEEN 1 AND 5)
+);
+
+-- Case-insensitive uniqueness keeps "Ahmed" and "ahmed" from splitting.
+CREATE UNIQUE INDEX persons_name_unique
+  ON persons(name COLLATE NOCASE)
+  WHERE archived_at IS NULL;
+
+
+selectActive:
+SELECT *
+FROM persons
+WHERE archived_at IS NULL
+ORDER BY name COLLATE NOCASE;
+
+selectAll:
+SELECT *
+FROM persons
+ORDER BY archived_at IS NULL DESC, name COLLATE NOCASE;
+
+selectById:
+SELECT *
+FROM persons
+WHERE id = ?;
+
+searchByName:
+SELECT *
+FROM persons
+WHERE archived_at IS NULL
+  AND name LIKE '%' || :query || '%' COLLATE NOCASE
+ORDER BY name COLLATE NOCASE
+LIMIT 20;
+
+findByExactName:
+SELECT *
+FROM persons
+WHERE name = :name COLLATE NOCASE
+  AND archived_at IS NULL;
+
+insert:
+INSERT INTO persons (id, name, avatar_tint_index, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?);
+
+updateBasics:
+UPDATE persons
+SET name              = :name,
+    avatar_tint_index = :tint,
+    updated_at        = :updatedAt
+WHERE id = :id;
+
+archive:
+UPDATE persons
+SET archived_at = :archivedAt,
+    updated_at  = :updatedAt
+WHERE id = :id AND archived_at IS NULL;

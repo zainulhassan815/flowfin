@@ -12,3 +12,8 @@
 
 # Logs
 *.log
+
+# SQLite artifacts (experiment DB, WAL, shared memory)
+*.db
+*.db-shm
+*.db-wal

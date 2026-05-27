@@ -1,0 +1,115 @@
+import com.flowfin.core.database.AccountId;
+import com.flowfin.core.database.Cadence;
+import com.flowfin.core.database.CategoryId;
+import com.flowfin.core.database.RecurringScheduleId;
+import com.flowfin.core.database.RecurringStatus;
+import kotlinx.datetime.Instant;
+
+-- Templates. Firings are rows in `transactions` with `recurring_id` set.
+-- "Pending" is computed (status = ACTIVE AND next_due_at <= now), not stored.
+
+CREATE TABLE recurring_schedules (
+  id              BLOB    AS RecurringScheduleId NOT NULL PRIMARY KEY,
+  name            TEXT                            NOT NULL,
+  amount_minor    INTEGER                         NOT NULL,
+  from_account_id BLOB    AS AccountId                     REFERENCES accounts(id)   ON DELETE RESTRICT,
+  to_account_id   BLOB    AS AccountId                     REFERENCES accounts(id)   ON DELETE RESTRICT,
+  category_id     BLOB    AS CategoryId                    REFERENCES categories(id) ON DELETE RESTRICT,
+  cadence         TEXT    AS Cadence             NOT NULL,
+  day_of_week     INTEGER,
+  day_of_month    INTEGER,
+  month_of_year   INTEGER,
+  next_due_at     INTEGER AS Instant             NOT NULL,
+  status          TEXT    AS RecurringStatus     NOT NULL DEFAULT 'ACTIVE',
+  paused_at       INTEGER AS Instant,
+  created_at      INTEGER AS Instant             NOT NULL,
+  updated_at      INTEGER AS Instant             NOT NULL,
+  CHECK (amount_minor > 0),
+  CHECK (cadence IN ('WEEKLY', 'MONTHLY', 'YEARLY')),
+  CHECK (status IN ('ACTIVE', 'PAUSED')),
+  CHECK (day_of_week  IS NULL OR day_of_week  BETWEEN 1 AND 7),
+  CHECK (day_of_month IS NULL OR day_of_month BETWEEN 1 AND 31),
+  CHECK (month_of_year IS NULL OR month_of_year BETWEEN 1 AND 12),
+  CHECK (
+    (cadence = 'WEEKLY'  AND day_of_week IS NOT NULL  AND day_of_month IS NULL     AND month_of_year IS NULL)
+    OR
+    (cadence = 'MONTHLY' AND day_of_week IS NULL      AND day_of_month IS NOT NULL AND month_of_year IS NULL)
+    OR
+    (cadence = 'YEARLY'  AND day_of_week IS NULL      AND day_of_month IS NOT NULL AND month_of_year IS NOT NULL)
+  )
+);
+
+CREATE INDEX recurring_due ON recurring_schedules(status, next_due_at);
+
+
+selectAll:
+SELECT *
+FROM recurring_schedules
+ORDER BY status, next_due_at;
+
+selectActive:
+SELECT *
+FROM recurring_schedules
+WHERE status = 'ACTIVE'
+ORDER BY next_due_at;
+
+selectById:
+SELECT *
+FROM recurring_schedules
+WHERE id = ?;
+
+-- Pending schedules at the call-site "now". Overdue is `next_due_at < now`.
+selectPending:
+SELECT *
+FROM recurring_schedules
+WHERE status = 'ACTIVE' AND next_due_at <= :now
+ORDER BY next_due_at;
+
+countPending:
+SELECT COUNT(*) AS count
+FROM recurring_schedules
+WHERE status = 'ACTIVE' AND next_due_at <= :now;
+
+insert:
+INSERT INTO recurring_schedules (
+  id, name, amount_minor, from_account_id, to_account_id, category_id,
+  cadence, day_of_week, day_of_month, month_of_year,
+  next_due_at, status, created_at, updated_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateTemplate:
+UPDATE recurring_schedules
+SET name            = :name,
+    amount_minor    = :amountMinor,
+    from_account_id = :fromAccountId,
+    to_account_id   = :toAccountId,
+    category_id     = :categoryId,
+    cadence         = :cadence,
+    day_of_week     = :dayOfWeek,
+    day_of_month    = :dayOfMonth,
+    month_of_year   = :monthOfYear,
+    updated_at      = :updatedAt
+WHERE id = :id;
+
+advanceNextDue:
+UPDATE recurring_schedules
+SET next_due_at = :nextDueAt,
+    updated_at  = :updatedAt
+WHERE id = :id;
+
+pause:
+UPDATE recurring_schedules
+SET status     = 'PAUSED',
+    paused_at  = :pausedAt,
+    updated_at = :updatedAt
+WHERE id = :id AND status = 'ACTIVE';
+
+resume:
+UPDATE recurring_schedules
+SET status     = 'ACTIVE',
+    paused_at  = NULL,
+    updated_at = :updatedAt
+WHERE id = :id AND status = 'PAUSED';
+
+delete:
+DELETE FROM recurring_schedules WHERE id = ?;
