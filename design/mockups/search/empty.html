@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Search (no matches) / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 20px; min-height: 100vh; overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg); border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E, 0 0 0 12px #0A0A0C, 0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28), 0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Search top bar ===== */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 12px;
+  flex-shrink: 0;
+}
+.close-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text-mute);
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color .15s, border-color .15s;
+}
+.close-btn:hover { color: var(--text); border-color: var(--text-soft); }
+
+.search-input {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid rgba(232,220,192,0.32);
+  border-radius: 12px;
+  box-shadow: 0 0 0 3px rgba(232,220,192,0.04);
+}
+.search-input > .lupe { color: var(--accent); flex-shrink: 0; }
+.search-query {
+  flex: 1;
+  font-family: var(--font-serif), serif;
+  font-size: 16px;
+  font-style: italic;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.search-query::after {
+  content: '';
+  display: inline-block;
+  width: 1.5px;
+  height: 17px;
+  background: var(--accent);
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: blink 1s steps(2) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+.search-clear {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--text-mute);
+  cursor: pointer;
+  border: none;
+  flex-shrink: 0;
+}
+.search-clear:hover { color: var(--text); background: rgba(255,255,255,0.10); }
+
+/* ===== Scope pills (which surfaces are being searched) ===== */
+.scope-pills {
+  display: flex;
+  gap: 6px;
+  padding: 0 16px 14px;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.scope-pills::-webkit-scrollbar { display: none; }
+.s-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.s-pill .count {
+  background: rgba(255,255,255,0.06);
+  color: var(--text-soft);
+  padding: 1px 5px;
+  border-radius: 5px;
+  font-size: 8.5px;
+}
+.s-pill.active {
+  background: rgba(232,220,192,0.08);
+  border-color: rgba(232,220,192,0.32);
+  color: var(--accent);
+}
+.s-pill.active .count {
+  background: rgba(232,220,192,0.12);
+  color: var(--accent);
+}
+.s-pill:hover { color: var(--text); border-color: var(--border-strong); }
+
+/* ===== Time range chip ===== */
+.range-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+  flex-shrink: 0;
+}
+.range-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+.range-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.range-chip:hover { border-color: var(--border-strong); }
+.range-chip svg { color: var(--text-soft); }
+
+.scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 0 20px 30px;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ===== Q-empty notice ===== */
+.q-empty {
+  padding: 40px 24px 34px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  position: relative;
+}
+.q-empty::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+.q-empty-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.q-empty-eyebrow .chip {
+  background: rgba(232,220,192,0.10);
+  border: 1px solid rgba(232,220,192,0.28);
+  color: var(--accent);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: none;
+  font-style: italic;
+  font-family: var(--font-serif), serif;
+  font-size: 11px;
+}
+.q-empty-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.22;
+  margin-top: 4px;
+}
+.q-empty-title strong {
+  font-family: var(--font-mono), monospace;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--accent);
+}
+.q-empty-body {
+  font-family: var(--font-serif), serif;
+  font-size: 13.5px;
+  color: var(--text-mute);
+  letter-spacing: -0.005em;
+  line-height: 1.5;
+  max-width: 290px;
+  margin-top: 4px;
+}
+
+/* Try-these suggestions */
+.try-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 300px;
+}
+.try-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  font-family: var(--font-serif), serif;
+  font-size: 13.5px;
+  color: var(--text-mute);
+  font-style: italic;
+  letter-spacing: -0.005em;
+}
+.try-row:hover {
+  border-color: var(--text-soft);
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+}
+.try-row .badge {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  background: rgba(255,255,255,0.05);
+  padding: 3px 7px;
+  border-radius: 6px;
+  font-style: normal;
+  flex-shrink: 0;
+}
+
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 6;
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 16<br>
+  <em>Search — no matches for query</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Top bar — close + active search input -->
+  <div class="search-bar">
+    <button class="close-btn" aria-label="Close search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 6l12 12M18 6L6 18"/>
+      </svg>
+    </button>
+    <div class="search-input">
+      <svg class="lupe" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M21 21l-4.3-4.3"/>
+      </svg>
+      <span class="search-query">rent april</span>
+      <button class="search-clear" aria-label="Clear">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Scope pills — which surfaces are searched. Counts show 0 across all. -->
+  <div class="scope-pills">
+    <span class="s-pill active">All <span class="count">0</span></span>
+    <span class="s-pill">Transactions <span class="count">0</span></span>
+    <span class="s-pill">Debts <span class="count">0</span></span>
+    <span class="s-pill">Recurring <span class="count">0</span></span>
+    <span class="s-pill">Accounts <span class="count">0</span></span>
+  </div>
+
+  <!-- Time range -->
+  <div class="range-line">
+    <span class="range-label">Range</span>
+    <button class="range-chip">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="16" rx="2"/>
+        <path d="M3 9h18M8 3v4M16 3v4"/>
+      </svg>
+      Last 3 months
+      <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3l3 3 3-3"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="scroll">
+
+    <div class="q-empty">
+      <div class="q-empty-eyebrow">
+        <span>Search</span>
+        <span class="chip">"rent april"</span>
+      </div>
+      <h3 class="q-empty-title">Nothing matches<br><strong>"rent april"</strong>.</h3>
+      <p class="q-empty-body">
+        No results across transactions, debts, recurring, or accounts within
+        the selected range. Try a wider range, or refine the wording.
+      </p>
+
+      <div class="try-list">
+        <button class="try-row">
+          <span class="badge">Range</span>
+          Expand to <em style="margin-left: 4px;">all time</em>
+        </button>
+        <button class="try-row">
+          <span class="badge">Term</span>
+          Search for <em style="margin-left: 4px;">"rent"</em> only
+        </button>
+        <button class="try-row">
+          <span class="badge">Term</span>
+          Search for <em style="margin-left: 4px;">"april"</em> only
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>

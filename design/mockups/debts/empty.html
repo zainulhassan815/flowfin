@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Debts (empty) / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+/* ===== Phone ===== */
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg); border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E,
+    0 0 0 12px #0A0A0C,
+    0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28),
+    0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Page header ===== */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px 8px; flex-shrink: 0;
+}
+.page-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-weight: 400;
+  font-size: 28px; letter-spacing: -0.02em; color: var(--text);
+}
+.header-actions { display: flex; gap: 4px; }
+.icon-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: var(--text-mute); cursor: pointer;
+  border-radius: 10px;
+  transition: color .15s, background .15s;
+}
+.icon-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+
+/* ===== Body ===== */
+.scroll {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ───────── Editorial empty moment ───────── */
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 28px 120px;
+  text-align: center;
+  position: relative;
+}
+
+/* faint horizontal rules framing the moment */
+.empty::before,
+.empty::after {
+  content: '';
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
+}
+.empty::before { margin-bottom: 30px; }
+.empty::after  { margin-top: 32px; }
+
+/* Direction glyph — two arrows in opposing directions, sketch the duality */
+.duality {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 26px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.duality-pole {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px 7px 9px;
+  background: var(--surface);
+  border: 1px solid var(--pole-border);
+  border-radius: 999px;
+  color: var(--pole-color);
+}
+.duality-pole.out { --pole-border: rgba(232,182,110,0.32); --pole-color: var(--warn); }
+.duality-pole.in  { --pole-border: rgba(156,212,162,0.32); --pole-color: var(--pos); }
+.duality-pole svg {
+  width: 12px; height: 12px;
+  stroke: currentColor;
+}
+.duality-bridge {
+  width: 18px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(232,182,110,0.4), rgba(156,212,162,0.4));
+}
+
+.empty-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.empty-eyebrow::before,
+.empty-eyebrow::after {
+  content: '';
+  width: 10px;
+  height: 1px;
+  background: rgba(232,220,192,0.4);
+}
+
+.empty-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 32px;
+  letter-spacing: -0.025em;
+  line-height: 1.18;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.empty-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.empty-body {
+  font-family: var(--font-serif), serif;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text-mute);
+  letter-spacing: -0.005em;
+  max-width: 300px;
+}
+
+/* ───────── Paired CTA ───────── */
+.cta-pair {
+  margin-top: 30px;
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+}
+.cta {
+  flex: 1;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 16px 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--cta-border);
+  background: var(--cta-bg);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--cta-color);
+  cursor: pointer;
+  transition: background .15s, border-color .15s, transform .15s;
+  position: relative;
+}
+.cta:hover {
+  transform: translateY(-1px);
+  background: var(--cta-bg-hover);
+  border-color: var(--cta-border-hover);
+}
+.cta-glyph {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--cta-border);
+  background: var(--cta-glyph-bg);
+  color: var(--cta-color);
+  margin-bottom: 1px;
+}
+
+.cta.owe {
+  --cta-color: var(--warn);
+  --cta-bg: rgba(232,182,110,0.08);
+  --cta-bg-hover: rgba(232,182,110,0.13);
+  --cta-border: rgba(232,182,110,0.28);
+  --cta-border-hover: rgba(232,182,110,0.45);
+  --cta-glyph-bg: rgba(232,182,110,0.10);
+}
+.cta.lent {
+  --cta-color: var(--pos);
+  --cta-bg: rgba(156,212,162,0.08);
+  --cta-bg-hover: rgba(156,212,162,0.13);
+  --cta-border: rgba(156,212,162,0.28);
+  --cta-border-hover: rgba(156,212,162,0.45);
+  --cta-glyph-bg: rgba(156,212,162,0.10);
+}
+
+/* ===== Tab bar ===== */
+.tab-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 88px;
+  background: rgba(8,8,10,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-around; align-items: flex-start;
+  padding: 14px 12px 0; z-index: 5;
+}
+.tab {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  color: var(--text-mute); background: transparent; border: none;
+  cursor: pointer; font-family: var(--font-mono), monospace;
+  font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase;
+  flex: 1; padding: 4px 0;
+}
+.tab.active { color: var(--text); }
+.tab.active .tab-icon { color: var(--text); }
+.tab-icon { color: var(--text-mute); transition: color .2s; }
+
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 6;
+}
+
+@media (max-width: 480px) {
+  body { padding: 0; }
+  .phone {
+    width: 100%; height: 100vh;
+    border-radius: 0; box-shadow: none;
+  }
+  .caption, .caption-r { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 08b<br>
+  <em>Debts — empty · no debts, no receivables</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Page header — history hidden (no history), + remains -->
+  <div class="page-header">
+    <h1 class="page-title">Debts</h1>
+    <div class="header-actions">
+      <button class="icon-btn" aria-label="Add">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- No hero, no tabs — nothing to summarise or filter -->
+
+  <div class="scroll">
+
+    <!-- EMPTY STATE — editorial moment -->
+    <section class="empty">
+
+      <!-- Duality glyph — sketches the two directions before the title says them -->
+      <div class="duality" aria-hidden="true">
+        <span class="duality-pole out">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 7L7 17M7 7h10v10"/>
+          </svg>
+          Owed
+        </span>
+        <span class="duality-bridge"></span>
+        <span class="duality-pole in">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17L17 7M17 17H7V7"/>
+          </svg>
+          Lent
+        </span>
+      </div>
+
+      <div class="empty-eyebrow">Owed &amp; Owed to</div>
+      <h2 class="empty-title">Money moves <em>between people.</em><br>Keep score.</h2>
+      <p class="empty-body">
+        Borrowed for rent, fronted lunch for a friend — record either
+        direction. FlowFin reconciles each repayment until it settles.
+      </p>
+
+      <div class="cta-pair">
+        <a href="#" class="cta owe">
+          <span class="cta-glyph">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14M5 12l7 7 7-7"/>
+            </svg>
+          </span>
+          Record a debt
+        </a>
+        <a href="#" class="cta lent">
+          <span class="cta-glyph">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 19V5M5 12l7-7 7 7"/>
+            </svg>
+          </span>
+          Record a receivable
+        </a>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Tab bar -->
+  <nav class="tab-bar">
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10z"/>
+      </svg>
+      Home
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="6" width="18" height="13" rx="2"/>
+        <path d="M3 10h18M7 15h3"/>
+      </svg>
+      Accounts
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>
+      </svg>
+      Recur
+    </button>
+    <button class="tab active">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 11a4 4 0 1 0-8 0M5 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/>
+        <circle cx="13" cy="7" r="4"/>
+      </svg>
+      Debts
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19V5M9 19V9M14 19v-6M19 19V3"/>
+      </svg>
+      Reports
+    </button>
+  </nav>
+
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>

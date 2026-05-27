@@ -324,7 +324,7 @@
     <div class="group-head">
       <span class="group-num">03</span>
       <span class="group-name">Accounts</span>
-      <span class="group-count">3 screens · 2 states</span>
+      <span class="group-count">3 screens · 4 states</span>
     </div>
     <div class="mock-grid">
       <a href="accounts/index.html" class="mock-card">
@@ -355,6 +355,8 @@
       <div class="state-pills">
         <a href="accounts/accounts-empty.html" class="state-pill f">No real, no budgets</a>
         <a href="accounts/accounts-no-budgets.html" class="state-pill s">No budgets</a>
+        <a href="accounts/detail-real-empty.html" class="state-pill s">Real · just added</a>
+        <a href="accounts/detail-budget-empty.html" class="state-pill s">Budget · just allocated</a>
       </div>
     </div>
   </section>
@@ -382,7 +384,7 @@
     <div class="group-head">
       <span class="group-num">05</span>
       <span class="group-name">Recurring</span>
-      <span class="group-count">2 screens</span>
+      <span class="group-count">2 screens · 3 states</span>
     </div>
     <div class="mock-grid">
       <a href="recurring/index.html" class="mock-card">
@@ -400,6 +402,15 @@
         <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
       </a>
     </div>
+
+    <div class="states-strip">
+      <span class="states-strip-label">Recurring <em>· empty states</em></span>
+      <div class="state-pills">
+        <a href="recurring/empty.html" class="state-pill f">No schedules</a>
+        <a href="recurring/no-pending.html" class="state-pill s">Nothing pending</a>
+        <a href="recurring/all-paused.html" class="state-pill s">All paused</a>
+      </div>
+    </div>
   </section>
 
   <!-- ═══ DEBTS ═══ -->
@@ -407,7 +418,7 @@
     <div class="group-head">
       <span class="group-num">06</span>
       <span class="group-name">Debts &amp; receivables</span>
-      <span class="group-count">6 screens</span>
+      <span class="group-count">6 screens · 2 states</span>
     </div>
     <div class="mock-grid">
       <a href="debts/index.html" class="mock-card">
@@ -453,6 +464,14 @@
         <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
       </a>
     </div>
+
+    <div class="states-strip">
+      <span class="states-strip-label">Debts <em>· empty states</em></span>
+      <div class="state-pills">
+        <a href="debts/empty.html" class="state-pill f">No debts, no receivables</a>
+        <a href="debts/detail-empty.html" class="state-pill s">Detail · just added</a>
+      </div>
+    </div>
   </section>
 
   <!-- ═══ REPORTS ═══ -->
@@ -460,7 +479,7 @@
     <div class="group-head">
       <span class="group-num">07</span>
       <span class="group-name">Reports</span>
-      <span class="group-count">3 screens</span>
+      <span class="group-count">3 screens · 5 states</span>
     </div>
     <div class="mock-grid">
       <a href="reports/index.html" class="mock-card">
@@ -485,6 +504,17 @@
         <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
       </a>
     </div>
+
+    <div class="states-strip">
+      <span class="states-strip-label">Reports <em>· empty states</em></span>
+      <div class="state-pills">
+        <a href="reports/empty.html" class="state-pill f">No transactions ever</a>
+        <a href="reports/no-activity.html" class="state-pill q">Past month · no activity</a>
+        <a href="reports/filtered-empty.html" class="state-pill q">Filter · no results</a>
+        <a href="reports/early-data.html" class="state-pill n">Early data · day 5</a>
+        <a href="reports/insights-early.html" class="state-pill n">Insights · early</a>
+      </div>
+    </div>
   </section>
 
   <!-- ═══ SETTINGS ═══ -->
@@ -492,7 +522,7 @@
     <div class="group-head">
       <span class="group-num">08</span>
       <span class="group-name">Settings &amp; pickers</span>
-      <span class="group-count">3 screens</span>
+      <span class="group-count">3 screens · 1 state</span>
     </div>
     <div class="mock-grid">
       <a href="settings/index.html" class="mock-card">
@@ -516,6 +546,28 @@
         <span class="mock-path">settings/pickers.html</span>
         <span class="mock-cta">Open <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
       </a>
+    </div>
+
+    <div class="states-strip">
+      <span class="states-strip-label">Categories <em>· empty states</em></span>
+      <div class="state-pills">
+        <a href="settings/categories-search-empty.html" class="state-pill q">Search · no matches</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SEARCH ═══ -->
+  <section class="ds-section">
+    <div class="group-head">
+      <span class="group-num">09</span>
+      <span class="group-name">Search</span>
+      <span class="group-count">1 state</span>
+    </div>
+    <div class="states-strip">
+      <span class="states-strip-label">Cross-app search <em>· empty states</em></span>
+      <div class="state-pills">
+        <a href="search/empty.html" class="state-pill q">Query · no matches</a>
+      </div>
     </div>
   </section>
 

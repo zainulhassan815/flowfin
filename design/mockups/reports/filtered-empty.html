@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Reports (filter empty) / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+
+  --cat-food: #E8A87B;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 20px; min-height: 100vh; overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg); border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E, 0 0 0 12px #0A0A0C, 0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28), 0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px 8px; flex-shrink: 0;
+}
+.page-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-weight: 400;
+  font-size: 28px; letter-spacing: -0.02em;
+}
+.header-actions { display: flex; gap: 4px; }
+.icon-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: var(--text-mute); cursor: pointer;
+  border-radius: 10px;
+  transition: color .15s, background .15s;
+}
+.icon-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+.icon-btn.active {
+  color: var(--accent);
+  background: rgba(232,220,192,0.06);
+}
+
+.scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 0 20px 110px;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ===== Month strip ===== */
+.month-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px 18px;
+}
+.month-nav {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-mute);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.month-label { text-align: center; flex: 1; }
+.month-name {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+.month-year {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-top: 2px;
+}
+
+/* ===== Active filter strip ===== */
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 0 4px 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+}
+.filters-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+  margin-right: 2px;
+}
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 10px;
+  background: rgba(232,168,123,0.08);
+  border: 1px solid rgba(232,168,123,0.28);
+  border-radius: 999px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  font-weight: 500;
+}
+.filter-chip .marker {
+  width: 6px; height: 6px;
+  background: var(--cat-food);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.filter-chip .x {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.25);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--text-mute);
+  cursor: pointer;
+  transition: color .15s, background .15s;
+}
+.filter-chip .x:hover { color: var(--text); background: rgba(0,0,0,0.4); }
+.clear-link {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  text-decoration: none;
+  cursor: pointer;
+  margin-left: auto;
+  font-weight: 500;
+  transition: color .15s;
+}
+.clear-link:hover { color: var(--text); }
+
+/* ===== Scope tabs ===== */
+.scope-segment {
+  display: inline-flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+  margin-bottom: 18px;
+}
+.scope-item {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  background: transparent;
+  border: none;
+  padding: 7px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.scope-item.active {
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+}
+
+/* ===== Q-empty inline notice ===== */
+.q-empty {
+  padding: 36px 24px 32px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  position: relative;
+}
+.q-empty::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(232,168,123,0.5), transparent);
+}
+.q-empty-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--cat-food);
+  font-weight: 500;
+}
+.q-empty-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.25;
+  margin-top: 4px;
+}
+.q-empty-title em {
+  font-style: italic;
+  color: var(--cat-food);
+}
+.q-empty-body {
+  font-family: var(--font-serif), serif;
+  font-size: 13.5px;
+  color: var(--text-mute);
+  letter-spacing: -0.005em;
+  line-height: 1.5;
+  max-width: 270px;
+  margin-top: 4px;
+}
+.q-empty-links {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.q-empty-link {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  border: 1px solid var(--border-strong);
+  padding: 8px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.q-empty-link:hover { color: var(--text); border-color: var(--text-soft); background: rgba(255,255,255,0.03); }
+.q-empty-link.primary {
+  color: var(--accent);
+  border-color: rgba(232,220,192,0.32);
+}
+.q-empty-link.primary:hover { background: rgba(232,220,192,0.06); border-color: rgba(232,220,192,0.5); }
+
+/* ===== Tab bar ===== */
+.tab-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 88px;
+  background: rgba(8,8,10,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-around; align-items: flex-start;
+  padding: 14px 12px 0; z-index: 5;
+}
+.tab {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  color: var(--text-mute); background: transparent; border: none;
+  cursor: pointer; font-family: var(--font-mono), monospace;
+  font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase;
+  flex: 1; padding: 4px 0;
+}
+.tab.active { color: var(--text); }
+.tab.active .tab-icon { color: var(--text); }
+.tab-icon { color: var(--text-mute); transition: color .2s; }
+
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 6;
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 10d<br>
+  <em>Reports — filter active · no results</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="page-header">
+    <h1 class="page-title">Reports</h1>
+    <div class="header-actions">
+      <button class="icon-btn" aria-label="Insights">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"/>
+        </svg>
+      </button>
+      <!-- Filter icon shown active because a filter is applied -->
+      <button class="icon-btn active" aria-label="Filter">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18M6 12h12M10 18h4"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="scroll">
+
+    <!-- Month strip — current month -->
+    <div class="month-strip">
+      <button class="month-nav" aria-label="Previous">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+      <div class="month-label">
+        <div class="month-name">May</div>
+        <div class="month-year">2026</div>
+      </div>
+      <button class="month-nav" aria-label="Next">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Active filter strip -->
+    <div class="filters">
+      <span class="filters-label">Filtered by</span>
+      <span class="filter-chip">
+        <span class="marker"></span>
+        Food &amp; Dining
+        <span class="x" aria-label="Remove filter">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 6l12 12M18 6L6 18"/>
+          </svg>
+        </span>
+      </span>
+      <a class="clear-link">Clear all</a>
+    </div>
+
+    <!-- Scope tabs (kept — the user might switch scopes to find activity) -->
+    <div class="scope-segment">
+      <button class="scope-item active">Expense</button>
+      <button class="scope-item">Income</button>
+    </div>
+
+    <!-- Q-EMPTY — echoes the filter terms -->
+    <div class="q-empty">
+      <span class="q-empty-eyebrow">Food &amp; Dining · May 2026</span>
+      <h3 class="q-empty-title">No spending in <em>Food &amp; Dining</em><br>this month.</h3>
+      <p class="q-empty-body">
+        Other categories may have activity — clear the filter, or switch to
+        another category to compare.
+      </p>
+      <div class="q-empty-links">
+        <a class="q-empty-link primary">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 6l12 12M18 6L6 18"/>
+          </svg>
+          Clear filter
+        </a>
+        <a class="q-empty-link">Pick another category</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab bar -->
+  <nav class="tab-bar">
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10z"/>
+      </svg>
+      Home
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="6" width="18" height="13" rx="2"/>
+        <path d="M3 10h18M7 15h3"/>
+      </svg>
+      Accounts
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>
+      </svg>
+      Recur
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 11a4 4 0 1 0-8 0M5 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/>
+        <circle cx="13" cy="7" r="4"/>
+      </svg>
+      Debts
+    </button>
+    <button class="tab active">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19V5M9 19V9M14 19v-6M19 19V3"/>
+      </svg>
+      Reports
+    </button>
+  </nav>
+
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>

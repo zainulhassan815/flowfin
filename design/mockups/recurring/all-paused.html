@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Recurring (all paused) / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  --cat-bank: #82C5D4;
+  --cat-cash: #C5D982;
+  --cat-food: #E8A87B;
+  --cat-transport: #8AB4E0;
+  --cat-fun: #C98ED4;
+  --cat-salary: #9CD4A2;
+  --cat-subs: #9A8AE0;
+  --cat-rent: #D89A82;
+  --cat-utilities: #E8CC7B;
+  --cat-health: #DC8A8A;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+/* ===== Phone ===== */
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg); border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E,
+    0 0 0 12px #0A0A0C,
+    0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28),
+    0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Page header ===== */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px 8px; flex-shrink: 0;
+}
+.page-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-weight: 400;
+  font-size: 28px; letter-spacing: -0.02em; color: var(--text);
+}
+.header-actions { display: flex; gap: 4px; }
+.icon-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: var(--text-mute); cursor: pointer;
+  border-radius: 10px;
+  transition: color .15s, background .15s;
+}
+.icon-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+
+/* ===== Quick stats line ===== */
+.stats-line {
+  padding: 4px 24px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-shrink: 0;
+}
+.stats-main {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  color: var(--text-soft);
+  letter-spacing: -0.01em;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stats-main .label {
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-right: 4px;
+  font-weight: 500;
+}
+.stats-main .pause-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--text-mute);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+.stats-main .pause-pill svg { opacity: 0.7; }
+.stats-aux {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 500;
+}
+.stats-aux .ok { color: var(--pos); margin-right: 3px; }
+
+/* ===== Scroll ===== */
+.scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding-bottom: 110px;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ===== Section ===== */
+.section { padding: 0 20px; margin-top: 22px; }
+.section-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+.section-title .count {
+  color: var(--text);
+  background: rgba(255,255,255,0.06);
+  padding: 1px 6px;
+  border-radius: 7px;
+  font-size: 9px;
+  margin-left: 6px;
+}
+.section-title .count.zero {
+  color: var(--text-faint);
+}
+.section-aux {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  color: var(--text-mute);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ===== Section-empty hint inside Active ===== */
+.empty-hint {
+  padding: 32px 24px 28px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  position: relative;
+}
+.empty-hint::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+.empty-hint-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 500;
+}
+.empty-hint-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.2;
+  margin-top: 2px;
+}
+.empty-hint-body {
+  font-family: var(--font-serif), serif;
+  font-size: 13.5px;
+  color: var(--text-mute);
+  letter-spacing: -0.005em;
+  line-height: 1.5;
+  max-width: 250px;
+  margin-top: 4px;
+}
+.empty-hint-link {
+  margin-top: 12px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  border: 1px solid rgba(232,220,192,0.32);
+  padding: 9px 14px;
+  border-radius: 10px;
+  transition: background .15s, border-color .15s;
+}
+.empty-hint-link:hover {
+  background: rgba(232,220,192,0.06);
+  border-color: rgba(232,220,192,0.5);
+}
+
+/* ===== Paused row ===== */
+.paused-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 0;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.paused-row:last-of-type { border-bottom: none; }
+.paused-icon {
+  width: 38px; height: 38px;
+  border: 1px solid var(--border-strong);
+  background: rgba(255,255,255,0.02);
+  border-radius: 10px;
+  color: var(--text-soft);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.paused-body { flex: 1; min-width: 0; }
+.paused-name {
+  font-family: var(--font-serif), serif;
+  font-size: 16px;
+  color: var(--text-mute);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.paused-name .pause-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px; height: 13px;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+.freq-tag {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  background: rgba(255,255,255,0.03);
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-weight: 500;
+}
+.paused-meta {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  color: var(--text-soft);
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+.paused-meta em {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  letter-spacing: 0;
+  color: var(--text-mute);
+}
+
+.paused-amount {
+  text-align: right;
+  flex-shrink: 0;
+}
+.paused-amount .val {
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-mute);
+  letter-spacing: -0.01em;
+}
+.paused-amount .val .dec { color: var(--text-faint); font-weight: 400; }
+
+.resume-btn {
+  flex-shrink: 0;
+  width: 34px; height: 34px;
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  border-radius: 10px;
+  color: var(--text-mute);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all .15s;
+}
+.resume-btn:hover {
+  color: var(--pos);
+  border-color: rgba(156,212,162,0.4);
+  background: rgba(156,212,162,0.06);
+}
+
+/* ===== Tab bar ===== */
+.tab-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 88px;
+  background: rgba(8,8,10,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-around; align-items: flex-start;
+  padding: 14px 12px 0; z-index: 5;
+}
+.tab {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  color: var(--text-mute); background: transparent; border: none;
+  cursor: pointer; font-family: var(--font-mono), monospace;
+  font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase;
+  flex: 1; padding: 4px 0;
+}
+.tab.active { color: var(--text); }
+.tab.active .tab-icon { color: var(--text); }
+.tab-icon { color: var(--text-mute); transition: color .2s; }
+
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 6;
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 05c<br>
+  <em>Recurring — all paused</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Page header -->
+  <div class="page-header">
+    <h1 class="page-title">Recurring</h1>
+    <div class="header-actions">
+      <button class="icon-btn" aria-label="History">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 7v5l3 2"/>
+        </svg>
+      </button>
+      <button class="icon-btn" aria-label="Add">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick stats — monthly load reads as "paused", and active count is zero -->
+  <div class="stats-line">
+    <div class="stats-main">
+      <span class="label">Monthly</span>
+      <span class="pause-pill">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="6" y="4" width="4" height="16" rx="1"/>
+          <rect x="14" y="4" width="4" height="16" rx="1"/>
+        </svg>
+        All paused
+      </span>
+    </div>
+    <div class="stats-aux">
+      <span class="ok">0</span>active · 4 paused
+    </div>
+  </div>
+
+  <div class="scroll">
+
+    <!-- ACTIVE SECTION — empty, with inline hint -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-title">All active <span class="count zero">0</span></div>
+        <div class="section-aux">Next 30 days</div>
+      </div>
+
+      <div class="empty-hint">
+        <span class="empty-hint-eyebrow">All paused</span>
+        <h3 class="empty-hint-title">Nothing running.</h3>
+        <p class="empty-hint-body">
+          Every schedule is paused. Resume one to start surfacing it before
+          its next due date.
+        </p>
+        <a href="#" class="empty-hint-link">
+          Resume one
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 3l14 9-14 9V3z"/>
+          </svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- PAUSED SECTION — surfaces inline (not behind the usual link) -->
+    <section class="section">
+      <div class="section-head">
+        <div class="section-title">Paused <span class="count">4</span></div>
+        <div class="section-aux">Tap ▶ to resume</div>
+      </div>
+
+      <!-- Paused row 1 -->
+      <div class="paused-row">
+        <div class="paused-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9z"/>
+            <path d="M9 22V12h6v10"/>
+          </svg>
+        </div>
+        <div class="paused-body">
+          <div class="paused-name">
+            <span class="pause-glyph">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="4" width="4" height="16" rx="1"/>
+                <rect x="14" y="4" width="4" height="16" rx="1"/>
+              </svg>
+            </span>
+            Rent
+            <span class="freq-tag">Monthly</span>
+          </div>
+          <div class="paused-meta">Paused <em>since 12 May</em></div>
+        </div>
+        <div class="paused-amount">
+          <span class="val">30,000<span class="dec">.00</span></span>
+        </div>
+        <button class="resume-btn" aria-label="Resume Rent">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 3l14 9-14 9V3z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Paused row 2 -->
+      <div class="paused-row">
+        <div class="paused-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <polygon points="11 9 16 12 11 15 11 9" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="paused-body">
+          <div class="paused-name">
+            <span class="pause-glyph">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="4" width="4" height="16" rx="1"/>
+                <rect x="14" y="4" width="4" height="16" rx="1"/>
+              </svg>
+            </span>
+            Netflix
+            <span class="freq-tag">Monthly</span>
+          </div>
+          <div class="paused-meta">Paused <em>since 4 May</em></div>
+        </div>
+        <div class="paused-amount">
+          <span class="val">1,500<span class="dec">.00</span></span>
+        </div>
+        <button class="resume-btn" aria-label="Resume Netflix">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 3l14 9-14 9V3z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Paused row 3 -->
+      <div class="paused-row">
+        <div class="paused-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20l0 .01"/>
+          </svg>
+        </div>
+        <div class="paused-body">
+          <div class="paused-name">
+            <span class="pause-glyph">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="4" width="4" height="16" rx="1"/>
+                <rect x="14" y="4" width="4" height="16" rx="1"/>
+              </svg>
+            </span>
+            Internet
+            <span class="freq-tag">Monthly</span>
+          </div>
+          <div class="paused-meta">Paused <em>since 28 Apr</em></div>
+        </div>
+        <div class="paused-amount">
+          <span class="val">2,500<span class="dec">.00</span></span>
+        </div>
+        <button class="resume-btn" aria-label="Resume Internet">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 3l14 9-14 9V3z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Paused row 4 -->
+      <div class="paused-row">
+        <div class="paused-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9v6M2 11v2M18 9v6M22 11v2M6 12h12M14 9c0-1.1.9-2 2-2s2 .9 2 2M6 9c0-1.1.9-2 2-2s2 .9 2 2"/>
+          </svg>
+        </div>
+        <div class="paused-body">
+          <div class="paused-name">
+            <span class="pause-glyph">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="4" width="4" height="16" rx="1"/>
+                <rect x="14" y="4" width="4" height="16" rx="1"/>
+              </svg>
+            </span>
+            Gym Membership
+            <span class="freq-tag">Monthly</span>
+          </div>
+          <div class="paused-meta">Paused <em>since 1 Apr</em></div>
+        </div>
+        <div class="paused-amount">
+          <span class="val">5,000<span class="dec">.00</span></span>
+        </div>
+        <button class="resume-btn" aria-label="Resume Gym Membership">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 3l14 9-14 9V3z"/>
+          </svg>
+        </button>
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- Tab bar -->
+  <nav class="tab-bar">
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10z"/>
+      </svg>
+      Home
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="6" width="18" height="13" rx="2"/>
+        <path d="M3 10h18M7 15h3"/>
+      </svg>
+      Accounts
+    </button>
+    <button class="tab active">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>
+      </svg>
+      Recur
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 11a4 4 0 1 0-8 0M5 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/>
+        <circle cx="13" cy="7" r="4"/>
+      </svg>
+      Debts
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19V5M9 19V9M14 19v-6M19 19V3"/>
+      </svg>
+      Reports
+    </button>
+  </nav>
+
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>

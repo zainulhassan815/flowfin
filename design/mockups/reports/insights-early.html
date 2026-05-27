@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Insights (early data) / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 20px; min-height: 100vh; overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg); border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E, 0 0 0 12px #0A0A0C, 0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28), 0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Reports glimpse behind ===== */
+.behind {
+  flex: 1;
+  padding: 0 20px;
+  filter: blur(0.5px);
+  opacity: 0.45;
+}
+.behind .ph-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0 8px;
+}
+.behind .ph-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 28px;
+}
+.behind .ph-icons { display: flex; gap: 8px; }
+.behind .ph-icon {
+  width: 26px; height: 26px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 8px;
+}
+.behind .ph-month {
+  text-align: center;
+  margin: 12px 0 18px;
+}
+.behind .ph-month-name {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 20px;
+}
+.behind .ph-month-year {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-top: 2px;
+}
+.behind .ph-summary {
+  height: 90px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+/* ===== Backdrop ===== */
+.sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.62);
+  backdrop-filter: blur(1.5px);
+  z-index: 40;
+}
+
+/* ===== Sheet ===== */
+.insights-sheet {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 78%;
+  background: var(--bg);
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  border-top: 1px solid var(--border);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -20px 50px rgba(0,0,0,0.4);
+}
+.sheet-handle {
+  width: 38px; height: 4px;
+  background: rgba(255,255,255,0.16);
+  border-radius: 3px;
+  margin: 10px auto 6px;
+  flex-shrink: 0;
+}
+.sheet-head {
+  padding: 12px 22px 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sheet-title-block {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.sheet-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+.sheet-subtitle {
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sheet-subtitle .day-chip {
+  background: rgba(232,220,192,0.10);
+  color: var(--accent);
+  border: 1px solid rgba(232,220,192,0.28);
+  padding: 1px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.14em;
+}
+.sheet-close {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: none;
+  color: var(--text-mute);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.sheet-close:hover { color: var(--text); background: rgba(255,255,255,0.08); }
+
+.sheet-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 22px 28px;
+  display: flex;
+  flex-direction: column;
+}
+.sheet-scroll::-webkit-scrollbar { display: none; }
+
+/* ===== N editorial moment ===== */
+.n-moment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 28px 8px 26px;
+  position: relative;
+}
+.n-moment::before,
+.n-moment::after {
+  content: '';
+  width: 60px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
+}
+.n-moment::before { margin-bottom: 22px; }
+.n-moment::after  { margin-top: 22px; }
+
+.n-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.n-eyebrow::before,
+.n-eyebrow::after {
+  content: '';
+  width: 10px;
+  height: 1px;
+  background: rgba(232,220,192,0.4);
+}
+.n-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 26px;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  color: var(--text);
+  margin-bottom: 14px;
+  max-width: 290px;
+}
+.n-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+.n-body {
+  font-family: var(--font-serif), serif;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-mute);
+  letter-spacing: -0.005em;
+  max-width: 290px;
+}
+.n-progress {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(232,220,192,0.06);
+  border: 1px solid rgba(232,220,192,0.20);
+  border-radius: 999px;
+}
+.n-progress-bar {
+  width: 56px;
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.n-progress-fill {
+  height: 100%;
+  width: 17%;
+  background: var(--accent);
+  border-radius: 2px;
+}
+.n-progress-text {
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ===== Preview section ===== */
+.preview-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 500;
+  margin: 4px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.preview-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.preview-card {
+  display: flex;
+  gap: 14px;
+  padding: 16px 14px;
+  border: 1px dashed rgba(232,182,110,0.32);
+  border-radius: 12px;
+  background: rgba(232,182,110,0.03);
+  opacity: 0.7;
+  position: relative;
+}
+.preview-card::before {
+  content: 'Preview';
+  position: absolute;
+  top: -7px; right: 14px;
+  background: var(--bg);
+  font-family: var(--font-mono), monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 0 6px;
+  font-weight: 500;
+}
+.pc-glyph {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: rgba(232,182,110,0.08);
+  border: 1px solid rgba(232,182,110,0.28);
+  color: var(--warn);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.pc-body { flex: 1; min-width: 0; }
+.pc-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--warn);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.pc-title {
+  font-family: var(--font-serif), serif;
+  font-size: 14px;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--text-mute);
+  font-style: italic;
+}
+.pc-title em {
+  color: var(--warn);
+  font-style: italic;
+}
+
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 60;
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 12d<br>
+  <em>Insights — early data, &lt; 1 month</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Suggestion of the Reports screen behind the sheet -->
+  <div class="behind" aria-hidden="true">
+    <div class="ph-header">
+      <span class="ph-title">Reports</span>
+      <div class="ph-icons">
+        <span class="ph-icon"></span><span class="ph-icon"></span><span class="ph-icon"></span>
+      </div>
+    </div>
+    <div class="ph-month">
+      <div class="ph-month-name">May</div>
+      <div class="ph-month-year">2026</div>
+    </div>
+    <div class="ph-summary"></div>
+  </div>
+
+  <!-- Backdrop -->
+  <div class="sheet-backdrop"></div>
+
+  <!-- Insights sheet -->
+  <aside class="insights-sheet" role="dialog" aria-label="Insights">
+    <div class="sheet-handle"></div>
+
+    <div class="sheet-head">
+      <div class="sheet-title-block">
+        <div class="sheet-title">Insights</div>
+        <div class="sheet-subtitle">
+          <span>May · 2026</span>
+          <span class="day-chip">Day 5</span>
+        </div>
+      </div>
+      <button class="sheet-close" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="sheet-scroll">
+
+      <!-- Editorial N moment -->
+      <div class="n-moment">
+        <div class="n-eyebrow">Patterns</div>
+        <h2 class="n-title">
+          Patterns surface after about <em>a month</em> of tracking.
+        </h2>
+        <p class="n-body">
+          Keep logging. By week three or four FlowFin starts flagging spending
+          shifts, budget pace, and recurring detections — nothing useful
+          before then.
+        </p>
+        <div class="n-progress" aria-label="5 of 28 days">
+          <div class="n-progress-bar"><div class="n-progress-fill"></div></div>
+          <span class="n-progress-text">Day 5 / 28</span>
+        </div>
+      </div>
+
+      <!-- Preview of what insights look like, faded & dashed -->
+      <div class="preview-label">What insights will look like</div>
+
+      <div class="preview-card" aria-hidden="true">
+        <div class="pc-glyph">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L4 14h7l-1 8 9-12h-7l1-8z"/>
+          </svg>
+        </div>
+        <div class="pc-body">
+          <div class="pc-eyebrow">Spending watch</div>
+          <div class="pc-title">
+            <em>Food spending is 14% above</em> your three-month average — Rs 1,800 more than typical.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>

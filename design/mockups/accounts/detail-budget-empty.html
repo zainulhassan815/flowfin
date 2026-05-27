@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Account Detail (Budget, empty) / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  --cat-food: #E8A87B;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 20px; min-height: 100vh; overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+/* ===== Phone ===== */
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg); border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E, 0 0 0 12px #0A0A0C, 0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28), 0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Header ===== */
+.page-header {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  padding: 12px 20px 8px;
+  flex-shrink: 0;
+}
+.icon-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: var(--text); cursor: pointer;
+  border-radius: 10px;
+  transition: background .15s;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.04); }
+.icon-btn.muted { color: var(--text-mute); }
+.icon-btn.muted:hover { color: var(--text); }
+.header-eyebrow {
+  text-align: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+/* ===== Scroll ===== */
+.scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 4px 20px 110px;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ===== Hero ===== */
+.acct-hero {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 0 6px;
+}
+.acct-icon-lg {
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  border: 1px dashed var(--cat-food);
+  background: rgba(232,168,123,0.10);
+  color: var(--cat-food);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.acct-title-block { flex: 1; min-width: 0; }
+.acct-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.acct-meta {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 500;
+}
+.acct-tag {
+  background: rgba(232,168,123,0.10);
+  border: 1px solid rgba(232,168,123,0.28);
+  color: var(--cat-food);
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.08em;
+}
+.acct-tag.fresh {
+  background: rgba(232,220,192,0.08);
+  border-color: rgba(232,220,192,0.32);
+  color: var(--accent);
+}
+
+/* ===== Balance ===== */
+.balance-block {
+  padding: 22px 0 18px;
+  border-bottom: 1px dashed var(--border-strong);
+}
+.balance-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.balance-label::before { content: ''; width: 14px; height: 1px; background: var(--text-soft); }
+.balance-label .full-tag {
+  margin-left: auto;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--cat-food);
+  background: rgba(232,168,123,0.10);
+  border: 1px solid rgba(232,168,123,0.24);
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.balance-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.bal-currency {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 22px;
+  color: var(--text-mute);
+  letter-spacing: -0.02em;
+}
+.bal-amount {
+  font-family: var(--font-mono), monospace;
+  font-size: 52px;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.bal-decimal {
+  font-family: var(--font-mono), monospace;
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--text-mute);
+}
+
+/* ===== Budget progress ===== */
+.budget-progress { margin-top: 16px; }
+.bp-bar {
+  height: 6px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+}
+.bp-fill {
+  height: 100%;
+  background: var(--cat-food);
+  border-radius: 3px 0 0 3px;
+  position: relative;
+}
+/* glow at the fill edge — hidden when the bar is at 0% */
+.bp-fill::after {
+  content: '';
+  position: absolute;
+  top: -3px; right: -1px;
+  width: 2px; height: 12px;
+  background: var(--cat-food);
+  border-radius: 1px;
+  box-shadow: 0 0 6px rgba(232,168,123,0.4);
+}
+.bp-fill.empty { width: 0; }
+.bp-fill.empty::after { display: none; }
+
+.bp-stats {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+.bp-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.bp-stat + .bp-stat {
+  border-left: 1px solid var(--border);
+  padding-left: 12px;
+}
+.bp-stat .l {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+.bp-stat .v {
+  font-family: var(--font-mono), monospace;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.bp-stat .v .cur {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--text-mute);
+  margin-right: 1px;
+}
+.bp-stat .v.zero { color: var(--text-soft); }
+.bp-stat .v.left { color: var(--cat-food); }
+
+/* ===== Quick actions ===== */
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-top: 22px;
+}
+.qa-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all .15s;
+}
+.qa-btn:hover { border-color: var(--border-strong); background: var(--surface-2); }
+.qa-icon {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--qa-border, var(--border-strong));
+  background: var(--qa-bg, transparent);
+  color: var(--qa-color, var(--text-mute));
+}
+.qa-btn.expense .qa-icon { --qa-color: var(--cat-food); --qa-bg: rgba(232,168,123,0.08); --qa-border: rgba(232,168,123,0.28); }
+.qa-btn.topup .qa-icon { --qa-color: var(--transfer); --qa-bg: rgba(130,197,212,0.08); --qa-border: rgba(130,197,212,0.28); }
+.qa-btn.move .qa-icon { --qa-color: var(--text-mute); }
+.qa-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.qa-sub {
+  font-family: var(--font-serif), serif;
+  font-size: 11px;
+  color: var(--text-soft);
+  font-style: italic;
+  letter-spacing: -0.005em;
+}
+
+/* ===== Activity section ===== */
+.activity-section { margin-top: 32px; }
+.activity-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.activity-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+.activity-meta {
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 500;
+}
+
+/* ── Section-empty hint ── */
+.empty-hint {
+  margin-top: 4px;
+  padding: 40px 24px 36px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  position: relative;
+}
+.empty-hint::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cat-food), transparent);
+}
+.empty-hint-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--cat-food);
+  font-weight: 500;
+}
+.empty-hint-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.2;
+  margin-top: 2px;
+}
+.empty-hint-body {
+  font-family: var(--font-serif), serif;
+  font-size: 13.5px;
+  color: var(--text-mute);
+  letter-spacing: -0.005em;
+  line-height: 1.55;
+  max-width: 270px;
+  margin-top: 4px;
+}
+.empty-hint-body strong {
+  font-family: var(--font-mono), monospace;
+  font-weight: 500;
+  color: var(--cat-food);
+  font-size: 12.5px;
+  padding: 0 1px;
+}
+
+/* ===== FAB ===== */
+.fab {
+  position: absolute;
+  bottom: 24px; right: 24px;
+  width: 56px; height: 56px;
+  background: var(--accent);
+  color: #0A0A0B;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: none; cursor: pointer;
+  box-shadow:
+    0 12px 28px rgba(232,220,192,0.18),
+    0 4px 10px rgba(232,220,192,0.12);
+  z-index: 10;
+  transition: transform .2s;
+}
+.fab:hover { transform: scale(1.05); }
+
+/* Home indicator */
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 6;
+}
+
+@media (max-width: 480px) {
+  body { padding: 0; }
+  .phone {
+    width: 100%; height: 100vh;
+    border-radius: 0; box-shadow: none;
+  }
+  .caption, .caption-r { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 11d<br>
+  <em>Account · budget — just allocated, no spending</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <button class="icon-btn" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <div class="header-eyebrow">Budget Account</div>
+    <button class="icon-btn muted" aria-label="More">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="5" r="1.5"/>
+        <circle cx="12" cy="12" r="1.5"/>
+        <circle cx="12" cy="19" r="1.5"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="scroll">
+
+    <!-- ACCOUNT HERO — name & period are what the user entered on create -->
+    <div class="acct-hero">
+      <div class="acct-icon-lg">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/>
+        </svg>
+      </div>
+      <div class="acct-title-block">
+        <div class="acct-title">Food</div>
+        <div class="acct-meta">
+          <span class="acct-tag">Budget</span>
+          <span>Monthly · Dec</span>
+          <span class="acct-tag fresh">Just allocated</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BALANCE — remaining == allocated, since spent is 0 -->
+    <div class="balance-block">
+      <div class="balance-label">
+        Remaining balance
+        <span class="full-tag">Full envelope</span>
+      </div>
+      <div class="balance-row">
+        <span class="bal-currency">Rs</span>
+        <span class="bal-amount">15,000</span>
+        <span class="bal-decimal">.00</span>
+      </div>
+
+      <div class="budget-progress">
+        <!-- Empty fill — 0%, no glow -->
+        <div class="bp-bar">
+          <div class="bp-fill empty"></div>
+        </div>
+
+        <div class="bp-stats">
+          <div class="bp-stat">
+            <span class="l">Allocated</span>
+            <span class="v"><span class="cur">Rs</span>15,000</span>
+          </div>
+          <div class="bp-stat">
+            <span class="l">Spent</span>
+            <span class="v zero"><span class="cur">Rs</span>0</span>
+          </div>
+          <div class="bp-stat">
+            <span class="l">Left · 30d</span>
+            <span class="v left"><span class="cur">Rs</span>15,000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS — same three from the populated screen -->
+    <div class="quick-actions">
+      <button class="qa-btn expense">
+        <div class="qa-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14M19 12l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="qa-label">Spend</div>
+        <div class="qa-sub">log expense</div>
+      </button>
+      <button class="qa-btn topup">
+        <div class="qa-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19V5M5 12l7-7 7 7"/>
+          </svg>
+        </div>
+        <div class="qa-label">Top up</div>
+        <div class="qa-sub">from Bank</div>
+      </button>
+      <button class="qa-btn move">
+        <div class="qa-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 8h14M14 5l3 3-3 3M21 16H7M10 13l-3 3 3 3"/>
+          </svg>
+        </div>
+        <div class="qa-label">Move</div>
+        <div class="qa-sub">to another</div>
+      </button>
+    </div>
+
+    <!-- ACTIVITY — section-empty hint, encouraging tone -->
+    <section class="activity-section">
+      <div class="activity-head">
+        <h2 class="activity-title">Activity</h2>
+        <span class="activity-meta">Untouched · Day 1</span>
+      </div>
+
+      <div class="empty-hint">
+        <span class="empty-hint-eyebrow">Envelope full</span>
+        <h3 class="empty-hint-title">Nothing spent yet.</h3>
+        <p class="empty-hint-body">
+          That's the start, not an oversight. Tap <strong>Spend</strong>
+          above to log against this envelope — each charge will appear here
+          and chip away at the allocation.
+        </p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- FAB — logging the first spend is the next action -->
+  <button class="fab" aria-label="Add transaction">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M12 5v14M5 12h14"/>
+    </svg>
+  </button>
+
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>

@@ -1227,6 +1227,506 @@
     color: var(--text-soft);
     font-weight: 500;
   }
+
+  /* ════════════════════════════════════════════════
+     Empty-state patterns (02.22 / 02.23)
+  ════════════════════════════════════════════════ */
+
+  /* — Category legend — */
+  .es-cat-legend {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px 16px;
+    align-items: baseline;
+    padding: 18px 18px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 22px;
+  }
+  .es-cat-key {
+    font-family: var(--font-mono), monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .es-cat-key .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    color: #0A0A0B;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0;
+    font-family: var(--font-mono), monospace;
+  }
+  .es-cat-key.f .badge { background: var(--accent); }
+  .es-cat-key.s .badge { background: var(--transfer); }
+  .es-cat-key.q .badge { background: var(--warn); }
+  .es-cat-key.n .badge { background: var(--text-mute); }
+  .es-cat-desc {
+    font-family: var(--font-serif), serif;
+    font-size: 13px;
+    color: var(--text-mute);
+    letter-spacing: -0.005em;
+    line-height: 1.45;
+  }
+  .es-cat-desc em { color: var(--text); font-style: italic; }
+
+  /* — F · Full empty editorial moment — */
+  .es-f-frame {
+    width: 100%;
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+  }
+  .es-f-frame::before,
+  .es-f-frame::after {
+    content: '';
+    width: 50px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
+  }
+  .es-f-frame::before { margin-bottom: 14px; }
+  .es-f-frame::after { margin-top: 14px; }
+  .es-eyebrow {
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .es-eyebrow::before,
+  .es-eyebrow::after {
+    content: '';
+    width: 8px; height: 1px;
+    background: rgba(232,220,192,0.4);
+  }
+  .es-title {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 20px;
+    letter-spacing: -0.025em;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .es-title em { color: var(--accent); font-style: italic; }
+  .es-body {
+    font-family: var(--font-serif), serif;
+    font-size: 12.5px;
+    color: var(--text-mute);
+    line-height: 1.5;
+    max-width: 240px;
+  }
+  .es-cta {
+    margin-top: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #0A0A0B;
+    padding: 10px 14px;
+    border-radius: 11px;
+    font-family: var(--font-mono), monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid var(--accent);
+  }
+
+  /* — S · Section-empty inline hint — */
+  .es-section-hint {
+    padding: 22px 18px 20px;
+    border: 1px dashed var(--border-strong);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+    position: relative;
+    width: 100%;
+  }
+  .es-section-hint::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 22px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .es-hint-eyebrow {
+    font-family: var(--font-mono), monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-weight: 500;
+  }
+  .es-hint-title {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    line-height: 1.2;
+    margin-top: 2px;
+  }
+  .es-hint-link {
+    margin-top: 8px;
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    border: 1px solid rgba(232,220,192,0.32);
+    padding: 7px 11px;
+    border-radius: 8px;
+  }
+
+  /* — Q · Filter / search empty — */
+  .es-q-chip {
+    background: rgba(232,220,192,0.10);
+    border: 1px solid rgba(232,220,192,0.28);
+    color: var(--accent);
+    padding: 1px 7px;
+    border-radius: 6px;
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-size: 10.5px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .es-q-title strong {
+    font-family: var(--font-mono), monospace;
+    font-style: normal;
+    font-weight: 500;
+    color: var(--accent);
+    font-size: 14px;
+  }
+  .es-q-links {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .es-q-link {
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-mute);
+    font-weight: 500;
+    border: 1px solid var(--border-strong);
+    padding: 6px 10px;
+    border-radius: 8px;
+    text-decoration: none;
+  }
+  .es-q-link.primary {
+    color: var(--accent);
+    border-color: rgba(232,220,192,0.32);
+  }
+
+  /* — N · Not-enough-yet banner — */
+  .es-n-banner {
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    background: rgba(232,220,192,0.05);
+    border: 1px solid rgba(232,220,192,0.18);
+    border-radius: 12px;
+    width: 100%;
+  }
+  .es-n-glyph {
+    width: 28px; height: 28px;
+    border-radius: 9px;
+    background: rgba(232,220,192,0.10);
+    border: 1px solid rgba(232,220,192,0.28);
+    color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .es-n-text { flex: 1; min-width: 0; }
+  .es-n-title {
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-size: 13.5px;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  .es-n-title em { color: var(--accent); font-style: italic; }
+  .es-n-sub {
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-top: 4px;
+    font-weight: 500;
+  }
+
+  /* — N · Progress pill — */
+  .es-n-progress {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 11px;
+    background: rgba(232,220,192,0.06);
+    border: 1px solid rgba(232,220,192,0.20);
+    border-radius: 999px;
+  }
+  .es-n-progress-bar {
+    width: 44px; height: 3px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .es-n-progress-fill {
+    height: 100%;
+    width: 28%;
+    background: var(--accent);
+  }
+  .es-n-progress-text {
+    font-family: var(--font-mono), monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* — Caught-up banner (pos variant of n-banner) — */
+  .es-caught {
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    background: rgba(156,212,162,0.05);
+    border: 1px solid rgba(156,212,162,0.18);
+    border-radius: 12px;
+    width: 100%;
+  }
+  .es-caught .es-n-glyph {
+    background: rgba(156,212,162,0.10);
+    border-color: rgba(156,212,162,0.32);
+    color: var(--pos);
+  }
+
+  /* — Filter chip (dismissable category pill) — */
+  .es-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 5px 5px 9px;
+    background: rgba(232,168,123,0.08);
+    border: 1px solid rgba(232,168,123,0.28);
+    border-radius: 999px;
+    font-family: var(--font-mono), monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .es-filter-chip .marker {
+    width: 5px; height: 5px;
+    background: var(--cat-food, #E8A87B);
+    border-radius: 50%;
+  }
+  .es-filter-chip .x {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.25);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--text-mute);
+  }
+  .es-clear-link {
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  /* — Active search input — */
+  .es-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 11px;
+    background: var(--surface);
+    border: 1px solid rgba(232,220,192,0.32);
+    border-radius: 11px;
+    box-shadow: 0 0 0 3px rgba(232,220,192,0.04);
+    width: 100%;
+    max-width: 240px;
+  }
+  .es-search .lupe { color: var(--accent); flex-shrink: 0; }
+  .es-search-query {
+    flex: 1;
+    font-family: var(--font-serif), serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--text);
+    letter-spacing: -0.005em;
+  }
+  .es-search-query::after {
+    content: '';
+    display: inline-block;
+    width: 1.5px; height: 14px;
+    background: var(--accent);
+    margin-left: 1px;
+    vertical-align: middle;
+    animation: es-blink 1s steps(2) infinite;
+  }
+  @keyframes es-blink { 50% { opacity: 0; } }
+  .es-search-clear {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--text-mute);
+    flex-shrink: 0;
+    border: none;
+    cursor: pointer;
+  }
+
+  /* — "Fresh" chip — just-added marker — */
+  .es-fresh-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(232,220,192,0.08);
+    border: 1px solid rgba(232,220,192,0.32);
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  /* — Paired CTA (equal-weight two-button row) — */
+  .es-cta-pair {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+  .es-pair-btn {
+    flex: 1;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px;
+    border-radius: 11px;
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .es-pair-btn.owe {
+    background: rgba(232,182,110,0.08);
+    border: 1px solid rgba(232,182,110,0.28);
+    color: var(--warn);
+  }
+  .es-pair-btn.lent {
+    background: rgba(156,212,162,0.08);
+    border: 1px solid rgba(156,212,162,0.28);
+    color: var(--pos);
+  }
+  .es-pair-btn .glyph {
+    width: 22px; height: 22px;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid currentColor;
+    opacity: 0.55;
+  }
+
+  /* — Paused row — */
+  .es-paused-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+  }
+  .es-paused-row:last-child { border-bottom: none; }
+  .es-paused-icon {
+    width: 32px; height: 32px;
+    border: 1px solid var(--border-strong);
+    background: rgba(255,255,255,0.02);
+    border-radius: 9px;
+    color: var(--text-soft);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+  .es-paused-body { flex: 1; min-width: 0; }
+  .es-paused-name {
+    font-family: var(--font-serif), serif;
+    font-size: 14px;
+    color: var(--text-mute);
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .es-paused-name .pause-glyph {
+    color: var(--text-faint);
+    flex-shrink: 0;
+    display: inline-flex;
+  }
+  .es-paused-meta {
+    font-family: var(--font-mono), monospace;
+    font-size: 9px;
+    color: var(--text-soft);
+    letter-spacing: 0.06em;
+    margin-top: 3px;
+  }
+  .es-resume-btn {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    border-radius: 9px;
+    color: var(--text-mute);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
@@ -2261,6 +2761,219 @@
         </div>
         <div class="sheet-mini-body">Body content</div>
       </div>
+    </div>
+  </section>
+
+  <!-- ═══ EMPTY STATES ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.22</div>
+      <h2 class="ds-section-title">Empty states</h2>
+      <p class="ds-section-desc">
+        Four categories, four treatments. Match the category to the data
+        condition — don't reuse a takeover where a hint is enough, and don't
+        downgrade a takeover into a hint. The full per-screen inventory lives
+        in <code style="font-family: var(--font-mono); color: var(--accent); font-size: 11px;">docs/empty-states.md</code>.
+      </p>
+    </div>
+
+    <!-- Category legend -->
+    <div class="es-cat-legend">
+      <div class="es-cat-key f"><span class="badge">F</span>Full empty</div>
+      <div class="es-cat-desc">
+        Screen takeover. Editorial moment with eyebrow / italic title / body / CTA.
+        Hero muted or hidden, FAB hidden if its action depends on missing data.
+        Used when <em>nothing</em> can be done on the screen until the user adds the missing thing.
+      </div>
+
+      <div class="es-cat-key s"><span class="badge">S</span>Section empty</div>
+      <div class="es-cat-desc">
+        Inline dashed-border hint <em>inside</em> a populated screen. Short, quiet,
+        optional small link. Never takes over. Used when one section has no data but
+        the rest of the screen carries the user's existing state.
+      </div>
+
+      <div class="es-cat-key q"><span class="badge">Q</span>Filter / search</div>
+      <div class="es-cat-desc">
+        Filter or search scaffolding stays visible. Inline notice in the body echoes
+        the query terms in a serif chip + mono callout, with action links to clear
+        the filter or adjust the search.
+      </div>
+
+      <div class="es-cat-key n"><span class="badge">N</span>Not-enough-yet</div>
+      <div class="es-cat-desc">
+        Calm, informational — <em>no CTA</em>. The user can't act, they need time.
+        Often paired with a small progress pill (Day N / 28) or a faded preview of
+        what the populated state will look like.
+      </div>
+    </div>
+
+    <!-- The four treatments — one demo each -->
+    <div class="demo-grid-2">
+
+      <div class="demo-block tile">
+        <div class="demo-label">F · Full empty takeover</div>
+        <div class="es-f-frame">
+          <div class="es-eyebrow">Begin</div>
+          <h3 class="es-title">Money lives <em>somewhere.</em></h3>
+          <p class="es-body">Add the first place — your bank, the cash in your wallet, a mobile wallet.</p>
+          <a class="es-cta">
+            Add an account
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">S · Inline section hint</div>
+        <div class="es-section-hint">
+          <span class="es-hint-eyebrow">First entry</span>
+          <h3 class="es-hint-title">Nothing logged yet.</h3>
+          <a class="es-hint-link">
+            Tap + below
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Q · Filter / search notice</div>
+        <div class="es-section-hint">
+          <span class="es-hint-eyebrow" style="color: var(--accent); display: inline-flex; gap: 6px; align-items: center;">
+            Search <span class="es-q-chip">"xyz"</span>
+          </span>
+          <h3 class="es-hint-title es-q-title">No category matches <strong>"xyz"</strong>.</h3>
+          <div class="es-q-links">
+            <a class="es-q-link primary">Create "xyz"</a>
+            <a class="es-q-link">Clear search</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">N · Not-enough-yet</div>
+        <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; align-items: center;">
+          <div class="es-n-banner">
+            <div class="es-n-glyph">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </div>
+            <div class="es-n-text">
+              <div class="es-n-title"><em>Building a picture</em> — 5 days in.</div>
+              <div class="es-n-sub">Patterns sharpen after ~4 weeks</div>
+            </div>
+          </div>
+          <div class="es-n-progress">
+            <div class="es-n-progress-bar"><div class="es-n-progress-fill"></div></div>
+            <span class="es-n-progress-text">Day 5 / 28</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ EMPTY-STATE PRIMITIVES ═══ -->
+  <section class="ds-section">
+    <div class="ds-section-header">
+      <div class="ds-section-eyebrow">02.23</div>
+      <h2 class="ds-section-title">Empty-state primitives</h2>
+      <p class="ds-section-desc">
+        Reusable parts that compose into the category treatments above —
+        dismissable filter chips, active search inputs, the "fresh" marker
+        for just-created records, paired CTAs, the paused-row treatment for
+        recurring schedules, and the green caught-up banner.
+      </p>
+    </div>
+
+    <div class="demo-grid-2">
+
+      <div class="demo-block tile">
+        <div class="demo-label">Filter chip (dismissable)</div>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <span class="es-filter-chip">
+            <span class="marker"></span>
+            Food &amp; Dining
+            <span class="x">
+              <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </span>
+          </span>
+          <a class="es-clear-link">Clear all</a>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Active search input</div>
+        <div class="es-search">
+          <svg class="lupe" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <span class="es-search-query">xyz</span>
+          <button class="es-search-clear">
+            <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">"Fresh" chip — just-added marker</div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <span class="es-fresh-chip">Just added</span>
+          <span class="es-fresh-chip">Just allocated</span>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Paired CTA (warn · pos)</div>
+        <div class="es-cta-pair">
+          <a class="es-pair-btn owe">
+            <span class="glyph">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+            </span>
+            Record debt
+          </a>
+          <a class="es-pair-btn lent">
+            <span class="glyph">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            </span>
+            Record receivable
+          </a>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Caught-up banner (good-news variant)</div>
+        <div class="es-caught">
+          <div class="es-n-glyph">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+          </div>
+          <div class="es-n-text">
+            <div class="es-n-title">Nothing's due right now.</div>
+            <div class="es-n-sub">Next bill · Rent · 1 Jun</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-block tile">
+        <div class="demo-label">Paused row + resume</div>
+        <div style="width: 100%;">
+          <div class="es-paused-row">
+            <div class="es-paused-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9z"/><path d="M9 22V12h6v10"/></svg>
+            </div>
+            <div class="es-paused-body">
+              <div class="es-paused-name">
+                <span class="pause-glyph">
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+                </span>
+                Rent
+              </div>
+              <div class="es-paused-meta">Paused since 12 May</div>
+            </div>
+            <button class="es-resume-btn" aria-label="Resume">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 

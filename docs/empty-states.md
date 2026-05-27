@@ -72,14 +72,14 @@ deletion of the last real account when budgets exist).
 
 | State | Cat | Status | Notes |
 |---|---|---|---|
-| Account just created, no transactions yet | **F** | · | Hero balance = whatever opening balance was entered, *Activity* section is a centered empty moment. CTA: *Log a transaction*. |
+| Account just created, no transactions yet | **S** | ✓ [accounts/detail-real-empty.html](../design/mockups/accounts/detail-real-empty.html) | Hero, opening balance and quick actions all populated — only Activity is empty. Re-categorized **F** → **S** during design: the screen isn't a takeover when most of it carries the user's just-entered data. Flow strip hidden until there's flow. Inline `empty-hint` block in Activity with a `+` reference back to the FAB and quick-actions row. *Just added* chip in the hero meta marks the freshness. |
 | Has transactions, none this month | **S** | · | Flow strip shows Rs 0 in / Rs 0 out for the month; activity section empty for this period. Inline hint. |
 
 ## 05 · Account detail — budget (`accounts/detail.html`)
 
 | State | Cat | Status | Notes |
 |---|---|---|---|
-| Budget just created, no spending yet | **F** | · | Progress bar at 0%, activity empty. Encouraging tone — they haven't *failed*, they just haven't started. |
+| Budget just created, no spending yet | **S** | ✓ [accounts/detail-budget-empty.html](../design/mockups/accounts/detail-budget-empty.html) | Hero, allocation, progress bar (at 0%, no glow), all three stats and quick actions populated — only Activity is empty. Re-categorized **F** → **S** for the same reason as the real-account just-created state. *Just allocated* chip in hero meta; *Full envelope* tag on balance label; activity meta reads *Untouched · Day 1*. Empty-hint copy: *"Nothing spent yet — that's the start, not an oversight."* Eyebrow and hint accent use `--cat-food` (the budget's own tint) instead of the global accent to reinforce envelope identity. |
 | Budget had spending in past period, none this period | **S** | · | Show the period nav clearly; inline hint inside activity. |
 
 ---
@@ -96,11 +96,11 @@ Picker filter-empties for this form live under **08 · Pickers**.
 
 | State | Cat | Status | Notes |
 |---|---|---|---|
-| No recurring schedules at all | **F** | · | Both *Pending* and *Schedule* absent. CTA: *Set up a recurring payment*. |
-| Schedules exist, none pending right now | **S** | · | Hide *Pending* section, keep *Schedule* populated. No inline hint needed — the absence reads as good news. |
-| All schedules paused | **S** | · | Active section empty, paused section populated. Inline hint inside Active with *Resume one →* link. |
-| Has paused/archived but no current schedules | **S** | · | Edge case — inline hint same as above. |
-| Stats / "Rs X monthly" with no schedules | **N** | · | If we show a "monthly total" tile, replace with placeholder *Add one to see your monthly load.* |
+| No recurring schedules at all | **F** | ✓ [recurring/empty.html](../design/mockups/recurring/empty.html) | Both *Pending* and *Schedule* absent. Page header keeps the **+** button, history icon hidden. Specimen chips (Rent · Subs · Bills) sit above the title to telegraph what the feature captures. CTA: *Set up a recurring payment*. |
+| Schedules exist, none pending right now | **S** | ✓ [recurring/no-pending.html](../design/mockups/recurring/no-pending.html) | Pending section removed entirely. A short *caught-banner* (green-tinted check glyph + *"Nothing's due right now. Next bill · Rent · 1 Jun"*) takes its place — small enough not to compete with the active list, big enough to read as good news. Stats aux line replaces *"N pending"* with a green *All caught up* pill. Active and paused-link sections unchanged from populated. |
+| All schedules paused | **S** | ✓ [recurring/all-paused.html](../design/mockups/recurring/all-paused.html) | Active section empty (inline hint with *Resume one ▶* link, play-arrow glyph). Paused section surfaces inline rather than being collapsed behind the usual *View paused recurring* link — every row gets a small ▶ resume button on the right. Stats line replaces the monthly total with an *All paused* pill (pause-glyph) and reads *"0 active · 4 paused"*. Pending section hidden (nothing pending when nothing runs). New patterns locked: `.paused-row`, `.resume-btn`, and `.pause-pill` — all reusable for the has-paused-no-current edge case. |
+| Has paused/archived but no current schedules | **S** | ✓ *(inherits [recurring/all-paused.html](../design/mockups/recurring/all-paused.html))* | Same render path as **All schedules paused** — Active section empty with the *Resume one* hint, Paused section populated inline. The data-model distinction (some archived vs. all paused) doesn't change what the user sees, so no separate mockup. |
+| Stats / "Rs X monthly" with no schedules | **N** | — | N/A given the current design — the F empty ([recurring/empty.html](../design/mockups/recurring/empty.html)) omits the stats line entirely, so there's no monthly-total tile to replace. Re-introduce this state only if a future variant decides to show a stat tile on the empty screen. |
 
 `recurring/add.html` is a form — no empty state.
 
@@ -110,7 +110,7 @@ Picker filter-empties for this form live under **08 · Pickers**.
 
 | State | Cat | Status | Notes |
 |---|---|---|---|
-| No debts, no receivables | **F** | · | Takeover. CTA pair: *Record a debt* / *Record a receivable* (two-button row). |
+| No debts, no receivables | **F** | ✓ [debts/empty.html](../design/mockups/debts/empty.html) | Takeover. Hero + tabs both hidden — nothing to summarise or filter. Duality glyph (Owed ↗ · Lent ↙) above the title telegraphs the two directions. CTA pair: *Record a debt* (warn-tinted) / *Record a receivable* (pos-tinted) — equal visual weight, semantic tints carry over from the populated screen's tabs. |
 | Has *I owe*, no *Owe me* | **S** | · | Hide *Owe me* segment, keep *I owe* populated. No inline hint — absence is neutral. |
 | Has *Owe me*, no *I owe* | **S** | · | Mirror — same treatment. |
 | All settled (everything in *Settled*) | **F** | · | Special variant: hero says *"All clear."* with a faint check; settled section visible below. Different from no-debts-ever. |
@@ -120,7 +120,7 @@ Picker filter-empties for this form live under **08 · Pickers**.
 
 | State | Cat | Status | Notes |
 |---|---|---|---|
-| Just added, only origin entry on the timeline | **S** | · | Timeline shows the origin dot. Inline hint below it: *No payments yet — [Record a payment →]*. |
+| Just added, only origin entry on the timeline | **S** | ✓ [debts/detail-empty.html](../design/mockups/debts/detail-empty.html) | Person hero, full amount, *Record a payment* CTA and secondary actions all stay. Progress bar at 0%; `Paid · 0%` stat shows zero in muted grey; *Full amount* chip on the balance label. Mocked on the I-owe variant — receivable mirrors with pos tint and inverted copy. Timeline shows two items: an empty placeholder card at the top (where future payments will appear, with hollow dot + dashed border + *Record one →* link) and the **origin** entry below it with the warm-amber dot. Hero meta carries a *Just added* chip. |
 
 `add-debt.html`, `add-receivable.html`, `record-payment.html` — forms, no empty states.
 
@@ -130,21 +130,30 @@ Picker filter-empties for this form live under **08 · Pickers**.
 
 | State | Cat | Status | Notes |
 |---|---|---|---|
-| No transactions logged ever | **F** | · | Takeover. *"Reports appear after your first transaction."* CTA: *Log one*. |
-| < 1 month of data | **N** | · | Trend chart renders only the days available, axis stays full month. Inline note above donut: *Building a picture — N days in.* |
-| Selected a past month with no activity | **Q** | · | Month strip works normally. Body of the period reads: *Nothing logged in May 2026.* |
-| Filter applied (category / account), no results | **Q** | · | Filter chip visible. Inline notice: *No spending in this category this month.* |
+| No transactions logged ever | **F** | ✓ [reports/empty.html](../design/mockups/reports/empty.html) | Takeover. Page header strips all 3 secondary actions (insights/filter/export) — none apply. Month strip, summary, scope tabs and all charts hidden. Specimen: 7 faded category-tinted bars sketching the trend-chart form. CTA: *Log a transaction*. |
+| < 1 month of data | **N** | ✓ [reports/early-data.html](../design/mockups/reports/early-data.html) | Trend chart renders 5 colored bars; remaining 26 days are dashed baselines that hold the axis width but communicate "not yet logged." The bars use category tints so the chart reads as both partial *and* informative. Axis labels stay full-month (1 · 5 today · 15 · 22 · 31) with the today index in accent. Forward-month nav arrow disabled. Summary card carries a *So far* chip on the label. An accent **n-banner** between the trend and donut reads *"Building a picture — 5 days in."* with sub *"Patterns sharpen after ~4 weeks."* Donut + breakdown render with whatever exists, donut center caption switches to *"5 days · 7 txns."* No CTA — they need time, not action. |
+| Selected a past month with no activity | **Q** | ✓ [reports/no-activity.html](../design/mockups/reports/no-activity.html) | Month strip stays interactive. Summary card shows muted Rs 0 in/out. Charts/breakdown replaced by a Q-empty notice with a `Period · Jan 2026` chip eyebrow and a *Jump to May 2026* link. |
+| Filter applied (category / account), no results | **Q** | ✓ [reports/filtered-empty.html](../design/mockups/reports/filtered-empty.html) | Filter chip pattern locked: rounded pill with the category marker, label, and ✕ dismiss. *Filtered by* label + chip + *Clear all* link sit above the scope tabs. Filter icon in the header turns accent-tinted while active. Q-empty notice echoes the filter terms in its eyebrow chip (`Food & Dining · May 2026`) and copies them into the title with the category color (`var(--cat-food)`). Two action links: *Clear filter* (primary) and *Pick another category*. |
 
 ## 11 · Reports — income (`reports/income.html`)
 
-Same axes as Reports — spending. Status pending for all four.
+Same axes as Reports — spending. All four states inherit the spending mockups
+visually; only the scope segment lands on *Income* and the accent color shifts
+from neg/cat-* to `--pos` for the empty hero zeros.
+
+| State | Cat | Status | Notes |
+|---|---|---|---|
+| No transactions logged ever | **F** | ✓ *(inherits [reports/empty.html](../design/mockups/reports/empty.html))* | Same takeover — there's no spending OR income axis to surface yet. |
+| < 1 month of data | **N** | ✓ *(inherits [reports/early-data.html](../design/mockups/reports/early-data.html))* | Same render path with scope set to *Income*. The partial trend bars use `--pos`/income-source tints instead of expense category tints; the n-banner copy is unchanged. |
+| Selected a past month with no activity | **Q** | ✓ *(inherits [reports/no-activity.html](../design/mockups/reports/no-activity.html))* | Identical render path — empty period is empty across both scopes. |
+| Filter applied, no results | **Q** | ✓ *(inherits [reports/filtered-empty.html](../design/mockups/reports/filtered-empty.html))* | Same chip + notice pattern. Filter chip tint shifts to a `--pos`/income source color when filtering by income sources. |
 
 ## 12 · Reports — insights (`reports/insights.html`)
 
 | State | Cat | Status | Notes |
 |---|---|---|---|
-| < 1 month of data | **N** | · | Friendly *"Patterns surface after about a month of tracking."* No CTA. Optionally show a faded preview card with the insight format. |
-| Exactly enough data, but no notable patterns | **N** | · | *"Nothing to flag this month — keep going."* Rare in practice, but the data model allows it. |
+| < 1 month of data | **N** | ✓ [reports/insights-early.html](../design/mockups/reports/insights-early.html) | Insights sheet renders over a dimmed reports backdrop. Sheet subtitle replaces the action-count chip with an accent **Day 5** chip. Body: an editorial **n-moment** (eyebrow *Patterns*, title *"Patterns surface after about a month of tracking,"* body explains the why) followed by an accent **n-progress** pill (`Day 5 / 28` with a small filled bar). Below: a single faded preview card with a dashed warn-tinted border, a *Preview* badge clipped into the top edge, and a sample *Spending watch* insight rendered with reduced opacity. No CTAs — sets expectation without promising anything actionable. |
+| Exactly enough data, but no notable patterns | **N** | ✓ *(inherits [reports/insights-early.html](../design/mockups/reports/insights-early.html))* | Same sheet, copy variation only: title *"Nothing to flag this month — keep going,"* body shifts to a quiet "this is the data model behaving correctly, not a bug" line, and the n-progress pill is replaced with a small *On track* tag (no fill bar — they're already past day 28). Preview card hidden (they've seen real insights before). |
 | No transactions at all | **F** | · | Inherits from Reports full-empty — probably route to that screen instead. |
 
 ---
@@ -166,7 +175,7 @@ Defaults always exist, so the screen is never fully empty.
 | State | Cat | Status | Notes |
 |---|---|---|---|
 | Only defaults, no custom categories | **S** | · | Inline hint below the defaults list: *Tap + to add a custom category.* |
-| Search yields no matches | **Q** | · | Filter empty when user types in the search box. *"No category matches 'xyz'."* |
+| Search yields no matches | **Q** | ✓ [settings/categories-search-empty.html](../design/mockups/settings/categories-search-empty.html) | Adds an active search bar at the top of the screen (accent-bordered with a glow ring and blinking caret on the query). Scope tabs (Expense / Income) stay visible — lets the user widen the search across scopes. Q-empty notice echoes the query in a serif chip and renders it as `"xyz"` in mono inside the title. Action links: *Create "xyz"* (primary, opens add-custom flow with the query pre-filled) and *Clear search*. |
 
 ## 15 · Pickers (`settings/pickers.html`)
 
@@ -176,9 +185,9 @@ themselves get used inside forms and need their own empty handling.
 | Picker | State | Cat | Status | Notes |
 |---|---|---|---|---|
 | Account picker | No accounts | **F** within sheet | · | Sheet body: *Add an account first* with a CTA that closes the sheet and routes to account-add. |
-| Account picker | Search yields nothing | **Q** | · | Inline notice below search input. |
+| Account picker | Search yields nothing | **Q** | ✓ *(inherits [settings/categories-search-empty.html](../design/mockups/settings/categories-search-empty.html))* | Same search-input + Q-empty pattern, rendered inside the picker sheet. The *Create "xyz"* primary link routes to add-account with the query pre-filled. |
 | Category picker | No categories | — | — | Defaults always exist. |
-| Category picker | Search yields nothing | **Q** | · | Same pattern as account picker search. |
+| Category picker | Search yields nothing | **Q** | ✓ *(inherits [settings/categories-search-empty.html](../design/mockups/settings/categories-search-empty.html))* | Identical pattern inside the category-picker sheet. |
 | Person picker (debts) | No contacts yet | **S** within sheet | · | First-debt scenario: just a *Add new person* row, no other entries. |
 | Date picker | — | — | — | Never empty by nature. |
 
@@ -192,7 +201,7 @@ the treatment before that screen is built.
 | State | Cat | Status | Notes |
 |---|---|---|---|
 | Empty query (no input yet) | **F** within sheet | · | Recent searches OR suggestion list. Not strictly "empty." |
-| Query with zero matches | **Q** | · | *"Nothing matches '{query}'."* + optional *Try a different time range* link. |
+| Query with zero matches | **Q** | ✓ [search/empty.html](../design/mockups/search/empty.html) | Full-screen sheet (rather than a bottom sheet) since the home header search is a primary route. Close ✕ + active search input at top. Below: horizontal-scrolling **scope pills** showing zero counts (`All 0 · Transactions 0 · Debts 0 · Recurring 0 · Accounts 0`) and a *Range · Last 3 months* chip. Q-empty notice with query in a serif chip + mono callout in the title. Three actionable *try* rows: expand range, search for one term, search for the other. Each row is a tappable card with a small `Range`/`Term` mono badge on the left. |
 | Query is too short (< 2 chars) | — | — | Just don't fire a search; no empty state. |
 
 ---
@@ -204,19 +213,19 @@ the treatment before that screen is built.
 | Home | 5 | 5 |
 | Onboarding | 0 | — |
 | Accounts | 2 | 2 |
-| Account detail (real) | 2 | 0 |
-| Account detail (budget) | 2 | 0 |
-| Recurring | 5 | 0 |
-| Debts | 4 | 0 |
-| Debt detail | 1 | 0 |
-| Reports — spending | 4 | 0 |
-| Reports — income | 4 | 0 |
-| Reports — insights | 3 | 0 |
+| Account detail (real) | 2 | 1 |
+| Account detail (budget) | 2 | 1 |
+| Recurring | 4 | 4 |
+| Debts | 4 | 1 |
+| Debt detail | 1 | 1 |
+| Reports — spending | 4 | 4 |
+| Reports — income | 4 | 4 |
+| Reports — insights | 3 | 3 |
 | Settings | 1 | 0 |
-| Categories | 2 | 0 |
-| Pickers | 4 | 0 |
-| Search | 2 | 0 |
-| **Total actionable** | **41** | **7** |
+| Categories | 2 | 1 |
+| Pickers | 4 | 2 |
+| Search | 2 | 1 |
+| **Total actionable** | **40** | **30** |
 
 ---
 
@@ -232,13 +241,13 @@ patterns:
 5. ~~Home — early data (< 1 month)~~ ✓
 6. ~~Accounts — no real, no budgets~~ ✓
 7. ~~Accounts — real, no budgets~~ ✓
-8. Recurring — no schedules *(first full-empty for a non-home tab)*
-9. Debts — no debts and no receivables *(needs paired CTA pattern)*
-10. Reports — no transactions ever *(first "not-enough" + "full" hybrid)*
-11. Account / debt detail — just-added states *(section-empty pattern locked)*
-12. Section empties across recurring *(reuse the inline-hint component)*
-13. Filter / search empties *(small, batched together)*
-14. Not-enough-yet for reports & insights *(unique tone, designed late)*
+8. ~~Recurring — no schedules~~ ✓
+9. ~~Debts — no debts and no receivables~~ ✓
+10. ~~Reports — no transactions ever~~ ✓
+11. ~~Account / debt detail — just-added states~~ ✓
+12. ~~Section empties across recurring~~ ✓
+13. ~~Filter / search empties~~ ✓
+14. ~~Not-enough-yet for reports & insights~~ ✓
 
 Once the inline-hint and not-enough-yet patterns are locked in, all the
 section-empty rows collapse into pattern application — no new design needed.

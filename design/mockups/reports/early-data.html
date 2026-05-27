@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Reports (early data) / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+
+  --cat-food: #E8A87B;
+  --cat-rent: #D89A82;
+  --cat-transport: #8AB4E0;
+  --cat-utilities: #E8CC7B;
+  --cat-other: #B4B4BC;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 20px; min-height: 100vh; overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg); border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E, 0 0 0 12px #0A0A0C, 0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28), 0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px 8px; flex-shrink: 0;
+}
+.page-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-weight: 400;
+  font-size: 28px; letter-spacing: -0.02em;
+}
+.header-actions { display: flex; gap: 4px; }
+.icon-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: var(--text-mute); cursor: pointer;
+  border-radius: 10px;
+  transition: color .15s, background .15s;
+}
+.icon-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+
+.scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 0 20px 110px;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ===== Month strip ===== */
+.month-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px 18px;
+}
+.month-nav {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-mute);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.month-nav.disabled { opacity: 0.35; cursor: default; }
+.month-label { text-align: center; flex: 1; }
+.month-name {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+.month-year {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-top: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.month-year .day-chip {
+  background: rgba(232,220,192,0.10);
+  border: 1px solid rgba(232,220,192,0.28);
+  color: var(--accent);
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+}
+
+/* ===== Summary ===== */
+.summary-card {
+  padding: 6px 4px 18px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--border);
+}
+.summary-net-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 500;
+}
+.summary-net-label::before { content: ''; width: 14px; height: 1px; background: var(--text-soft); }
+.summary-net-label .so-far {
+  margin-left: auto;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--text-soft);
+  background: rgba(255,255,255,0.04);
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+.summary-net {
+  display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px;
+}
+.net-sign {
+  font-family: var(--font-mono), monospace;
+  font-size: 34px; font-weight: 300;
+  letter-spacing: -0.02em; color: var(--pos);
+}
+.net-currency {
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 17px; color: var(--text-mute);
+}
+.net-amount {
+  font-family: var(--font-mono), monospace;
+  font-size: 34px; font-weight: 300;
+  letter-spacing: -0.04em; line-height: 1;
+}
+.net-decimal {
+  font-family: var(--font-mono), monospace;
+  font-size: 16px; color: var(--text-mute);
+}
+.summary-split {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border-strong);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.split-cell .lbl {
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+  display: flex; align-items: center; gap: 6px;
+}
+.split-cell .lbl .dot { width: 6px; height: 6px; border-radius: 50%; }
+.split-cell .lbl .dot.in { background: var(--pos); }
+.split-cell .lbl .dot.out { background: var(--neg); }
+.split-cell .val {
+  margin-top: 6px;
+  display: flex; align-items: baseline; gap: 4px;
+}
+.split-cell .val .cur {
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 13px; color: var(--text-mute);
+}
+.split-cell .val .num {
+  font-family: var(--font-mono), monospace;
+  font-size: 19px; font-weight: 500; letter-spacing: -0.02em;
+}
+.split-cell .val .num.in { color: var(--pos); }
+.split-cell .val .num.out { color: var(--text); }
+
+/* ===== Scope tabs ===== */
+.scope-segment {
+  display: inline-flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+  margin-bottom: 18px;
+}
+.scope-item {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  background: transparent;
+  border: none;
+  padding: 7px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.scope-item.active {
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+}
+
+/* ===== Trend chart — partial ===== */
+.trend-section { margin-bottom: 26px; }
+.trend-head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.trend-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-weight: 300;
+  font-size: 22px; letter-spacing: -0.02em;
+}
+.trend-sub {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 500;
+  margin-top: 4px;
+}
+.trend-today { text-align: right; }
+.trend-today .v {
+  font-family: var(--font-mono), monospace;
+  font-size: 19px; font-weight: 500; letter-spacing: -0.02em;
+}
+.trend-today .v .cur {
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 13px; color: var(--text-mute);
+  margin-right: 2px;
+}
+.trend-today .l {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-top: 2px;
+  font-weight: 500;
+}
+.trend-chart-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 14px 12px;
+}
+.trend-chart-bars {
+  width: 100%; height: 96px;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  position: relative;
+}
+.trend-chart-bars::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--border);
+}
+.tb {
+  flex: 1;
+  background: var(--bar-color, var(--cat-food));
+  border-radius: 2px 2px 0 0;
+  min-height: 2px;
+  opacity: 0.85;
+}
+.tb.future {
+  background: transparent;
+  border-bottom: 1px dashed var(--border-strong);
+  border-radius: 0;
+  opacity: 1;
+  height: 1px !important;
+  min-height: 0;
+  align-self: flex-end;
+}
+.tb.today {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}
+.trend-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding: 0 2px;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+.trend-axis span.today-mark {
+  color: var(--accent);
+}
+
+/* ===== N-banner — replaces "today" stats line  ===== */
+.n-banner {
+  margin: 22px 0 18px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(232,220,192,0.05);
+  border: 1px solid rgba(232,220,192,0.18);
+  border-radius: 14px;
+}
+.n-banner .glyph {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  background: rgba(232,220,192,0.10);
+  border: 1px solid rgba(232,220,192,0.28);
+  color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.n-banner .text { flex: 1; min-width: 0; }
+.n-banner .title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.n-banner .title em { color: var(--accent); font-style: italic; }
+.n-banner .sub {
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* ===== Section / breakdown ===== */
+.section-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.section-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-weight: 300;
+  font-size: 22px; letter-spacing: -0.02em;
+}
+.section-sub {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 500;
+}
+
+/* Mini donut — partial */
+.donut-wrap {
+  display: flex; align-items: center; justify-content: center;
+  padding: 4px 0 18px;
+  position: relative;
+}
+.donut-svg {
+  width: 168px; height: 168px;
+  transform: rotate(-90deg);
+}
+.donut-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+.donut-center .lbl {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 500;
+}
+.donut-center .val {
+  font-family: var(--font-mono), monospace;
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  margin-top: 3px;
+}
+.donut-center .val .cur {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--text-mute);
+  font-weight: 400;
+  margin-right: 2px;
+}
+.donut-center .cap {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--accent);
+  margin-top: 4px;
+}
+
+.cat-row {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.cat-row:last-child { border-bottom: none; }
+.cat-row-top {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 8px;
+}
+.cat-marker {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.cat-marker.food      { background: var(--cat-food); }
+.cat-marker.transport { background: var(--cat-transport); }
+.cat-marker.utilities { background: var(--cat-utilities); }
+.cat-name {
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  flex: 1;
+}
+.cat-amount {
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.cat-amount .dec { color: var(--text-mute); font-weight: 400; }
+.cat-bar {
+  height: 4px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.cat-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+.cat-bar-fill.food      { background: var(--cat-food); }
+.cat-bar-fill.transport { background: var(--cat-transport); }
+.cat-bar-fill.utilities { background: var(--cat-utilities); }
+.cat-meta {
+  margin-top: 6px;
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+/* ===== Tab bar ===== */
+.tab-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 88px;
+  background: rgba(8,8,10,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-around; align-items: flex-start;
+  padding: 14px 12px 0; z-index: 5;
+}
+.tab {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  color: var(--text-mute); background: transparent; border: none;
+  cursor: pointer; font-family: var(--font-mono), monospace;
+  font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase;
+  flex: 1; padding: 4px 0;
+}
+.tab.active { color: var(--text); }
+.tab.active .tab-icon { color: var(--text); }
+.tab-icon { color: var(--text-mute); transition: color .2s; }
+
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 6;
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 10e<br>
+  <em>Reports — early data · day 5</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="page-header">
+    <h1 class="page-title">Reports</h1>
+    <div class="header-actions">
+      <button class="icon-btn" aria-label="Insights">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"/>
+        </svg>
+      </button>
+      <button class="icon-btn" aria-label="Filter">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18M6 12h12M10 18h4"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="scroll">
+
+    <!-- MONTH SELECTOR — current, with Day chip -->
+    <div class="month-strip">
+      <button class="month-nav" aria-label="Previous">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+      <div class="month-label">
+        <div class="month-name">May</div>
+        <div class="month-year">
+          2026
+          <span class="day-chip">Day 5</span>
+        </div>
+      </div>
+      <button class="month-nav disabled" aria-label="Next">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- SUMMARY — small numbers, "so far" tag on label -->
+    <div class="summary-card">
+      <div class="summary-net-label">
+        Net this month
+        <span class="so-far">So far</span>
+      </div>
+      <div class="summary-net">
+        <span class="net-sign">+</span>
+        <span class="net-currency">Rs</span>
+        <span class="net-amount">2,150</span>
+        <span class="net-decimal">.00</span>
+      </div>
+      <div class="summary-split">
+        <div class="split-cell">
+          <div class="lbl"><span class="dot in"></span>Income</div>
+          <div class="val">
+            <span class="cur">Rs</span>
+            <span class="num in">3,500</span>
+          </div>
+        </div>
+        <div class="split-cell">
+          <div class="lbl"><span class="dot out"></span>Expenses</div>
+          <div class="val">
+            <span class="cur">Rs</span>
+            <span class="num out">1,350</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scope tabs -->
+    <div class="scope-segment">
+      <button class="scope-item active">Expense</button>
+      <button class="scope-item">Income</button>
+    </div>
+
+    <!-- TREND — 5 bars rendered, rest of month shown as dashed baseline -->
+    <section class="trend-section">
+      <div class="trend-head">
+        <div>
+          <h2 class="trend-title">Daily trend</h2>
+          <div class="trend-sub">May · 5 of 31 days</div>
+        </div>
+        <div class="trend-today">
+          <div class="v"><span class="cur">Rs</span>320</div>
+          <div class="l">Today</div>
+        </div>
+      </div>
+      <div class="trend-chart-wrap">
+        <div class="trend-chart-bars" aria-hidden="true">
+          <!-- 5 days with data, last one is today -->
+          <span class="tb" style="height: 32%; --bar-color: var(--cat-food);"></span>
+          <span class="tb" style="height: 48%; --bar-color: var(--cat-transport);"></span>
+          <span class="tb" style="height: 26%; --bar-color: var(--cat-food);"></span>
+          <span class="tb" style="height: 60%; --bar-color: var(--cat-utilities);"></span>
+          <span class="tb today" style="height: 44%; --bar-color: var(--cat-food);"></span>
+          <!-- 26 future days — dashed baseline placeholders -->
+          <span class="tb future"></span><span class="tb future"></span>
+          <span class="tb future"></span><span class="tb future"></span>
+          <span class="tb future"></span><span class="tb future"></span>
+          <span class="tb future"></span><span class="tb future"></span>
+          <span class="tb future"></span><span class="tb future"></span>
+          <span class="tb future"></span><span class="tb future"></span>
+          <span class="tb future"></span><span class="tb future"></span>
+          <span class="tb future"></span><span class="tb future"></span>
+          <span class="tb future"></span><span class="tb future"></span>
+          <span class="tb future"></span><span class="tb future"></span>
+          <span class="tb future"></span><span class="tb future"></span>
+          <span class="tb future"></span><span class="tb future"></span>
+          <span class="tb future"></span><span class="tb future"></span>
+        </div>
+        <div class="trend-axis">
+          <span>1</span>
+          <span class="today-mark">5 · today</span>
+          <span>15</span>
+          <span>22</span>
+          <span>31</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- N-BANNER — sits between trend and donut -->
+    <div class="n-banner">
+      <div class="glyph">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 7v5l3 2"/>
+        </svg>
+      </div>
+      <div class="text">
+        <div class="title"><em>Building a picture</em> — 5 days in.</div>
+        <div class="sub">Patterns sharpen after ~4 weeks</div>
+      </div>
+    </div>
+
+    <!-- DONUT — renders partial -->
+    <div class="section-head">
+      <h2 class="section-title">By category</h2>
+      <span class="section-sub">3 active · so far</span>
+    </div>
+    <div class="donut-wrap">
+      <svg class="donut-svg" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="12"/>
+        <!-- Three small arcs adding up to ~360 deg. perimeter = 2*pi*38 ≈ 238.76 -->
+        <!-- Food: 50% -->
+        <circle cx="50" cy="50" r="38" fill="none" stroke="var(--cat-food)" stroke-width="12"
+          stroke-dasharray="119 240" stroke-dashoffset="0"/>
+        <!-- Transport: 30% -->
+        <circle cx="50" cy="50" r="38" fill="none" stroke="var(--cat-transport)" stroke-width="12"
+          stroke-dasharray="71 240" stroke-dashoffset="-119"/>
+        <!-- Utilities: 20% -->
+        <circle cx="50" cy="50" r="38" fill="none" stroke="var(--cat-utilities)" stroke-width="12"
+          stroke-dasharray="48 240" stroke-dashoffset="-190"/>
+      </svg>
+      <div class="donut-center">
+        <div class="lbl">Spent so far</div>
+        <div class="val"><span class="cur">Rs</span>1,350</div>
+        <div class="cap">5 days · 7 txns</div>
+      </div>
+    </div>
+
+    <!-- Breakdown — only categories with activity -->
+    <div class="cat-row">
+      <div class="cat-row-top">
+        <span class="cat-marker food"></span>
+        <span class="cat-name">Food</span>
+        <span class="cat-amount">680<span class="dec">.00</span></span>
+      </div>
+      <div class="cat-bar"><div class="cat-bar-fill food" style="width: 50%"></div></div>
+      <div class="cat-meta"><span>50% of spend</span><span>4 txns</span></div>
+    </div>
+
+    <div class="cat-row">
+      <div class="cat-row-top">
+        <span class="cat-marker transport"></span>
+        <span class="cat-name">Transport</span>
+        <span class="cat-amount">400<span class="dec">.00</span></span>
+      </div>
+      <div class="cat-bar"><div class="cat-bar-fill transport" style="width: 30%"></div></div>
+      <div class="cat-meta"><span>30% of spend</span><span>2 txns</span></div>
+    </div>
+
+    <div class="cat-row">
+      <div class="cat-row-top">
+        <span class="cat-marker utilities"></span>
+        <span class="cat-name">Utilities</span>
+        <span class="cat-amount">270<span class="dec">.00</span></span>
+      </div>
+      <div class="cat-bar"><div class="cat-bar-fill utilities" style="width: 20%"></div></div>
+      <div class="cat-meta"><span>20% of spend</span><span>1 txn</span></div>
+    </div>
+
+  </div>
+
+  <!-- Tab bar -->
+  <nav class="tab-bar">
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10z"/>
+      </svg>
+      Home
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="6" width="18" height="13" rx="2"/>
+        <path d="M3 10h18M7 15h3"/>
+      </svg>
+      Accounts
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>
+      </svg>
+      Recur
+    </button>
+    <button class="tab">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 11a4 4 0 1 0-8 0M5 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/>
+        <circle cx="13" cy="7" r="4"/>
+      </svg>
+      Debts
+    </button>
+    <button class="tab active">
+      <svg class="tab-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19V5M9 19V9M14 19v-6M19 19V3"/>
+      </svg>
+      Reports
+    </button>
+  </nav>
+
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>
