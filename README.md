@@ -43,17 +43,6 @@ flowfin/
 | Min SDK | 26 (Android 8) |
 | Target SDK | 36 |
 
-## Building
-
-```bash
-./gradlew assembleDebug                     # full debug APK
-./gradlew :core:database:compileDebugKotlin # database module only
-./gradlew :core:designsystem:compileDebugKotlin
-./gradlew projects                          # list all modules
-```
-
-The Android SDK path is read from `local.properties` (not checked in). If missing, copy from the template Android Studio creates on first sync.
-
 ## Viewing the design
 
 The HTML design system and mockups have no build step. Serve them from the repo root:

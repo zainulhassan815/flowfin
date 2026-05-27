@@ -1,0 +1,43 @@
+# Working in this repo
+
+FlowFin is an Android personal-finance app: Kotlin 2.3, Jetpack Compose + Material 3, SQLDelight, Koin, Arrow-kt. Module layout mirrors Now in Android (`:core:*` + `:feature:*` + `:app`); convention plugins live in `build-logic/`.
+
+## Where things are
+
+- `app/` — Application + MainActivity entry point.
+- `core/database/` — SQLDelight `.sq` files in `src/main/sqldelight/com/flowfin/core/database/`, Kotlin adapters/IDs/enums in `src/main/kotlin/…/`.
+- `core/designsystem/` — `theme/` for tokens (`FlowFinTheme`, `FlowFinColors`, `FlowFinTypography`), `component/` for the Compose component library, each with co-located `@Preview`s.
+- `core/{common, model, domain, data}/` — JVM-only libraries except `data` which is android-library for the DB driver context.
+- `feature/{home, accounts, transactions, recurring, debts, reports, settings}/` — one module per tab.
+- `docs/` — PRD, data model, decisions, design-system progress, empty-state inventory.
+- `experiments/sqlite/` — schema/seed/queries/stress tests used to validate the model before SQLDelight wiring.
+
+## Build
+
+```bash
+./gradlew assembleDebug
+./gradlew projects
+./gradlew :core:designsystem:compileDebugKotlin
+```
+
+SDK path comes from `local.properties` (gitignored).
+
+## Conventions worth knowing
+
+- **2-space indent, no decorative banner comments.** Annotations, blank lines, and KDoc are enough — no `// ─── Section ───` rules.
+- **SQLDelight triggers use lowercase `new` / `old`.** Uppercase trips the parser with "No table found with name NEW".
+- **Compute on read.** Balances and debt-remaining are queries, not stored counters. No caching layers (Store-style) at the data tier; in-memory caches arrive only when a benchmark proves a need.
+- **Each `.sq` file uses `AS Type` annotations** so generated row classes hold strongly-typed ids and enums; adapters are wired in `core/database/.../DatabaseFactory.kt`.
+- **Design system components** mirror M3 shape — stateless, M3 under the hood, FlowFin prefix (`FlowFinButton`, `FlowFinSwitch`). One file per concept, previews colocated.
+- **Driver applies `PRAGMA foreign_keys = ON` and `journal_mode = WAL` on every connection.** Both are per-connection in SQLite — not persistent.
+
+## Quality bar
+
+"IntelliJ-stable." Simple things do the right thing; the headline numbers don't drift; edge cases default to safe (negative balances warn, overpaid debts allowed). See [`docs/decisions.md`](docs/decisions.md#quality-bar).
+
+## Docs to skim first
+
+- [`docs/prd.md`](docs/prd.md) — what the product does.
+- [`docs/data-model.md`](docs/data-model.md) — six tables, the kinds, the triggers, the why.
+- [`docs/decisions.md`](docs/decisions.md) — stack, architecture, error handling, quality bar.
+- [`docs/design-system.md`](docs/design-system.md) — component porting progress.
