@@ -1,0 +1,19 @@
+-- Key/value store for schema metadata that needs to outlive the schema:
+-- schema version, install device id, future-sync bookkeeping.
+
+CREATE TABLE schema_meta (
+  key   TEXT NOT NULL PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
+
+getValue:
+SELECT value
+FROM schema_meta
+WHERE key = ?;
+
+upsert:
+INSERT OR REPLACE INTO schema_meta(key, value) VALUES (?, ?);
+
+selectAll:
+SELECT * FROM schema_meta;

@@ -1,0 +1,125 @@
+import com.flowfin.core.database.DebtDirection;
+import com.flowfin.core.database.DebtId;
+import com.flowfin.core.database.DebtStatus;
+import com.flowfin.core.database.PersonId;
+import com.flowfin.core.database.TransactionId;
+import kotlinx.datetime.Instant;
+
+-- The relationship. Money movement (origin + repayments) lives in
+-- `transactions` with `debt_id` set.
+--
+-- `origin_transaction_id` is a deferred FK so a debt and its origin row
+-- can be inserted inside one `db.transaction { ... }`.
+
+CREATE TABLE debts (
+  id                       BLOB    AS DebtId          NOT NULL PRIMARY KEY,
+  person_id                BLOB    AS PersonId        NOT NULL REFERENCES persons(id) ON DELETE RESTRICT,
+  direction                TEXT    AS DebtDirection   NOT NULL,
+  original_amount_minor    INTEGER                    NOT NULL,
+  currency                 TEXT                       NOT NULL,
+  reason                   TEXT,
+  status                   TEXT    AS DebtStatus      NOT NULL DEFAULT 'ACTIVE',
+  origin_transaction_id    BLOB    AS TransactionId   NOT NULL,
+  created_at               INTEGER AS Instant         NOT NULL,
+  updated_at               INTEGER AS Instant         NOT NULL,
+  settled_at               INTEGER AS Instant,
+  CHECK (direction IN ('I_OWE', 'OWED_TO_ME')),
+  CHECK (status IN ('ACTIVE', 'SETTLED')),
+  CHECK (original_amount_minor > 0),
+  FOREIGN KEY (origin_transaction_id) REFERENCES transactions(id) DEFERRABLE INITIALLY DEFERRED
+);
+
+CREATE INDEX debts_status_person ON debts(status, person_id);
+
+-- A debt's currency must match the origin transaction's account currency.
+CREATE TRIGGER debts_currency_match_ins
+BEFORE INSERT ON debts
+BEGIN
+  SELECT CASE
+    WHEN new.currency != (
+      SELECT COALESCE(afrom.currency, ato.currency)
+      FROM transactions t
+      LEFT JOIN accounts afrom ON afrom.id = t.from_account_id
+      LEFT JOIN accounts ato   ON ato.id   = t.to_account_id
+      WHERE t.id = new.origin_transaction_id
+    )
+    THEN RAISE(ABORT, 'debt currency must match origin transaction account')
+  END;
+END;
+
+
+selectByDirection:
+SELECT *
+FROM debts
+WHERE direction = ?
+ORDER BY status, created_at DESC;
+
+selectActiveByDirection:
+SELECT *
+FROM debts
+WHERE direction = ? AND status = 'ACTIVE'
+ORDER BY created_at DESC;
+
+selectById:
+SELECT *
+FROM debts
+WHERE id = ?;
+
+-- Debt list with computed remaining (original − paid). Drives both tabs.
+selectAllWithRemaining:
+SELECT
+  d.*,
+  COALESCE((
+    SELECT SUM(amount_minor)
+    FROM transactions
+    WHERE debt_id = d.id
+      AND kind IN ('DEBT_REPAY_OUT', 'DEBT_REPAY_IN')
+  ), 0) AS paid_minor,
+  d.original_amount_minor - COALESCE((
+    SELECT SUM(amount_minor)
+    FROM transactions
+    WHERE debt_id = d.id
+      AND kind IN ('DEBT_REPAY_OUT', 'DEBT_REPAY_IN')
+  ), 0) AS remaining_minor
+FROM debts d
+ORDER BY d.status, d.created_at DESC;
+
+selectByDirectionWithRemaining:
+SELECT
+  d.*,
+  COALESCE((SELECT SUM(amount_minor) FROM transactions
+            WHERE debt_id = d.id AND kind IN ('DEBT_REPAY_OUT','DEBT_REPAY_IN')), 0) AS paid_minor,
+  d.original_amount_minor - COALESCE((SELECT SUM(amount_minor) FROM transactions
+            WHERE debt_id = d.id AND kind IN ('DEBT_REPAY_OUT','DEBT_REPAY_IN')), 0) AS remaining_minor
+FROM debts d
+WHERE d.direction = ?
+ORDER BY d.status, d.created_at DESC;
+
+insert:
+INSERT INTO debts (
+  id, person_id, direction, original_amount_minor, currency,
+  reason, status, origin_transaction_id, created_at, updated_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateDetails:
+UPDATE debts
+SET reason     = :reason,
+    updated_at = :updatedAt
+WHERE id = :id;
+
+markSettled:
+UPDATE debts
+SET status     = 'SETTLED',
+    settled_at = :settledAt,
+    updated_at = :updatedAt
+WHERE id = :id AND status = 'ACTIVE';
+
+reopen:
+UPDATE debts
+SET status     = 'ACTIVE',
+    settled_at = NULL,
+    updated_at = :updatedAt
+WHERE id = :id AND status = 'SETTLED';
+
+delete:
+DELETE FROM debts WHERE id = ?;

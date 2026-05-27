@@ -52,6 +52,13 @@ Now in Android pattern — a layered split with `:core` modules underneath and o
 - IDs are UUIDv7 stored as `BLOB(16)`. Each entity has a typed inline wrapper (`AccountId`, `TransactionId`, …).
 - Balances and debt-remaining are computed on read. No materialised counter columns, no caching layers (Store4/5) at the data tier. See the quality bar below.
 - Driver applies `PRAGMA foreign_keys = ON` and `journal_mode = WAL` on every connection. Both are per-connection in SQLite and not persistent.
+- SQLDelight 2.3 with the `sqlite-3-38` dialect. Trigger bodies must reference `new`/`old` in **lowercase** — uppercase trips the parser with "No table found with name NEW".
+
+## Build
+
+- AGP 9.0 + Kotlin 2.3, JDK 17 toolchain, Gradle 9.4. Kotlin Android is applied implicitly by AGP — no explicit `org.jetbrains.kotlin.android` plugin anywhere.
+- Module structure mirrors Now in Android: `:core:*` for cross-cutting libraries, `:feature:*` for tabs, `:app` for the entry point.
+- Convention plugins live in `build-logic/` and expose `flowfin.android.application`, `flowfin.android.library`, `flowfin.android.library.compose`, `flowfin.android.feature`, `flowfin.android.sqldelight`, `flowfin.koin`, `flowfin.jvm.library`, `flowfin.android.lint`, `flowfin.root`.
 
 ## Settings
 

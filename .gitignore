@@ -17,3 +17,21 @@
 *.db
 *.db-shm
 *.db-wal
+
+# Gradle
+.gradle/
+build/
+**/build/
+local.properties
+captures/
+.cxx/
+
+# Generated sources (SQLDelight, etc.)
+**/generated/
+
+# Android Studio
+*.iml
+.idea/
+
+# Kotlin
+.kotlin/

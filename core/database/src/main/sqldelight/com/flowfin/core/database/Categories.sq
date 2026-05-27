@@ -1,0 +1,71 @@
+import com.flowfin.core.database.CategoryId;
+import com.flowfin.core.database.CategoryScope;
+import kotlinx.datetime.Instant;
+
+-- Tags for income and expense rows. Defaults are seeded at first launch
+-- and immutable; customs are user-created and archivable.
+
+CREATE TABLE categories (
+  id            BLOB    AS CategoryId    NOT NULL PRIMARY KEY,
+  name          TEXT                     NOT NULL,
+  scope         TEXT    AS CategoryScope NOT NULL,
+  is_default    INTEGER                  NOT NULL DEFAULT 0,
+  icon          TEXT,
+  color         TEXT,
+  display_order INTEGER                  NOT NULL DEFAULT 0,
+  created_at    INTEGER AS Instant       NOT NULL,
+  updated_at    INTEGER AS Instant       NOT NULL,
+  archived_at   INTEGER AS Instant,
+  CHECK (scope IN ('EXPENSE', 'INCOME')),
+  CHECK (is_default IN (0, 1)),
+  CHECK (is_default = 0 OR archived_at IS NULL)
+);
+
+
+selectActiveByScope:
+SELECT *
+FROM categories
+WHERE scope = ? AND archived_at IS NULL
+ORDER BY is_default DESC, display_order, name;
+
+selectAll:
+SELECT *
+FROM categories
+ORDER BY archived_at IS NULL DESC, is_default DESC, display_order, name;
+
+selectById:
+SELECT *
+FROM categories
+WHERE id = ?;
+
+selectDefaults:
+SELECT *
+FROM categories
+WHERE is_default = 1
+ORDER BY scope, display_order;
+
+insertCustom:
+INSERT INTO categories (
+  id, name, scope, is_default, icon, color, display_order, created_at, updated_at
+) VALUES (?, ?, ?, 0, ?, ?, ?, ?, ?);
+
+updateCustom:
+UPDATE categories
+SET name          = :name,
+    icon          = :icon,
+    color         = :color,
+    display_order = :displayOrder,
+    updated_at    = :updatedAt
+WHERE id = :id AND is_default = 0;
+
+archive:
+UPDATE categories
+SET archived_at = :archivedAt,
+    updated_at  = :updatedAt
+WHERE id = :id AND is_default = 0 AND archived_at IS NULL;
+
+unarchive:
+UPDATE categories
+SET archived_at = NULL,
+    updated_at  = :updatedAt
+WHERE id = :id AND is_default = 0;
