@@ -16,7 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -31,6 +37,9 @@ import com.flowfin.core.designsystem.theme.FlowFinTheme
  * surface with a strong border). When [tint] is supplied — typically a
  * category or avatar color — the icon takes the tint and the border and
  * background fade to low-alpha versions of the same hue.
+ *
+ * [dashed] swaps the solid border for a dashed one — the budget-account
+ * treatment, signalling an envelope allocation rather than a real balance.
  */
 @Composable
 fun FlowFinTileIcon(
@@ -38,6 +47,7 @@ fun FlowFinTileIcon(
   modifier: Modifier = Modifier,
   contentDescription: String? = null,
   tint: Color? = null,
+  dashed: Boolean = false,
   size: Dp = 40.dp,
 ) {
   val palette = FlowFinTheme.colors
@@ -47,15 +57,35 @@ fun FlowFinTileIcon(
   val backgroundColor = tint?.copy(alpha = 0.08f) ?: Color.Transparent
 
   // Smaller tiles use a tighter corner radius so they still read as a tile, not a chip.
-  val shape = RoundedCornerShape(if (size <= 32.dp) 8.dp else 10.dp)
+  val cornerRadius = if (size <= 32.dp) 8.dp else 10.dp
+  val shape = RoundedCornerShape(cornerRadius)
   val iconSize = size * 0.5f
+
+  val borderModifier = if (dashed) {
+    Modifier.drawBehind {
+      val strokeWidth = 1.dp.toPx()
+      val dimen = size.toPx()
+      drawRoundRect(
+        color = borderColor,
+        topLeft = Offset(strokeWidth / 2, strokeWidth / 2),
+        size = Size(dimen - strokeWidth, dimen - strokeWidth),
+        cornerRadius = CornerRadius(cornerRadius.toPx()),
+        style = Stroke(
+          width = strokeWidth,
+          pathEffect = PathEffect.dashPathEffect(floatArrayOf(4.dp.toPx(), 4.dp.toPx())),
+        ),
+      )
+    }
+  } else {
+    Modifier.border(width = 1.dp, color = borderColor, shape = shape)
+  }
 
   Row(
     modifier = modifier
       .size(size)
       .clip(shape)
       .background(backgroundColor)
-      .border(width = 1.dp, color = borderColor, shape = shape),
+      .then(borderModifier),
     horizontalArrangement = Arrangement.Center,
     verticalAlignment = Alignment.CenterVertically,
   ) {

@@ -13,10 +13,10 @@ Progress through the components from `design/system/components.html`. Each row i
 | 7 | Hero amount display | the big Geist Mono number on Home + add screens | small | done |
 | 8 | Page header | screen title block (eyebrow + title + optional aux) | small | done |
 | 9 | Calendar & month nav | calendar grid · month strip for Reports | medium-large | done |
-| 10 | Cards | real account card · budget card with progress · pending payment card | large | — |
-| 11 | List rows | transaction row · picker row with selection check | medium | — |
-| 12 | Settings list | grouped settings rows (uses Switch + FormRow primitives) | small | — |
-| 13 | Quick actions | the +Expense / +Income / +Transfer trio on Home | small | — |
+| 10 | Cards | real account card · budget card with progress · pending payment card | large | done |
+| 11 | List rows | transaction row · picker row with selection check | medium | done |
+| 12 | Settings list | grouped settings rows (uses Switch + FormRow primitives) | small | done |
+| 13 | Quick actions | the +Expense / +Income / +Transfer trio on Home | small | done |
 | 14 | Insight cards | small dashboard cards (warning / positive / info) | small | — |
 | 15 | Hints, banners & people | hint banner · warn banner · notification preview · person avatars · timeline | medium | — |
 | 16 | Progress bars | linear progress with optional spend/budget framing | small | — |
