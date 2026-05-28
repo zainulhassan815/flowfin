@@ -22,7 +22,7 @@ Progress through the components from `design/system/components.html`. Each row i
 | 16 | Progress bars | linear progress with optional spend/budget framing | small | done |
 | 17 | Navigation | bottom nav bar (5 tabs + indicator) | medium | done |
 | 18 | Progress dots | onboarding pagination dots | trivial | done |
-| 19 | Charts | the pie + bar charts in Reports | medium-large | — |
+| 19 | Charts | the pie + bar charts in Reports | medium-large | done |
 | 20 | Receipt thumbnail | small attachment preview | small | — |
 | 21 | Bottom sheets | picker sheets (account / category / person) | medium | — |
 | 22 | Empty states | the F/S/Q/N treatments — full screens | medium | — |
