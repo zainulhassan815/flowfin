@@ -8,11 +8,11 @@ Progress through the components from `design/system/components.html`. Each row i
 | 2 | Status & tags | StatusTag, FrequencyTag, CountBadge | small | done |
 | 3 | Form rows | FlowFinFormRow + TileIcon | medium | done |
 | 4 | Toggle switch | FlowFinSwitch | small | done |
-| 5 | Inputs & controls | text input · search input · segmented (pill) · underlined scope tabs | medium | — |
-| 6 | Calculator pad | numeric keypad for amount entry | medium | — |
-| 7 | Hero amount display | the big Geist Mono number on Home + add screens | small | — |
-| 8 | Page header | screen title block (eyebrow + title + optional aux) | small | — |
-| 9 | Calendar & month nav | calendar grid · month strip for Reports | medium-large | — |
+| 5 | Inputs & controls | text input · search input · segmented (pill) · underlined scope tabs | medium | done |
+| 6 | Calculator pad | numeric keypad for amount entry | medium | done |
+| 7 | Hero amount display | the big Geist Mono number on Home + add screens | small | done |
+| 8 | Page header | screen title block (eyebrow + title + optional aux) | small | done |
+| 9 | Calendar & month nav | calendar grid · month strip for Reports | medium-large | done |
 | 10 | Cards | real account card · budget card with progress · pending payment card | large | — |
 | 11 | List rows | transaction row · picker row with selection check | medium | — |
 | 12 | Settings list | grouped settings rows (uses Switch + FormRow primitives) | small | — |
