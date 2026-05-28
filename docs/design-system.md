@@ -20,8 +20,8 @@ Progress through the components from `design/system/components.html`. Each row i
 | 14 | Insight cards | small dashboard cards (warning / positive / info) | small | done |
 | 15 | Hints, banners & people | hint banner · warn banner · notification preview · person avatars · timeline | medium | done |
 | 16 | Progress bars | linear progress with optional spend/budget framing | small | done |
-| 17 | Navigation | bottom nav bar (5 tabs + indicator) | medium | — |
-| 18 | Progress dots | onboarding pagination dots | trivial | — |
+| 17 | Navigation | bottom nav bar (5 tabs + indicator) | medium | done |
+| 18 | Progress dots | onboarding pagination dots | trivial | done |
 | 19 | Charts | the pie + bar charts in Reports | medium-large | — |
 | 20 | Receipt thumbnail | small attachment preview | small | — |
 | 21 | Bottom sheets | picker sheets (account / category / person) | medium | — |
