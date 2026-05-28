@@ -83,5 +83,5 @@ See [`design/system/brand.html`](design/system/brand.html) for voice and tone, [
 | Design system (HTML) | complete · v0.1 |
 | Data model | shipped — SQLDelight schema, 100k-row stress test, all triggers green |
 | Gradle scaffolding | shipped — 14 modules build, debug APK assembles |
-| Design system (Compose) | 4 of 23 sections shipped (buttons, tags, form rows, switch) |
-| Feature screens | not started |
+| Design system (Compose) | complete — all 23 sections shipped |
+| Feature screens | Home — UI shell in progress (stateless, preview-driven); data/domain layer pending |

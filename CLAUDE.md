@@ -7,7 +7,7 @@ FlowFin is an Android personal-finance app: Kotlin 2.3, Jetpack Compose + Materi
 - `app/` — Application + MainActivity entry point.
 - `core/database/` — SQLDelight `.sq` files in `src/main/sqldelight/com/flowfin/core/database/`, Kotlin adapters/IDs/enums in `src/main/kotlin/…/`.
 - `core/designsystem/` — `theme/` for tokens (`FlowFinTheme`, `FlowFinColors`, `FlowFinTypography`), `component/` for the Compose component library, each with co-located `@Preview`s.
-- `core/{common, model, domain, data}/` — JVM-only libraries except `data` which is android-library for the DB driver context.
+- `core/{common, model, domain, data}/` — JVM-only libraries except `data` which is android-library for the DB driver context. Currently empty scaffolds — models, repositories, and use cases aren't built yet (domain design is the next effort). Note: the typed IDs and schema enums presently live in `core/database`; relocating them so `core/model` can share them is part of that design.
 - `feature/{home, accounts, transactions, recurring, debts, reports, settings}/` — one module per tab.
 - `docs/` — PRD, data model, decisions, design-system progress, empty-state inventory.
 - `experiments/sqlite/` — schema/seed/queries/stress tests used to validate the model before SQLDelight wiring.
@@ -28,7 +28,8 @@ SDK path comes from `local.properties` (gitignored).
 - **SQLDelight triggers use lowercase `new` / `old`.** Uppercase trips the parser with "No table found with name NEW".
 - **Compute on read.** Balances and debt-remaining are queries, not stored counters. No caching layers (Store-style) at the data tier; in-memory caches arrive only when a benchmark proves a need.
 - **Each `.sq` file uses `AS Type` annotations** so generated row classes hold strongly-typed ids and enums; adapters are wired in `core/database/.../DatabaseFactory.kt`.
-- **Design system components** mirror M3 shape — stateless, M3 under the hood, FlowFin prefix (`FlowFinButton`, `FlowFinSwitch`). One file per concept, previews colocated.
+- **Design system components** mirror M3 shape — stateless, M3 under the hood, FlowFin prefix (`FlowFinButton`, `FlowFinSwitch`). One file per concept, previews colocated. The library is complete — all 23 sections of `design/system/components.html` are ported; feature screens compose from it.
+- **Delegate complex M3 mechanics to M3.** Don't rebuild scrim/gesture/state machinery — e.g. `FlowFinModalBottomSheet` wraps M3's `ModalBottomSheet`, adding only FlowFin shape/color/handle; we supply the bespoke content (sheet headers, etc.).
 - **Driver applies `PRAGMA foreign_keys = ON` and `journal_mode = WAL` on every connection.** Both are per-connection in SQLite — not persistent.
 
 ## Quality bar
@@ -40,4 +41,4 @@ SDK path comes from `local.properties` (gitignored).
 - [`docs/prd.md`](docs/prd.md) — what the product does.
 - [`docs/data-model.md`](docs/data-model.md) — six tables, the kinds, the triggers, the why.
 - [`docs/decisions.md`](docs/decisions.md) — stack, architecture, error handling, quality bar.
-- [`docs/design-system.md`](docs/design-system.md) — component porting progress.
+- [`docs/design-system.md`](docs/design-system.md) — the component library (all 23 sections shipped).
