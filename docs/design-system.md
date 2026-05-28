@@ -17,9 +17,9 @@ Progress through the components from `design/system/components.html`. Each row i
 | 11 | List rows | transaction row · picker row with selection check | medium | done |
 | 12 | Settings list | grouped settings rows (uses Switch + FormRow primitives) | small | done |
 | 13 | Quick actions | the +Expense / +Income / +Transfer trio on Home | small | done |
-| 14 | Insight cards | small dashboard cards (warning / positive / info) | small | — |
-| 15 | Hints, banners & people | hint banner · warn banner · notification preview · person avatars · timeline | medium | — |
-| 16 | Progress bars | linear progress with optional spend/budget framing | small | — |
+| 14 | Insight cards | small dashboard cards (warning / positive / info) | small | done |
+| 15 | Hints, banners & people | hint banner · warn banner · notification preview · person avatars · timeline | medium | done |
+| 16 | Progress bars | linear progress with optional spend/budget framing | small | done |
 | 17 | Navigation | bottom nav bar (5 tabs + indicator) | medium | — |
 | 18 | Progress dots | onboarding pagination dots | trivial | — |
 | 19 | Charts | the pie + bar charts in Reports | medium-large | — |
