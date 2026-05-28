@@ -25,8 +25,8 @@ Progress through the components from `design/system/components.html`. Each row i
 | 19 | Charts | the pie + bar charts in Reports | medium-large | done |
 | 20 | Receipt thumbnail | small attachment preview | small | done |
 | 21 | Bottom sheets | picker sheets (account / category / person) | medium | done — M3 ModalBottomSheet + thin wrapper |
-| 22 | Empty states | the F/S/Q/N treatments — full screens | medium | — |
-| 23 | Empty-state primitives | the building blocks for empty states | small | — |
+| 22 | Empty states | the F/S/Q/N treatments — full screens | medium | done — full screens compose the F primitive at feature level |
+| 23 | Empty-state primitives | the building blocks for empty states | small | done |
 
 ## Useful groupings
 
