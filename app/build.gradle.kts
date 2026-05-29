@@ -41,6 +41,8 @@ dependencies {
   implementation(projects.core.data)
   implementation(projects.core.database)
   implementation(projects.core.model)
+  implementation(projects.core.ui)
+  implementation(projects.core.navigation)
 
   implementation(projects.feature.home)
   implementation(projects.feature.accounts)

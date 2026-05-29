@@ -4,6 +4,7 @@ import android.app.Application
 import com.flowfin.core.data.di.dataModule
 import com.flowfin.core.database.databaseModule
 import com.flowfin.core.domain.repository.CategoryRepository
+import com.flowfin.core.ui.di.uiModule
 import com.flowfin.feature.home.di.homeModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +21,7 @@ class FlowFinApp : Application() {
     val koin = startKoin {
       androidLogger(Level.INFO)
       androidContext(this@FlowFinApp)
-      modules(databaseModule, dataModule, homeModule)
+      modules(databaseModule, dataModule, uiModule, homeModule)
     }.koin
 
     CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {

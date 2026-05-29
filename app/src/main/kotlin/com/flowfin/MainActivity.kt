@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.flowfin.core.designsystem.theme.FlowFinTheme
-import com.flowfin.feature.home.HomeRoute
+import com.flowfin.ui.FlowFinApp
 import org.koin.compose.KoinContext
 
 class MainActivity : ComponentActivity() {
@@ -25,7 +25,7 @@ private fun FlowFinRoot() {
   KoinContext {
     FlowFinTheme {
       Surface(modifier = Modifier.fillMaxSize(), color = FlowFinTheme.colors.bg) {
-        HomeRoute()
+        FlowFinApp()
       }
     }
   }

@@ -1,229 +1,153 @@
 package com.flowfin.feature.home
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountBalanceWallet
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Autorenew
-import androidx.compose.material.icons.rounded.BarChart
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.NorthEast
-import androidx.compose.material.icons.rounded.People
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.flowfin.core.designsystem.component.FlowFinFab
-import com.flowfin.core.designsystem.component.FlowFinNavBar
-import com.flowfin.core.designsystem.component.FlowFinNavBarItem
+import androidx.compose.material3.Text
+import com.flowfin.core.designsystem.component.FlowFinAccountCard
+import com.flowfin.core.designsystem.component.FlowFinEmptyState
+import com.flowfin.core.designsystem.component.FlowFinHeroAmount
+import com.flowfin.core.designsystem.component.FlowFinSectionEmptyHint
+import com.flowfin.core.designsystem.component.FlowFinTransactionRow
+import com.flowfin.core.designsystem.component.TransactionKind
 import com.flowfin.core.designsystem.theme.FlowFinTheme
-import org.koin.compose.viewmodel.koinViewModel
-
-/** The five bottom-nav destinations. */
-enum class HomeTab { Home, Accounts, Recur, Debts, Reports }
-
-/** Stateful entry point: pulls [HomeUiState] from the ViewModel and renders it. */
-@Composable
-fun HomeRoute(
-  modifier: Modifier = Modifier,
-  viewModel: HomeViewModel = koinViewModel(),
-) {
-  val state by viewModel.uiState.collectAsStateWithLifecycle()
-  HomeScreen(state = state, modifier = modifier)
-}
+import com.flowfin.core.model.AccountId
+import com.flowfin.core.model.TransactionId
+import com.flowfin.core.ui.AccountCardUi
+import com.flowfin.core.ui.TxRowUi
+import com.flowfin.core.ui.categoryColor
+import com.flowfin.core.ui.categoryIcon
+import kotlin.uuid.Uuid
 
 @Composable
 fun HomeScreen(
   state: HomeUiState,
   modifier: Modifier = Modifier,
-  onAddTransaction: () -> Unit = {},
-  onSelectTab: (HomeTab) -> Unit = {},
+  onTransactionClick: (TransactionId) -> Unit = {},
+  onAccountClick: (AccountId) -> Unit = {},
+) {
+  when (state) {
+    HomeUiState.Loading -> Box(modifier.fillMaxSize())
+    HomeUiState.Empty -> Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+      FlowFinEmptyState(
+        eyebrow = "GET STARTED",
+        title = "Money lives somewhere.",
+        body = "Add your first account to start tracking where it goes.",
+        actionLabel = "Add an account",
+        onAction = {},
+        emphasis = "somewhere",
+      )
+    }
+    is HomeUiState.Content -> HomeContent(state, modifier, onTransactionClick, onAccountClick)
+  }
+}
+
+@Composable
+private fun HomeContent(
+  state: HomeUiState.Content,
+  modifier: Modifier,
+  onTransactionClick: (TransactionId) -> Unit,
+  onAccountClick: (AccountId) -> Unit,
 ) {
   val palette = FlowFinTheme.colors
-
-  Scaffold(
-    modifier = modifier,
-    containerColor = palette.bg,
-    bottomBar = { HomeNavBar(selected = HomeTab.Home, onSelect = onSelectTab) },
-    floatingActionButton = {
-      FlowFinFab(
-        onClick = onAddTransaction,
-        icon = Icons.Rounded.Add,
-        contentDescription = "Add transaction",
-      )
-    },
-  ) { innerPadding ->
-    Column(
-      modifier = Modifier
-        .fillMaxSize()
-        .padding(innerPadding)
-        .verticalScroll(rememberScrollState()),
-    ) {
-      Hero(state)
-      RecentActivity(state.recent)
-    }
-  }
-}
-
-/** Interim plain-text feed; replaced by hydrated transaction rows in the Home design pass. */
-@Composable
-private fun RecentActivity(lines: List<String>) {
-  if (lines.isEmpty()) return
-  val palette = FlowFinTheme.colors
-
   Column(
-    modifier = Modifier.padding(horizontal = 24.dp),
-    verticalArrangement = Arrangement.spacedBy(8.dp),
+    modifier = modifier
+      .fillMaxSize()
+      .verticalScroll(rememberScrollState())
+      .padding(vertical = 16.dp),
   ) {
-    Text(
-      text = "Recent".uppercase(),
-      style = FlowFinTheme.typography.label,
-      color = palette.textMute,
-    )
-    lines.forEach { line ->
-      Text(text = line, style = FlowFinTheme.typography.body, color = palette.text)
+    Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+      Text("AVAILABLE BALANCE", style = FlowFinTheme.typography.label, color = palette.textMute)
+      Spacer(Modifier.height(12.dp))
+      FlowFinHeroAmount(whole = state.totalWhole, decimal = state.totalDecimal)
+      Spacer(Modifier.height(8.dp))
+      Text("Allocated ${state.allocated}", style = FlowFinTheme.typography.caption, color = palette.textMute)
     }
-  }
-}
 
-@Composable
-private fun HomeNavBar(selected: HomeTab, onSelect: (HomeTab) -> Unit) {
-  FlowFinNavBar {
-    FlowFinNavBarItem(Icons.Rounded.Home, "Home", selected == HomeTab.Home, onClick = { onSelect(HomeTab.Home) })
-    FlowFinNavBarItem(Icons.Rounded.AccountBalanceWallet, "Accounts", selected == HomeTab.Accounts, onClick = { onSelect(HomeTab.Accounts) })
-    FlowFinNavBarItem(Icons.Rounded.Autorenew, "Recur", selected == HomeTab.Recur, onClick = { onSelect(HomeTab.Recur) })
-    FlowFinNavBarItem(Icons.Rounded.People, "Debts", selected == HomeTab.Debts, onClick = { onSelect(HomeTab.Debts) })
-    FlowFinNavBarItem(Icons.Rounded.BarChart, "Reports", selected == HomeTab.Reports, onClick = { onSelect(HomeTab.Reports) })
-  }
-}
-
-@Composable
-private fun Hero(state: HomeUiState) {
-  val palette = FlowFinTheme.colors
-
-  Column(modifier = Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 24.dp)) {
-    Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
+    SectionLabel("ACCOUNTS")
+    Column(
+      modifier = Modifier.padding(horizontal = 24.dp),
+      verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-      Box(
-        modifier = Modifier
-          .width(14.dp)
-          .height(1.dp)
-          .background(palette.textSoft),
-      )
-      Text(
-        text = "Available balance".uppercase(),
-        style = FlowFinTheme.typography.label,
-        color = palette.textMute,
-      )
-    }
-
-    Spacer(Modifier.height(14.dp))
-    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-      Text(
-        text = state.currency,
-        modifier = Modifier.alignByBaseline(),
-        style = FlowFinTheme.typography.h2.copy(fontSize = 24.sp, fontWeight = FontWeight.Light),
-        color = palette.textMute,
-      )
-      Text(
-        text = state.balanceWhole,
-        modifier = Modifier.alignByBaseline(),
-        style = FlowFinTheme.typography.hero,
-        color = palette.text,
-      )
-      Text(
-        text = state.balanceDecimal,
-        modifier = Modifier.alignByBaseline(),
-        style = FlowFinTheme.typography.hero.copy(fontSize = 24.sp, letterSpacing = (-0.02).em),
-        color = palette.textMute,
-      )
-    }
-
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 16.dp)
-        .drawBehind {
-          drawLine(
-            color = palette.borderStrong,
-            start = Offset(0f, 0f),
-            end = Offset(size.width, 0f),
-            strokeWidth = 1.dp.toPx(),
-            pathEffect = PathEffect.dashPathEffect(floatArrayOf(3.dp.toPx(), 3.dp.toPx())),
-          )
-        }
-        .padding(top = 16.dp),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically,
-    ) {
-      val metaStyle = FlowFinTheme.typography.monoNum.copy(
-        fontSize = 11.sp,
-        fontWeight = FontWeight.Normal,
-        letterSpacing = 0.05.em,
-      )
-      Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text("Allocated", style = metaStyle, color = palette.textMute)
-        Text(state.allocated, style = metaStyle, color = palette.text)
+      state.accounts.forEach { account ->
+        val tint = if (account.colorKey != null) categoryColor(account.colorKey) else null
+        FlowFinAccountCard(
+          icon = categoryIcon(account.iconKey),
+          name = account.name,
+          meta = account.meta,
+          balance = account.balanceWhole,
+          decimal = account.balanceDecimal,
+          tint = tint,
+          dashedIcon = account.isBudget,
+          modifier = Modifier.fillMaxWidth(),
+          onClick = { onAccountClick(account.id) },
+        )
       }
-      Row(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-      ) {
-        Row(
-          horizontalArrangement = Arrangement.spacedBy(4.dp),
-          verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Icon(
-            imageVector = Icons.Rounded.NorthEast,
-            contentDescription = null,
-            tint = palette.positive,
-            modifier = Modifier.size(9.dp),
+    }
+
+    SectionLabel("RECENT")
+    if (state.recent.isEmpty()) {
+      Box(modifier = Modifier.padding(horizontal = 24.dp)) {
+        FlowFinSectionEmptyHint(eyebrow = "NOTHING YET", title = "No activity to show.")
+      }
+    } else {
+      Column(modifier = Modifier.padding(horizontal = 12.dp)) {
+        state.recent.forEach { row ->
+          val tint = if (row.colorKey != null) categoryColor(row.colorKey) else null
+          FlowFinTransactionRow(
+            icon = categoryIcon(row.iconKey),
+            name = row.name,
+            meta = row.meta,
+            amount = row.amount,
+            kind = row.kind,
+            decimal = row.decimal,
+            tint = tint,
+            onClick = { onTransactionClick(row.id) },
           )
-          Text(state.trend, style = metaStyle, color = palette.positive)
         }
-        Text("this month", style = metaStyle, color = palette.textMute)
       }
     }
   }
 }
 
-@Preview(name = "Home", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 400, heightDp = 800)
 @Composable
-private fun PreviewHomeScreen() = FlowFinTheme {
+private fun SectionLabel(text: String) {
+  Text(
+    text = text,
+    style = FlowFinTheme.typography.label,
+    color = FlowFinTheme.colors.textMute,
+    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+  )
+}
+
+@Preview(name = "Home", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 400, heightDp = 820)
+@Composable
+private fun PreviewHome() = FlowFinTheme {
   HomeScreen(
-    state = HomeUiState(
-      currency = "Rs",
-      balanceWhole = "47,000",
-      balanceDecimal = ".00",
-      allocated = "Rs 16,000",
-      trend = "+12%",
+    state = HomeUiState.Content(
+      totalWhole = "2,00,000",
+      totalDecimal = ".00",
+      allocated = "Rs 10,000.00",
+      accounts = listOf(
+        AccountCardUi(AccountId(Uuid.random()), "Bank", "Account", "1,83,000", ".00", "bank", "bank", isBudget = false),
+        AccountCardUi(AccountId(Uuid.random()), "Food", "Budget", "10,000", ".00", "wallet", "food", isBudget = true),
+      ),
+      recent = listOf(
+        TxRowUi(TransactionId(Uuid.random()), "Salary", "Bank", "+1,50,000", ".00", TransactionKind.Income, "payments", "salary"),
+        TxRowUi(TransactionId(Uuid.random()), "Groceries", "Bank", "−5,000", ".00", TransactionKind.Expense, "shopping_cart", "grocery"),
+      ),
     ),
   )
 }

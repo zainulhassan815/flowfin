@@ -96,6 +96,9 @@ kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime",
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 kotlinx-uuid-core = { group = "app.softwork", name = "kotlinx-uuid-core", version.ref = "kotlinxUuid" }
 
+# Forms
+formz = { group = "io.github.zainulhassan815", name = "formz", version = "1.0.1" }
+
 # SQLDelight
 sqldelight-runtime = { group = "app.cash.sqldelight", name = "runtime", version.ref = "sqldelight" }
 sqldelight-coroutines = { group = "app.cash.sqldelight", name = "coroutines-extensions", version.ref = "sqldelight" }
