@@ -1,8 +1,8 @@
-import com.flowfin.core.database.DebtDirection;
-import com.flowfin.core.database.DebtId;
-import com.flowfin.core.database.DebtStatus;
-import com.flowfin.core.database.PersonId;
-import com.flowfin.core.database.TransactionId;
+import com.flowfin.core.model.DebtDirection;
+import com.flowfin.core.model.DebtId;
+import com.flowfin.core.model.DebtStatus;
+import com.flowfin.core.model.PersonId;
+import com.flowfin.core.model.TransactionId;
 import kotlinx.datetime.Instant;
 
 -- The relationship. Money movement (origin + repayments) lives in

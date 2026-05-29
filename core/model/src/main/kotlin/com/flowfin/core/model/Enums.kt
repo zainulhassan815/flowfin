@@ -1,4 +1,4 @@
-package com.flowfin.core.database
+package com.flowfin.core.model
 
 /**
  * Schema-level enums. Constant names are the strings stored on disk and

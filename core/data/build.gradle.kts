@@ -16,6 +16,12 @@ dependencies {
 
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.kotlinx.datetime)
-  implementation(libs.kotlinx.uuid.core)
   implementation(libs.sqldelight.coroutines)
+  implementation(libs.arrow.core)
+
+  testImplementation(libs.kotlin.test)
+  testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.sqldelight.driver.jvm)
+  testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.turbine)
 }

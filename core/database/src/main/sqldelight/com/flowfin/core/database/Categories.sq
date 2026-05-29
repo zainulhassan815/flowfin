@@ -1,5 +1,5 @@
-import com.flowfin.core.database.CategoryId;
-import com.flowfin.core.database.CategoryScope;
+import com.flowfin.core.model.CategoryId;
+import com.flowfin.core.model.CategoryScope;
 import kotlinx.datetime.Instant;
 
 -- Tags for income and expense rows. Defaults are seeded at first launch

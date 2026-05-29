@@ -1,4 +1,4 @@
-import com.flowfin.core.database.PersonId;
+import com.flowfin.core.model.PersonId;
 import kotlinx.datetime.Instant;
 
 -- Contacts referenced by debts. Free text; no system-contact integration.

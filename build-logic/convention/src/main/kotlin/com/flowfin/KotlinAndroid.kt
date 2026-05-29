@@ -57,5 +57,7 @@ private inline fun <reified T : KotlinBaseExtension> Project.configureKotlin() =
     jvmTarget = JvmTarget.JVM_11
     allWarningsAsErrors = warningsAsErrors
     freeCompilerArgs.add("-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
+    // Typed IDs wrap kotlin.uuid.Uuid, still @ExperimentalUuidApi in Kotlin 2.3.
+    freeCompilerArgs.add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
   }
 }

@@ -1,9 +1,9 @@
-import com.flowfin.core.database.AccountId;
-import com.flowfin.core.database.CategoryId;
-import com.flowfin.core.database.DebtId;
-import com.flowfin.core.database.RecurringScheduleId;
-import com.flowfin.core.database.TransactionId;
-import com.flowfin.core.database.TransactionKind;
+import com.flowfin.core.model.AccountId;
+import com.flowfin.core.model.CategoryId;
+import com.flowfin.core.model.DebtId;
+import com.flowfin.core.model.RecurringScheduleId;
+import com.flowfin.core.model.TransactionId;
+import com.flowfin.core.model.TransactionKind;
 import kotlinx.datetime.Instant;
 
 -- The ledger. One row per cash event. `kind` discriminates the nine

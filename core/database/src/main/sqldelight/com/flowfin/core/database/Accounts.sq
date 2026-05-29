@@ -1,5 +1,5 @@
-import com.flowfin.core.database.AccountId;
-import com.flowfin.core.database.AccountType;
+import com.flowfin.core.model.AccountId;
+import com.flowfin.core.model.AccountType;
 import kotlinx.datetime.Instant;
 
 -- Real-money locations (Bank, Cash) and budget envelopes (Food, Transport).
@@ -91,6 +91,12 @@ FROM accounts
 WHERE parent_account_id = ? AND archived_at IS NULL
 ORDER BY display_order, name;
 
+-- How many active (non-archived) accounts use this name? Mirrors the partial
+-- unique index so writes can return a typed DuplicateName up front instead of
+-- parsing a constraint exception after the fact.
+countActiveWithName:
+SELECT COUNT(*) FROM accounts WHERE name = :name AND archived_at IS NULL;
+
 insert:
 INSERT INTO accounts (
   id, name, type, currency, parent_account_id,
@@ -130,13 +136,11 @@ FROM accounts a
 WHERE a.id = ?;
 
 -- All active accounts with computed balances. Powers Home grid and Accounts list.
+-- `a.*` carries every column (color, icon, timestamps) so the row maps to a full
+-- Account; `balance_minor` is the computed balance alongside it.
 balanceForAll:
 SELECT
-  a.id,
-  a.name,
-  a.type,
-  a.currency,
-  a.parent_account_id,
+  a.*,
   a.opening_balance_minor
     + COALESCE((SELECT SUM(amount_minor) FROM transactions WHERE to_account_id   = a.id), 0)
     - COALESCE((SELECT SUM(amount_minor) FROM transactions WHERE from_account_id = a.id), 0)
