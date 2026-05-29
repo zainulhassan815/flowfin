@@ -2,10 +2,17 @@ package com.flowfin.core.data
 
 import com.flowfin.core.database.Accounts
 import com.flowfin.core.database.BalanceForAll
+import com.flowfin.core.database.Debts
+import com.flowfin.core.database.Persons
+import com.flowfin.core.database.SelectAllWithRemaining
+import com.flowfin.core.database.SelectByDirectionWithRemaining
 import com.flowfin.core.database.Transactions
 import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountBalance
+import com.flowfin.core.model.Debt
+import com.flowfin.core.model.DebtWithRemaining
 import com.flowfin.core.model.Money
+import com.flowfin.core.model.Person
 import com.flowfin.core.model.Transaction
 
 /**
@@ -59,4 +66,63 @@ internal fun Transactions.toModel(): Transaction = Transaction(
   debtId = debt_id,
   createdAt = created_at,
   updatedAt = updated_at,
+)
+
+internal fun Persons.toModel(): Person = Person(
+  id = id,
+  name = name,
+  avatarTintIndex = avatar_tint_index.toInt(),
+  createdAt = created_at,
+  updatedAt = updated_at,
+  archivedAt = archived_at,
+)
+
+internal fun Debts.toModel(): Debt = Debt(
+  id = id,
+  personId = person_id,
+  direction = direction,
+  originalAmount = Money(original_amount_minor),
+  currency = currency,
+  reason = reason,
+  status = status,
+  originTransactionId = origin_transaction_id,
+  createdAt = created_at,
+  updatedAt = updated_at,
+  settledAt = settled_at,
+)
+
+internal fun SelectAllWithRemaining.toDebtWithRemaining(): DebtWithRemaining = DebtWithRemaining(
+  debt = Debt(
+    id = id,
+    personId = person_id,
+    direction = direction,
+    originalAmount = Money(original_amount_minor),
+    currency = currency,
+    reason = reason,
+    status = status,
+    originTransactionId = origin_transaction_id,
+    createdAt = created_at,
+    updatedAt = updated_at,
+    settledAt = settled_at,
+  ),
+  paid = Money(paid_minor),
+  remaining = Money(remaining_minor),
+)
+
+internal fun SelectByDirectionWithRemaining.toDebtWithRemaining(): DebtWithRemaining = DebtWithRemaining(
+  debt = Debt(
+    id = id,
+    personId = person_id,
+    direction = direction,
+    originalAmount = Money(original_amount_minor),
+    currency = currency,
+    reason = reason,
+    status = status,
+    originTransactionId = origin_transaction_id,
+    createdAt = created_at,
+    updatedAt = updated_at,
+    settledAt = settled_at,
+  ),
+  paid = Money(paid_minor),
+  remaining = Money(remaining_minor),
 )

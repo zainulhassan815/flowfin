@@ -1,0 +1,37 @@
+package com.flowfin.core.domain.usecase
+
+import arrow.core.Either
+import arrow.core.raise.either
+import arrow.core.raise.ensure
+import com.flowfin.core.domain.error.DebtError
+import com.flowfin.core.domain.repository.AccountRepository
+import com.flowfin.core.domain.repository.DebtRepository
+import com.flowfin.core.model.AccountId
+import com.flowfin.core.model.DebtId
+import com.flowfin.core.model.Money
+import kotlinx.datetime.Instant
+
+/**
+ * Records a repayment against a debt. Overpayment is allowed (settling up or
+ * forgiveness), so there's no check against the remaining; the direction of the
+ * debt decides whether money leaves or enters the account.
+ */
+class RecordRepayment(
+  private val accounts: AccountRepository,
+  private val debts: DebtRepository,
+) {
+  suspend operator fun invoke(
+    debtId: DebtId,
+    account: AccountId,
+    amount: Money,
+    recordedAt: Instant,
+  ): Either<DebtError, Unit> = either {
+    ensure(amount.isPositive) { DebtError.AmountNotPositive }
+    val debt = debts.getById(debtId) ?: raise(DebtError.DebtNotFound(debtId))
+    val real = accounts.getById(account) ?: raise(DebtError.AccountNotFound(account))
+    ensure(real.isReal) { DebtError.AccountNotReal }
+    ensure(!real.isArchived) { DebtError.ArchivedAccount(account) }
+    ensure(real.currency == debt.currency) { DebtError.CurrencyMismatch }
+    debts.recordRepayment(debt, account, amount, recordedAt).bind()
+  }
+}
