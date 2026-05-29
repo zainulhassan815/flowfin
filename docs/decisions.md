@@ -36,11 +36,13 @@ Now in Android pattern — a layered split with `:core` modules underneath and o
 
 ```
 :app                  Android entry point
-:core:designsystem    theme, components, previews
+:core:designsystem    theme, components, previews (model-agnostic)
+:core:ui              model-bound composables, shared UiState, MoneyFormatter, color/icon resolvers
+:core:navigation      Navigation 3 route ADT (@Serializable NavKey) + Navigator + back stack
 :core:database        SQLDelight schemas + queries
 :core:domain          models, repository interfaces, use cases
 :core:data            repository implementations
-:core:common          utilities
+:core:common          utilities (incl. Result<T> + Flow.asResult())
 :feature:home
 :feature:accounts
 :feature:transactions
@@ -49,6 +51,37 @@ Now in Android pattern — a layered split with `:core` modules underneath and o
 :feature:reports
 :feature:settings
 ```
+
+`:core:ui` depends on `:core:designsystem` + `:core:model`; `:core:designsystem`
+stays model-agnostic. The rule: a composable that takes a domain model
+(`AccountCard(account)`, `TransactionRow(txn)`) lives in `:core:ui`; a model-agnostic
+M3 wrapper lives in `:core:designsystem`. Mirrors Now in Android.
+
+## Presentation (feature → domain wiring)
+
+- **One sealed `UiState` per screen, derived in the ViewModel.** The ViewModel is the
+  single place that decides *which* state to show; the composable just `when`s over it.
+  State is `combine(repo flows + UI context).asResult().stateIn(viewModelScope,
+  WhileSubscribed(5_000), Loading)`. Hydration (names, colors, icons) is joined in the
+  ViewModel from the small accounts/categories flows — compute on read, no stored joins.
+- **The mockup states are data/context-derived, not error-derived.** A screen's states
+  come from the *shape of the data + UI context* (active filter, range, thresholds), not
+  from the error channel. Map to the empty-state taxonomy (see [`empty-states.md`](empty-states.md)):
+  - **F** (full empty) — primary data empty *and* no filter → top-level `UiState` arm.
+  - **N** (not-enough-yet) — data below the feature's threshold (e.g. a trend needs ≥2 points) → top-level arm, calm, no CTA.
+  - **Q** (filter/search) — a filter is active *and* nothing matches → arm carrying the query to echo.
+  - **S** (section empty) — screen populated but one section empty → a *field on the Content* state, rendered as an inline hint.
+  - **Error** is the rare catastrophic-read arm only (from `asResult`'s `catch`); it does **not** drive the normal states.
+- **Forms** use formz (`io.github.zainulhassan815:formz`): the form `UiState` implements
+  `Form`, holds `FormInput`s, gates submit on `isValid && !submissionStatus.isInProgress`,
+  binds `displayError` to fields, and on submit folds the use-case `Either` → field error or success.
+- **One-shot effects** (navigate, snackbar) go through a `Channel<Effect>` → `receiveAsFlow()`
+  collected in the `Route` via `LaunchedEffect`. Screen-level conditions stay in `UiState`;
+  the channel is only for fire-once actions that must not replay on recomposition.
+- **Navigation 3.** Routes are `@Serializable` data classes/objects implementing `NavKey`
+  in `:core:navigation`; a `Navigator` owns the back stack with per-tab saved stacks for the
+  five tabs. IDs are typed route fields read as `key.id` (no string args), passed to the
+  ViewModel via `koinViewModel { parametersOf(key.id) }`.
 
 ## Money
 
