@@ -28,7 +28,8 @@ class RecordTransactionTest {
   private val db = inMemoryDatabase()
   private val accounts = AccountRepositoryImpl(db.accountsQueries, UuidV7Generator(), FixedClock(at), Dispatchers.Unconfined)
   private val transactions = TransactionRepositoryImpl(db.transactionsQueries, UuidV7Generator(), FixedClock(at), Dispatchers.Unconfined)
-  private val record = RecordTransaction(accounts, transactions)
+  private val categories = CategoryRepositoryImpl(db.categoriesQueries, UuidV7Generator(), FixedClock(at), Dispatchers.Unconfined)
+  private val record = RecordTransaction(accounts, transactions, categories)
   private val createReal = CreateRealAccount(accounts)
   private val createBudget = CreateBudget(accounts)
 
@@ -134,5 +135,15 @@ class RecordTransactionTest {
     val result = record(TransactionDraft.Income(bank.id, Money(0), salary, note = null, recordedAt = at))
 
     assertEquals(TransactionError.AmountNotPositive, result.leftOrFail())
+  }
+
+  @Test
+  fun `income tagged with an expense-scope category is rejected`() = runTest {
+    val bank = createReal("Bank").rightOrFail()
+    val groceries = db.seedCategory(CategoryScope.EXPENSE, at)
+
+    val result = record(TransactionDraft.Income(bank.id, Money(5_000), groceries, note = null, recordedAt = at))
+
+    assertEquals(TransactionError.CategoryScopeMismatch, result.leftOrFail())
   }
 }

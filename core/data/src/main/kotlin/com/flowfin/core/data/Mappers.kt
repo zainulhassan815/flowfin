@@ -2,6 +2,7 @@ package com.flowfin.core.data
 
 import com.flowfin.core.database.Accounts
 import com.flowfin.core.database.BalanceForAll
+import com.flowfin.core.database.Categories
 import com.flowfin.core.database.Debts
 import com.flowfin.core.database.Persons
 import com.flowfin.core.database.SelectAllWithRemaining
@@ -9,6 +10,7 @@ import com.flowfin.core.database.SelectByDirectionWithRemaining
 import com.flowfin.core.database.Transactions
 import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountBalance
+import com.flowfin.core.model.Category
 import com.flowfin.core.model.Debt
 import com.flowfin.core.model.DebtWithRemaining
 import com.flowfin.core.model.Money
@@ -66,6 +68,19 @@ internal fun Transactions.toModel(): Transaction = Transaction(
   debtId = debt_id,
   createdAt = created_at,
   updatedAt = updated_at,
+)
+
+internal fun Categories.toModel(): Category = Category(
+  id = id,
+  name = name,
+  scope = scope,
+  isDefault = is_default != 0L,
+  icon = icon,
+  color = color,
+  displayOrder = display_order.toInt(),
+  createdAt = created_at,
+  updatedAt = updated_at,
+  archivedAt = archived_at,
 )
 
 internal fun Persons.toModel(): Person = Person(

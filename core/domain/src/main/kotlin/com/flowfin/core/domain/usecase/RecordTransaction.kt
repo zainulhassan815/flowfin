@@ -6,9 +6,12 @@ import arrow.core.raise.either
 import arrow.core.raise.ensure
 import com.flowfin.core.domain.error.TransactionError
 import com.flowfin.core.domain.repository.AccountRepository
+import com.flowfin.core.domain.repository.CategoryRepository
 import com.flowfin.core.domain.repository.TransactionRepository
 import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountId
+import com.flowfin.core.model.CategoryId
+import com.flowfin.core.model.CategoryScope
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.model.TransactionDraft
 
@@ -22,6 +25,7 @@ import com.flowfin.core.model.TransactionDraft
 class RecordTransaction(
   private val accounts: AccountRepository,
   private val transactions: TransactionRepository,
+  private val categories: CategoryRepository,
 ) {
   suspend operator fun invoke(draft: TransactionDraft): Either<TransactionError, Transaction> = either {
     ensure(draft.amount.isPositive) { TransactionError.AmountNotPositive }
@@ -34,10 +38,13 @@ class RecordTransaction(
       is TransactionDraft.Income -> {
         val to = activeAccount(draft.to)
         ensure(to.isReal) { invalid("income must land in a real account") }
+        requireCategory(draft.category, CategoryScope.INCOME)
       }
 
-      is TransactionDraft.Expense ->
+      is TransactionDraft.Expense -> {
         activeAccount(draft.from) // spend from a real account or a budget — both allowed
+        requireCategory(draft.category, CategoryScope.EXPENSE)
+      }
 
       is TransactionDraft.Transfer -> {
         ensure(draft.from != draft.to) { TransactionError.SelfTransfer }
@@ -72,6 +79,11 @@ class RecordTransaction(
     val account = accounts.getById(id) ?: raise(TransactionError.AccountNotFound(id))
     ensure(!account.isArchived) { TransactionError.ArchivedAccount(id) }
     return account
+  }
+
+  private suspend fun Raise<TransactionError>.requireCategory(id: CategoryId, scope: CategoryScope) {
+    val category = categories.getById(id) ?: raise(TransactionError.CategoryNotFound(id))
+    ensure(category.scope == scope) { TransactionError.CategoryScopeMismatch }
   }
 
   private fun invalid(reason: String) = TransactionError.InvalidAccountForKind(reason)

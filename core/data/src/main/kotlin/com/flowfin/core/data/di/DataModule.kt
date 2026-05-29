@@ -1,16 +1,19 @@
 package com.flowfin.core.data.di
 
 import com.flowfin.core.data.AccountRepositoryImpl
+import com.flowfin.core.data.CategoryRepositoryImpl
 import com.flowfin.core.data.DebtRepositoryImpl
 import com.flowfin.core.data.IdGenerator
 import com.flowfin.core.data.PersonRepositoryImpl
 import com.flowfin.core.data.TransactionRepositoryImpl
 import com.flowfin.core.data.UuidV7Generator
 import com.flowfin.core.domain.repository.AccountRepository
+import com.flowfin.core.domain.repository.CategoryRepository
 import com.flowfin.core.domain.repository.DebtRepository
 import com.flowfin.core.domain.repository.PersonRepository
 import com.flowfin.core.domain.repository.TransactionRepository
 import com.flowfin.core.domain.usecase.CreateBudget
+import com.flowfin.core.domain.usecase.CreateCategory
 import com.flowfin.core.domain.usecase.CreatePerson
 import com.flowfin.core.domain.usecase.CreateRealAccount
 import com.flowfin.core.domain.usecase.RecordBorrow
@@ -35,11 +38,13 @@ val dataModule = module {
   single<TransactionRepository> { TransactionRepositoryImpl(get(), get(), get(), get()) }
   single<PersonRepository> { PersonRepositoryImpl(get(), get(), get(), get()) }
   single<DebtRepository> { DebtRepositoryImpl(get(), get(), get(), get()) }
+  single<CategoryRepository> { CategoryRepositoryImpl(get(), get(), get(), get()) }
 
-  factory { RecordTransaction(get(), get()) }
+  factory { RecordTransaction(get(), get(), get()) }
   factory { CreateRealAccount(get()) }
   factory { CreateBudget(get()) }
   factory { CreatePerson(get()) }
+  factory { CreateCategory(get()) }
   factory { RecordBorrow(get(), get(), get()) }
   factory { RecordLend(get(), get(), get()) }
   factory { RecordRepayment(get(), get()) }
