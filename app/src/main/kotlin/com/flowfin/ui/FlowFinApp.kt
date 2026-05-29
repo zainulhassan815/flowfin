@@ -2,13 +2,6 @@ package com.flowfin.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountBalanceWallet
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Autorenew
-import androidx.compose.material.icons.rounded.BarChart
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.People
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -20,6 +13,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.flowfin.core.designsystem.component.FlowFinFab
 import com.flowfin.core.designsystem.component.FlowFinNavBar
 import com.flowfin.core.designsystem.component.FlowFinNavBarItem
+import com.flowfin.core.designsystem.icon.FlowFinIcons
 import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.navigation.AccountsRoute
 import com.flowfin.core.navigation.AddTransactionRoute
@@ -41,11 +35,11 @@ import com.flowfin.feature.transactions.navigation.addTransactionEntry
 private data class Tab(val route: NavKey, val icon: ImageVector, val label: String)
 
 private val TABS = listOf(
-  Tab(HomeRoute, Icons.Rounded.Home, "Home"),
-  Tab(AccountsRoute, Icons.Rounded.AccountBalanceWallet, "Accounts"),
-  Tab(RecurringRoute, Icons.Rounded.Autorenew, "Recur"),
-  Tab(DebtsRoute, Icons.Rounded.People, "Debts"),
-  Tab(ReportsRoute, Icons.Rounded.BarChart, "Reports"),
+  Tab(HomeRoute, FlowFinIcons.Home, "Home"),
+  Tab(AccountsRoute, FlowFinIcons.Accounts, "Accounts"),
+  Tab(RecurringRoute, FlowFinIcons.Recurring, "Recur"),
+  Tab(DebtsRoute, FlowFinIcons.Debts, "Debts"),
+  Tab(ReportsRoute, FlowFinIcons.Reports, "Reports"),
 )
 
 /** The app shell: one Scaffold owning the bottom nav + FAB, hosting the nav back stack. */
@@ -86,7 +80,7 @@ fun FlowFinApp() {
       if (onTabRoot) {
         FlowFinFab(
           onClick = { navigator.navigate(AddTransactionRoute) },
-          icon = Icons.Rounded.Add,
+          icon = FlowFinIcons.Add,
           contentDescription = "Add transaction",
         )
       }
