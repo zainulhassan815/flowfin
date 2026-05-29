@@ -22,13 +22,16 @@ A running list of choices made before any Kotlin gets written. Update this when 
   no recoverable *domain* failure — a failed read is catastrophic (corrupt DB), not
   something a feature branches on, so wrapping it in `Either<DomainError, T>` would put
   a contentless `Unexpected` in every `Left` and tax every collect site for nothing.
-  Loading / empty / error are *UI* concerns, modelled at the ViewModel with a
-  `Result`/`asResult` (Loading / Content / Error) — the Now in Android pattern — not in
-  the repository. (When a fallible source like sync/remote arrives, it gets its own
-  error type *then*; we don't pre-empt it on local reads.)
+- **No per-screen error state on reads, and no `Result`/`asResult` wrapper.** A read
+  effectively always succeeds; the screen's states are `Loading` + the data-derived
+  states (see Presentation). A genuine read failure means the app is broken — it is
+  *not* caught and shown as a per-screen "something went wrong" (that hides the bug and
+  offers no recovery). It propagates to crash reporting, and graceful degradation, if
+  wanted, is a single app-wide fallback — never per-screen. (When a fallible source like
+  sync/remote arrives, it gets its own error type *then*; we don't pre-empt it now.)
 - Each feature has its own sealed `DomainError`. No app-wide error type.
-- `try / catch` only at the real edges (database, file I/O). Mapped to `Either` (writes)
-  or caught by `asResult` (read streams) there, and never seen again above.
+- `try / catch` only at the real edges (database, file I/O). Mapped to `Either` on
+  writes there, and never seen again above; reads aren't caught.
 
 ## Architecture
 
@@ -42,7 +45,7 @@ Now in Android pattern — a layered split with `:core` modules underneath and o
 :core:database        SQLDelight schemas + queries
 :core:domain          models, repository interfaces, use cases
 :core:data            repository implementations
-:core:common          utilities (incl. Result<T> + Flow.asResult())
+:core:common          utilities
 :feature:home
 :feature:accounts
 :feature:transactions
@@ -61,9 +64,11 @@ M3 wrapper lives in `:core:designsystem`. Mirrors Now in Android.
 
 - **One sealed `UiState` per screen, derived in the ViewModel.** The ViewModel is the
   single place that decides *which* state to show; the composable just `when`s over it.
-  State is `combine(repo flows + UI context).asResult().stateIn(viewModelScope,
-  WhileSubscribed(5_000), Loading)`. Hydration (names, colors, icons) is joined in the
-  ViewModel from the small accounts/categories flows — compute on read, no stored joins.
+  State is `combine(repo flows + UI context) { … deriveState … }.stateIn(viewModelScope,
+  WhileSubscribed(5_000), Loading)` — `stateIn`'s initial value gives `Loading`; the
+  sealed `UiState` gives the rest. No `Result`/`asResult`, no `.catch`. Hydration (names,
+  colors, icons) is joined in the ViewModel from the small accounts/categories flows —
+  compute on read, no stored joins.
 - **The mockup states are data/context-derived, not error-derived.** A screen's states
   come from the *shape of the data + UI context* (active filter, range, thresholds), not
   from the error channel. Map to the empty-state taxonomy (see [`empty-states.md`](empty-states.md)):
@@ -71,7 +76,9 @@ M3 wrapper lives in `:core:designsystem`. Mirrors Now in Android.
   - **N** (not-enough-yet) — data below the feature's threshold (e.g. a trend needs ≥2 points) → top-level arm, calm, no CTA.
   - **Q** (filter/search) — a filter is active *and* nothing matches → arm carrying the query to echo.
   - **S** (section empty) — screen populated but one section empty → a *field on the Content* state, rendered as an inline hint.
-  - **Error** is the rare catastrophic-read arm only (from `asResult`'s `catch`); it does **not** drive the normal states.
+
+  There is no per-screen error state: a read failure is catastrophic (handled app-wide,
+  see Errors), not one of a screen's normal states.
 - **Forms** use formz (`io.github.zainulhassan815:formz`): the form `UiState` implements
   `Form`, holds `FormInput`s, gates submit on `isValid && !submissionStatus.isInProgress`,
   binds `displayError` to fields, and on submit folds the use-case `Either` → field error or success.
