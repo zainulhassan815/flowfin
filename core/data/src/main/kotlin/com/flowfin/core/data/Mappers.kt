@@ -5,11 +5,13 @@ import com.flowfin.core.database.BalanceForAll
 import com.flowfin.core.database.Categories
 import com.flowfin.core.database.Debts
 import com.flowfin.core.database.Persons
+import com.flowfin.core.database.Recurring_schedules
 import com.flowfin.core.database.SelectAllWithRemaining
 import com.flowfin.core.database.SelectByDirectionWithRemaining
 import com.flowfin.core.database.Transactions
 import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountBalance
+import com.flowfin.core.model.Cadence
 import com.flowfin.core.model.Category
 import com.flowfin.core.model.Debt
 import com.flowfin.core.model.DebtDirection
@@ -19,6 +21,8 @@ import com.flowfin.core.model.DebtWithRemaining
 import com.flowfin.core.model.Money
 import com.flowfin.core.model.Person
 import com.flowfin.core.model.PersonId
+import com.flowfin.core.model.Recurrence
+import com.flowfin.core.model.RecurringSchedule
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.model.TransactionId
 import kotlinx.datetime.Instant
@@ -97,6 +101,53 @@ internal fun Persons.toModel(): Person = Person(
   updatedAt = updated_at,
   archivedAt = archived_at,
 )
+
+internal fun Recurring_schedules.toModel(): RecurringSchedule = RecurringSchedule(
+  id = id,
+  name = name,
+  amount = Money(amount_minor),
+  fromAccountId = from_account_id,
+  toAccountId = to_account_id,
+  categoryId = category_id,
+  recurrence = recurrence(cadence, day_of_week, day_of_month, month_of_year),
+  nextDueAt = next_due_at,
+  status = status,
+  pausedAt = paused_at,
+  createdAt = created_at,
+  updatedAt = updated_at,
+)
+
+// Cadence + day columns -> Recurrence. The per-cadence CHECKs guarantee the right
+// field is non-null, so a missing one is a corrupt row and fails loudly.
+private fun recurrence(cadence: Cadence, dayOfWeek: Long?, dayOfMonth: Long?, monthOfYear: Long?): Recurrence =
+  when (cadence) {
+    Cadence.WEEKLY -> Recurrence.Weekly(requireNotNull(dayOfWeek) { "WEEKLY schedule missing day_of_week" }.toInt())
+    Cadence.MONTHLY -> Recurrence.Monthly(requireNotNull(dayOfMonth) { "MONTHLY schedule missing day_of_month" }.toInt())
+    Cadence.YEARLY -> Recurrence.Yearly(
+      month = requireNotNull(monthOfYear) { "YEARLY schedule missing month_of_year" }.toInt(),
+      dayOfMonth = requireNotNull(dayOfMonth) { "YEARLY schedule missing day_of_month" }.toInt(),
+    )
+  }
+
+// Recurrence -> flat schedule columns, for inserts.
+internal fun Recurrence.cadence(): Cadence = when (this) {
+  is Recurrence.Weekly -> Cadence.WEEKLY
+  is Recurrence.Monthly -> Cadence.MONTHLY
+  is Recurrence.Yearly -> Cadence.YEARLY
+}
+
+internal val Recurrence.dayOfWeekColumn: Long?
+  get() = (this as? Recurrence.Weekly)?.dayOfWeek?.toLong()
+
+internal val Recurrence.dayOfMonthColumn: Long?
+  get() = when (this) {
+    is Recurrence.Monthly -> dayOfMonth.toLong()
+    is Recurrence.Yearly -> dayOfMonth.toLong()
+    is Recurrence.Weekly -> null
+  }
+
+internal val Recurrence.monthOfYearColumn: Long?
+  get() = (this as? Recurrence.Yearly)?.month?.toLong()
 
 internal fun Debts.toModel(): Debt = Debt(
   id = id,
