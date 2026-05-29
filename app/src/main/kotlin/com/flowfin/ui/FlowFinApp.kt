@@ -60,7 +60,7 @@ fun FlowFinApp() {
     recurringEntry()
     debtsEntry()
     reportsEntry()
-    addTransactionEntry()
+    addTransactionEntry(navigator)
   }
 
   // Nav bar + FAB only on a tab root, not on pushed screens (e.g. Add Transaction).

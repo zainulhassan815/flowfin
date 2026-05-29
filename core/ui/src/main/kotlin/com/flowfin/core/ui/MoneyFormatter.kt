@@ -30,4 +30,7 @@ class MoneyFormatter(
 
   /** Full display string: `Rs 1,50,000.00`. */
   fun display(money: Money): String = "$symbol ${whole(money)}${fraction(money)}"
+
+  /** Group a plain integer (e.g. the live calculator whole part): `1,50,000`. */
+  fun group(value: Long): String = grouping.format(value)
 }
