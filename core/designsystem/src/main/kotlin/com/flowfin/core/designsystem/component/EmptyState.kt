@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import com.flowfin.core.designsystem.icon.FlowFinIcons
 import com.flowfin.core.designsystem.theme.FlowFinTheme
 
 /**
@@ -60,64 +61,61 @@ fun FlowFinEmptyState(
   Column(
     modifier = modifier
       .fillMaxWidth()
-      .padding(horizontal = 16.dp, vertical = 18.dp),
+      .padding(horizontal = 24.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     GradientRule()
-    Spacer(Modifier.height(14.dp))
+    Spacer(Modifier.height(38.dp))
 
     Row(
       verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
+      horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
       EyebrowDash()
       Text(
         text = eyebrow.uppercase(),
-        style = FlowFinTheme.typography.caption.copy(fontSize = 9.sp, letterSpacing = 0.32.em),
+        style = FlowFinTheme.typography.caption.copy(fontSize = 10.sp, letterSpacing = 0.32.em),
         color = palette.accent,
       )
       EyebrowDash()
     }
 
-    Spacer(Modifier.height(10.dp))
+    Spacer(Modifier.height(18.dp))
     Text(
       text = emphasized(title, emphasis, palette.accent),
       style = FlowFinTheme.typography.h1.copy(
-        fontSize = 20.sp,
+        fontSize = 32.sp,
         fontWeight = FontWeight.Light,
         letterSpacing = (-0.025).em,
-        lineHeight = 24.sp,
+        lineHeight = 37.sp,
       ),
       color = palette.text,
       textAlign = TextAlign.Center,
     )
 
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(18.dp))
     Text(
       text = body,
-      modifier = Modifier.widthIn(max = 240.dp),
-      style = FlowFinTheme.typography.body.copy(fontSize = 12.5.sp, lineHeight = 19.sp),
+      modifier = Modifier.widthIn(max = 300.dp),
+      style = FlowFinTheme.typography.body.copy(fontSize = 15.sp, lineHeight = 24.sp),
       color = palette.textMute,
       textAlign = TextAlign.Center,
     )
 
-    Spacer(Modifier.height(14.dp))
-    Text(
-      text = actionLabel.uppercase(),
-      modifier = Modifier
-        .clip(RoundedCornerShape(11.dp))
-        .background(palette.accent)
-        .clickable(onClick = onAction)
-        .padding(horizontal = 14.dp, vertical = 10.dp),
-      style = FlowFinTheme.typography.caption.copy(
-        fontSize = 9.5.sp,
-        letterSpacing = 0.2.em,
-        fontWeight = FontWeight.SemiBold,
+    Spacer(Modifier.height(30.dp))
+    FlowFinButton(
+      onClick = onAction,
+      text = actionLabel,
+      trailingIcon = FlowFinIcons.ArrowRight,
+      modifier = Modifier.shadow(
+        elevation = 16.dp,
+        shape = RoundedCornerShape(14.dp),
+        spotColor = palette.accent,
+        ambientColor = palette.accent,
       ),
-      color = palette.bg,
     )
 
-    Spacer(Modifier.height(14.dp))
+    Spacer(Modifier.height(38.dp))
     GradientRule()
   }
 }
@@ -132,6 +130,7 @@ fun FlowFinSectionEmptyHint(
   eyebrow: String,
   title: String,
   modifier: Modifier = Modifier,
+  body: String? = null,
   actionLabel: String? = null,
   onAction: () -> Unit = {},
 ) {
@@ -171,6 +170,15 @@ fun FlowFinSectionEmptyHint(
         color = palette.text,
         textAlign = TextAlign.Center,
       )
+      if (body != null) {
+        Text(
+          text = body,
+          modifier = Modifier.widthIn(max = 240.dp),
+          style = FlowFinTheme.typography.body.copy(fontSize = 13.5.sp, lineHeight = 20.sp),
+          color = palette.textMute,
+          textAlign = TextAlign.Center,
+        )
+      }
       if (actionLabel != null) {
         Spacer(Modifier.height(2.dp))
         Text(
@@ -227,7 +235,7 @@ private fun emphasized(text: String, emphasis: String?, color: Color) =
 private fun GradientRule() {
   Box(
     modifier = Modifier
-      .width(50.dp)
+      .width(80.dp)
       .height(1.dp)
       .background(
         Brush.horizontalGradient(
@@ -252,10 +260,10 @@ private fun EyebrowDash() {
 private fun PreviewEmptyStateFull() = FlowFinTheme {
   Box(modifier = Modifier.padding(24.dp)) {
     FlowFinEmptyState(
-      eyebrow = "No accounts yet",
+      eyebrow = "Begin",
       title = "Money lives somewhere. Tell us where.",
-      emphasis = "Tell us where.",
-      body = "Add a real account to start tracking what you actually have.",
+      emphasis = "somewhere.",
+      body = "Add the first place — your bank, the cash in your wallet, a mobile wallet. Every transaction starts from an account.",
       actionLabel = "Add an account",
       onAction = {},
     )
