@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -32,6 +34,7 @@ import com.flowfin.feature.recurring.navigation.recurringEntry
 import com.flowfin.feature.reports.navigation.reportsEntry
 import com.flowfin.feature.transactions.navigation.addTransactionEntry
 import com.flowfin.feature.transactions.navigation.transactionsEntry
+import org.koin.compose.viewmodel.koinViewModel
 
 private data class Tab(val route: NavKey, val icon: ImageVector, val label: String)
 
@@ -48,6 +51,9 @@ private val TABS = listOf(
 fun FlowFinApp() {
   val navState = rememberNavigationState(HomeRoute, TOP_LEVEL_ROUTES.toSet())
   val navigator = remember(navState) { Navigator(navState) }
+
+  val appViewModel = koinViewModel<FlowFinAppViewModel>()
+  val canAddTransaction by appViewModel.canAddTransaction.collectAsStateWithLifecycle()
 
   val entryProvider = entryProvider {
     homeEntry(navigator)
@@ -79,7 +85,8 @@ fun FlowFinApp() {
       }
     },
     floatingActionButton = {
-      if (onTabRoot) {
+      // Adding a transaction needs an account to post to, so the FAB waits for one.
+      if (onTabRoot && canAddTransaction) {
         FlowFinFab(
           onClick = { navigator.navigate(AddTransactionRoute) },
           icon = FlowFinIcons.Add,
