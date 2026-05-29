@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -36,13 +37,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.flowfin.core.designsystem.component.FlowFinFab
 import com.flowfin.core.designsystem.component.FlowFinNavBar
 import com.flowfin.core.designsystem.component.FlowFinNavBarItem
 import com.flowfin.core.designsystem.theme.FlowFinTheme
+import org.koin.compose.viewmodel.koinViewModel
 
 /** The five bottom-nav destinations. */
 enum class HomeTab { Home, Accounts, Recur, Debts, Reports }
+
+/** Stateful entry point: pulls [HomeUiState] from the ViewModel and renders it. */
+@Composable
+fun HomeRoute(
+  modifier: Modifier = Modifier,
+  viewModel: HomeViewModel = koinViewModel(),
+) {
+  val state by viewModel.uiState.collectAsStateWithLifecycle()
+  HomeScreen(state = state, modifier = modifier)
+}
 
 @Composable
 fun HomeScreen(
@@ -72,7 +85,28 @@ fun HomeScreen(
         .verticalScroll(rememberScrollState()),
     ) {
       Hero(state)
-      // Accounts · Pending · Recent — wired next.
+      RecentActivity(state.recent)
+    }
+  }
+}
+
+/** Interim plain-text feed; replaced by hydrated transaction rows in the Home design pass. */
+@Composable
+private fun RecentActivity(lines: List<String>) {
+  if (lines.isEmpty()) return
+  val palette = FlowFinTheme.colors
+
+  Column(
+    modifier = Modifier.padding(horizontal = 24.dp),
+    verticalArrangement = Arrangement.spacedBy(8.dp),
+  ) {
+    Text(
+      text = "Recent".uppercase(),
+      style = FlowFinTheme.typography.label,
+      color = palette.textMute,
+    )
+    lines.forEach { line ->
+      Text(text = line, style = FlowFinTheme.typography.body, color = palette.text)
     }
   }
 }

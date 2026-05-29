@@ -23,7 +23,10 @@ fun flowFinDatabaseDriver(
     override fun onOpen(db: SupportSQLiteDatabase) {
       super.onOpen(db)
       db.setForeignKeyConstraintsEnabled(true)
-      db.execSQL("PRAGMA journal_mode = WAL")
+      // `journal_mode = WAL` returns the resulting mode as a row, so it must run
+      // as a query — execSQL rejects statements that return data. `synchronous`
+      // returns nothing, so execSQL is fine there.
+      db.query("PRAGMA journal_mode = WAL").use { it.moveToFirst() }
       db.execSQL("PRAGMA synchronous = NORMAL")
     }
   },
