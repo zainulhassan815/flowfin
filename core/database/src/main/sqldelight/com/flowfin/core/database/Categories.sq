@@ -44,10 +44,19 @@ FROM categories
 WHERE is_default = 1
 ORDER BY scope, display_order;
 
+countDefaults:
+SELECT COUNT(*) FROM categories WHERE is_default = 1;
+
 insertCustom:
 INSERT INTO categories (
   id, name, scope, is_default, icon, color, display_order, created_at, updated_at
 ) VALUES (?, ?, ?, 0, ?, ?, ?, ?, ?);
+
+-- Shipped defaults (is_default = 1). Seeded once at first launch.
+insertDefault:
+INSERT INTO categories (
+  id, name, scope, is_default, icon, color, display_order, created_at, updated_at
+) VALUES (?, ?, ?, 1, ?, ?, ?, ?, ?);
 
 updateCustom:
 UPDATE categories

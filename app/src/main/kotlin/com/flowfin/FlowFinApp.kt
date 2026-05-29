@@ -3,6 +3,7 @@ package com.flowfin
 import android.app.Application
 import com.flowfin.core.data.di.dataModule
 import com.flowfin.core.database.databaseModule
+import com.flowfin.core.domain.repository.CategoryRepository
 import com.flowfin.feature.home.di.homeModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,9 +23,11 @@ class FlowFinApp : Application() {
       modules(databaseModule, dataModule, homeModule)
     }.koin
 
-    // Temporary: populate sample data until create-flows exist (see DevSeed).
     CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
-      seedSampleDataIfEmpty(koin.get(), koin.get(), koin.get(), koin.get(), koin.get())
+      // Permanent: ship the default categories so income/expense can be tagged.
+      koin.get<CategoryRepository>().ensureDefaultsSeeded()
+      // Temporary: sample accounts until create-flows exist (see DevSeed).
+      seedSampleDataIfEmpty(koin.get(), koin.get(), koin.get(), koin.get(), koin.get(), koin.get())
     }
   }
 }

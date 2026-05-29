@@ -16,9 +16,37 @@ import kotlin.uuid.Uuid
 class CategoryRepositoryTest {
 
   private val at = Instant.fromEpochMilliseconds(1_700_000_000_000)
-  private val test = inMemoryTestDatabase()
-  private val categories = CategoryRepositoryImpl(test.db.categoriesQueries, UuidV7Generator(), FixedClock(at), Dispatchers.Unconfined)
+  private val db = inMemoryDatabase()
+  private val categories = CategoryRepositoryImpl(db.categoriesQueries, UuidV7Generator(), FixedClock(at), Dispatchers.Unconfined)
   private val createCategory = CreateCategory(categories)
+
+  @Test
+  fun `seeding ships the default categories into both scopes`() = runTest {
+    categories.ensureDefaultsSeeded().rightOrFail()
+
+    val expense = categories.observeByScope(CategoryScope.EXPENSE).first()
+    val income = categories.observeByScope(CategoryScope.INCOME).first()
+    assertEquals(13, expense.size)
+    assertEquals(6, income.size)
+    assertTrue(expense.all { it.isDefault })
+    assertTrue(income.any { it.name == "Salary" })
+  }
+
+  @Test
+  fun `seeding is idempotent`() = runTest {
+    categories.ensureDefaultsSeeded().rightOrFail()
+    categories.ensureDefaultsSeeded().rightOrFail()
+
+    assertEquals(13, categories.observeByScope(CategoryScope.EXPENSE).first().size)
+  }
+
+  @Test
+  fun `a shipped default cannot be archived`() = runTest {
+    categories.ensureDefaultsSeeded().rightOrFail()
+    val default = categories.observeByScope(CategoryScope.EXPENSE).first().first { it.isDefault }
+
+    assertEquals(CategoryError.CannotModifyDefault, categories.archive(default.id).leftOrFail())
+  }
 
   @Test
   fun `a created custom category appears only in its own scope`() = runTest {
@@ -40,13 +68,6 @@ class CategoryRepositoryTest {
     categories.archive(food.id).rightOrFail()
 
     assertTrue(categories.observeByScope(CategoryScope.EXPENSE).first().none { it.id == food.id })
-  }
-
-  @Test
-  fun `a default category cannot be archived`() = runTest {
-    val default = test.seedDefaultCategory(CategoryScope.EXPENSE, at)
-
-    assertEquals(CategoryError.CannotModifyDefault, categories.archive(default).leftOrFail())
   }
 
   @Test

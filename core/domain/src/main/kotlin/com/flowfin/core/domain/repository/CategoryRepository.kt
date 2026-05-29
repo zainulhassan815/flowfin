@@ -18,6 +18,9 @@ interface CategoryRepository {
 
   fun observeAll(): Flow<List<Category>>
 
+  /** Inserts the shipped default categories if none exist yet. Idempotent. */
+  suspend fun ensureDefaultsSeeded(): Either<CategoryError, Unit>
+
   suspend fun getById(id: CategoryId): Category?
 
   suspend fun createCustom(

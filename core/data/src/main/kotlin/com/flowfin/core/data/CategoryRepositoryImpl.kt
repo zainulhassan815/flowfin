@@ -31,6 +31,28 @@ internal class CategoryRepositoryImpl(
   override fun observeAll(): Flow<List<Category>> =
     queries.selectAll().asFlow().mapToList(dispatcher).map { rows -> rows.map { it.toModel() } }
 
+  override suspend fun ensureDefaultsSeeded(): Either<CategoryError, Unit> = withContext(dispatcher) {
+    Either.catch {
+      if (queries.countDefaults().executeAsOne() == 0L) {
+        val now = clock.now()
+        queries.transaction {
+          DEFAULT_CATEGORIES.forEachIndexed { index, category ->
+            queries.insertDefault(
+              id = CategoryId(ids.next()),
+              name = category.name,
+              scope = category.scope,
+              icon = category.icon,
+              color = category.color,
+              display_order = index.toLong(),
+              created_at = now,
+              updated_at = now,
+            )
+          }
+        }
+      }
+    }.mapLeft { CategoryError.Unexpected(it) }
+  }
+
   override suspend fun getById(id: CategoryId): Category? = withContext(dispatcher) {
     queries.selectById(id).executeAsOneOrNull()?.toModel()
   }
