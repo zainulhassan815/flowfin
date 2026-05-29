@@ -31,6 +31,7 @@ import com.flowfin.feature.home.navigation.homeEntry
 import com.flowfin.feature.recurring.navigation.recurringEntry
 import com.flowfin.feature.reports.navigation.reportsEntry
 import com.flowfin.feature.transactions.navigation.addTransactionEntry
+import com.flowfin.feature.transactions.navigation.transactionsEntry
 
 private data class Tab(val route: NavKey, val icon: ImageVector, val label: String)
 
@@ -49,12 +50,13 @@ fun FlowFinApp() {
   val navigator = remember(navState) { Navigator(navState) }
 
   val entryProvider = entryProvider {
-    homeEntry()
+    homeEntry(navigator)
     accountsEntry()
     recurringEntry()
     debtsEntry()
     reportsEntry()
     addTransactionEntry(navigator)
+    transactionsEntry()
   }
 
   // Nav bar + FAB only on a tab root, not on pushed screens (e.g. Add Transaction).

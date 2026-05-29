@@ -207,9 +207,13 @@ private fun HeroAsideRow(
   }
 }
 
-fun LazyListScope.accountsSection(state: HomeUiState.Content, onAccountClick: (AccountId) -> Unit) {
+fun LazyListScope.accountsSection(
+  state: HomeUiState.Content,
+  onAccountClick: (AccountId) -> Unit,
+  onAll: () -> Unit,
+) {
   item(key = "accounts-header", contentType = "header") {
-    SectionHeader(title = "Accounts")
+    SectionHeader(title = "Accounts", onAll = onAll)
   }
   segment("Real", state.realTotal, state.realAccounts, onAccountClick)
   segment("Budget", state.budgetTotal, state.budgetAccounts, onAccountClick)
@@ -303,10 +307,14 @@ private fun AccountRow(ui: AccountCardUi, onClick: () -> Unit, showDivider: Bool
   }
 }
 
-fun LazyListScope.pendingSection(state: HomeUiState.Content, onPay: (RecurringScheduleId) -> Unit) {
+fun LazyListScope.pendingSection(
+  state: HomeUiState.Content,
+  onPay: (RecurringScheduleId) -> Unit,
+  onAll: () -> Unit,
+) {
   if (state.pending.isEmpty()) return
   item(key = "pending-header", contentType = "header") {
-    SectionHeader(title = "Pending", count = state.pending.size)
+    SectionHeader(title = "Pending", count = state.pending.size, onAll = onAll)
   }
   item(key = "pending-strip", contentType = "pending") {
     PendingStrip(state.pending, onPay)
@@ -388,11 +396,21 @@ private fun PayButton(onClick: () -> Unit) {
   }
 }
 
-fun LazyListScope.recentSection(state: HomeUiState.Content, onTransactionClick: (TransactionId) -> Unit) {
+fun LazyListScope.recentSection(
+  state: HomeUiState.Content,
+  onTransactionClick: (TransactionId) -> Unit,
+  onAll: () -> Unit,
+) {
+  val recent = state.recent
   item(key = "recent-header", contentType = "header") {
-    SectionHeader(title = "Recent")
+    SectionHeader(
+      title = "Recent",
+      // "History" once entries have aged out of this week; no link when nothing was ever logged.
+      linkLabel = if (recent is RecentSection.Quiet) "History" else "All",
+      onAll = if (recent is RecentSection.NoEntries) null else onAll,
+    )
   }
-  when (val recent = state.recent) {
+  when (recent) {
     is RecentSection.Activity -> recent.groups.forEach { group ->
       item(key = "date-${group.dateLabel}", contentType = "date") {
         RecentDateHeader(group.dateLabel)
@@ -451,7 +469,12 @@ private fun RecentDateHeader(label: String) {
 }
 
 @Composable
-private fun SectionHeader(title: String, count: Int? = null, onAll: (() -> Unit)? = null) {
+private fun SectionHeader(
+  title: String,
+  count: Int? = null,
+  linkLabel: String = "All",
+  onAll: (() -> Unit)? = null,
+) {
   val palette = FlowFinTheme.colors
   Row(
     modifier = Modifier
@@ -483,7 +506,7 @@ private fun SectionHeader(title: String, count: Int? = null, onAll: (() -> Unit)
         horizontalArrangement = Arrangement.spacedBy(4.dp),
       ) {
         Text(
-          text = "All".uppercase(),
+          text = linkLabel.uppercase(),
           style = FlowFinTheme.typography.caption.copy(letterSpacing = 0.18.em),
           color = palette.textMute,
         )

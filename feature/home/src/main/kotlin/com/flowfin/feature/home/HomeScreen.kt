@@ -42,6 +42,9 @@ fun HomeScreen(
   onSearch: () -> Unit = {},
   onSettings: () -> Unit = {},
   onAddAccount: () -> Unit = {},
+  onAllAccounts: () -> Unit = {},
+  onAllPending: () -> Unit = {},
+  onAllRecent: () -> Unit = {},
 ) {
   Column(modifier.fillMaxSize().background(FlowFinTheme.colors.bg)) {
     HomeTopBar(onSearch = onSearch, onSettings = onSettings)
@@ -64,8 +67,16 @@ fun HomeScreen(
           )
         }
       }
-      is HomeUiState.Content ->
-        HomeContent(state, Modifier.weight(1f), onTransactionClick, onAccountClick, onPayPending)
+      is HomeUiState.Content -> HomeContent(
+        state = state,
+        modifier = Modifier.weight(1f),
+        onTransactionClick = onTransactionClick,
+        onAccountClick = onAccountClick,
+        onPayPending = onPayPending,
+        onAllAccounts = onAllAccounts,
+        onAllPending = onAllPending,
+        onAllRecent = onAllRecent,
+      )
     }
   }
 }
@@ -77,12 +88,15 @@ private fun HomeContent(
   onTransactionClick: (TransactionId) -> Unit,
   onAccountClick: (AccountId) -> Unit,
   onPayPending: (RecurringScheduleId) -> Unit,
+  onAllAccounts: () -> Unit,
+  onAllPending: () -> Unit,
+  onAllRecent: () -> Unit,
 ) {
   LazyColumn(modifier = modifier, contentPadding = PaddingValues(bottom = 96.dp)) {
     heroItem(state)
-    accountsSection(state, onAccountClick)
-    pendingSection(state, onPayPending)
-    recentSection(state, onTransactionClick)
+    accountsSection(state, onAccountClick, onAllAccounts)
+    pendingSection(state, onPayPending, onAllPending)
+    recentSection(state, onTransactionClick, onAllRecent)
   }
 }
 
