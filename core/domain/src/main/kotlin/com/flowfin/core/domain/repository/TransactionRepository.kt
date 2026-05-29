@@ -22,6 +22,13 @@ interface TransactionRepository {
   /** Newest first, for the Home feed. */
   fun recentFeed(limit: Long): Flow<List<Transaction>>
 
+  /**
+   * Net change to the headline total over `[startAt, endAt)` — the signed sum of
+   * external flows (income/borrow/repay-in positive, expense/lend/repay-out
+   * negative). Powers Home's "this month" trend.
+   */
+  fun observeNetChange(startAt: Instant, endAt: Instant): Flow<Money>
+
   /** Every row touching one account, for Account detail. */
   fun observeByAccount(accountId: AccountId, limit: Long, offset: Long): Flow<List<Transaction>>
 

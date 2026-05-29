@@ -2,6 +2,7 @@ package com.flowfin.core.data
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOne
 import arrow.core.Either
 import com.flowfin.core.database.TransactionsQueries
 import com.flowfin.core.domain.error.TransactionError
@@ -28,6 +29,9 @@ internal class TransactionRepositoryImpl(
 
   override fun recentFeed(limit: Long): Flow<List<Transaction>> =
     queries.recentFeed(limit).asFlow().mapToList(dispatcher).map { rows -> rows.map { it.toModel() } }
+
+  override fun observeNetChange(startAt: Instant, endAt: Instant): Flow<Money> =
+    queries.netChangeInRange(startAt, endAt).asFlow().mapToOne(dispatcher).map { Money(it) }
 
   override fun observeByAccount(accountId: AccountId, limit: Long, offset: Long): Flow<List<Transaction>> =
     queries.byAccount(accountId, limit, offset).asFlow().mapToList(dispatcher).map { rows -> rows.map { it.toModel() } }

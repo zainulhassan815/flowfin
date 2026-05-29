@@ -1,34 +1,35 @@
 package com.flowfin.feature.home
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.Text
-import com.flowfin.core.designsystem.component.FlowFinAccountCard
 import com.flowfin.core.designsystem.component.FlowFinEmptyState
-import com.flowfin.core.designsystem.component.FlowFinHeroAmount
-import com.flowfin.core.designsystem.component.FlowFinSectionEmptyHint
-import com.flowfin.core.designsystem.component.FlowFinTransactionRow
+import com.flowfin.core.designsystem.component.FlowFinIconButton
 import com.flowfin.core.designsystem.component.TransactionKind
+import com.flowfin.core.designsystem.icon.FlowFinIcons
 import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.model.AccountId
+import com.flowfin.core.model.RecurringScheduleId
 import com.flowfin.core.model.TransactionId
 import com.flowfin.core.ui.AccountCardUi
 import com.flowfin.core.ui.TxRowUi
-import com.flowfin.core.ui.categoryColor
-import com.flowfin.core.ui.categoryIcon
 import kotlin.uuid.Uuid
 
 @Composable
@@ -37,116 +38,118 @@ fun HomeScreen(
   modifier: Modifier = Modifier,
   onTransactionClick: (TransactionId) -> Unit = {},
   onAccountClick: (AccountId) -> Unit = {},
+  onPayPending: (RecurringScheduleId) -> Unit = {},
+  onSearch: () -> Unit = {},
+  onSettings: () -> Unit = {},
+  onAddAccount: () -> Unit = {},
 ) {
-  when (state) {
-    HomeUiState.Loading -> Box(modifier.fillMaxSize())
-    HomeUiState.Empty -> Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-      FlowFinEmptyState(
-        eyebrow = "GET STARTED",
-        title = "Money lives somewhere.",
-        body = "Add your first account to start tracking where it goes.",
-        actionLabel = "Add an account",
-        onAction = {},
-        emphasis = "somewhere",
-      )
+  Column(modifier.fillMaxSize().background(FlowFinTheme.colors.bg)) {
+    HomeTopBar(onSearch = onSearch, onSettings = onSettings)
+    when (state) {
+      HomeUiState.Loading -> Box(Modifier.weight(1f).fillMaxWidth())
+      HomeUiState.Empty -> Box(
+        modifier = Modifier.weight(1f).fillMaxWidth(),
+        contentAlignment = Alignment.Center,
+      ) {
+        FlowFinEmptyState(
+          eyebrow = "Get started",
+          title = "Money lives somewhere. Tell us where.",
+          body = "Add a real account to start tracking what you actually have.",
+          actionLabel = "Add an account",
+          onAction = onAddAccount,
+          emphasis = "Tell us where.",
+          modifier = Modifier.padding(horizontal = 24.dp),
+        )
+      }
+      is HomeUiState.Content ->
+        HomeContent(state, Modifier.weight(1f), onTransactionClick, onAccountClick, onPayPending)
     }
-    is HomeUiState.Content -> HomeContent(state, modifier, onTransactionClick, onAccountClick)
   }
 }
 
 @Composable
 private fun HomeContent(
   state: HomeUiState.Content,
-  modifier: Modifier,
+  modifier: Modifier = Modifier,
   onTransactionClick: (TransactionId) -> Unit,
   onAccountClick: (AccountId) -> Unit,
+  onPayPending: (RecurringScheduleId) -> Unit,
 ) {
-  val palette = FlowFinTheme.colors
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .verticalScroll(rememberScrollState())
-      .padding(vertical = 16.dp),
-  ) {
-    Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-      Text("AVAILABLE BALANCE", style = FlowFinTheme.typography.label, color = palette.textMute)
-      Spacer(Modifier.height(12.dp))
-      FlowFinHeroAmount(whole = state.totalWhole, decimal = state.totalDecimal)
-      Spacer(Modifier.height(8.dp))
-      Text("Allocated ${state.allocated}", style = FlowFinTheme.typography.caption, color = palette.textMute)
-    }
-
-    SectionLabel("ACCOUNTS")
-    Column(
-      modifier = Modifier.padding(horizontal = 24.dp),
-      verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-      state.accounts.forEach { account ->
-        val tint = if (account.colorKey != null) categoryColor(account.colorKey) else null
-        FlowFinAccountCard(
-          icon = categoryIcon(account.iconKey),
-          name = account.name,
-          meta = account.meta,
-          balance = account.balanceWhole,
-          decimal = account.balanceDecimal,
-          tint = tint,
-          dashedIcon = account.isBudget,
-          modifier = Modifier.fillMaxWidth(),
-          onClick = { onAccountClick(account.id) },
-        )
-      }
-    }
-
-    SectionLabel("RECENT")
-    if (state.recent.isEmpty()) {
-      Box(modifier = Modifier.padding(horizontal = 24.dp)) {
-        FlowFinSectionEmptyHint(eyebrow = "NOTHING YET", title = "No activity to show.")
-      }
-    } else {
-      Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-        state.recent.forEach { row ->
-          val tint = if (row.colorKey != null) categoryColor(row.colorKey) else null
-          FlowFinTransactionRow(
-            icon = categoryIcon(row.iconKey),
-            name = row.name,
-            meta = row.meta,
-            amount = row.amount,
-            kind = row.kind,
-            decimal = row.decimal,
-            tint = tint,
-            onClick = { onTransactionClick(row.id) },
-          )
-        }
-      }
-    }
+  LazyColumn(modifier = modifier, contentPadding = PaddingValues(bottom = 96.dp)) {
+    heroItem(state)
+    accountsSection(state, onAccountClick)
+    pendingSection(state, onPayPending)
+    recentSection(state, onTransactionClick)
   }
 }
 
 @Composable
-private fun SectionLabel(text: String) {
-  Text(
-    text = text,
-    style = FlowFinTheme.typography.label,
-    color = FlowFinTheme.colors.textMute,
-    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
-  )
+private fun HomeTopBar(onSearch: () -> Unit, onSettings: () -> Unit) {
+  val palette = FlowFinTheme.colors
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(start = 24.dp, end = 14.dp, top = 8.dp, bottom = 4.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+      Text(
+        text = "flowfin",
+        style = FlowFinTheme.typography.h2.copy(fontWeight = FontWeight.Light),
+        color = palette.text,
+      )
+      Box(
+        modifier = Modifier
+          .padding(start = 3.dp)
+          .size(5.dp)
+          .clip(CircleShape)
+          .background(palette.accent),
+      )
+    }
+    Spacer(Modifier.weight(1f))
+    FlowFinIconButton(onClick = onSearch, icon = FlowFinIcons.Search, contentDescription = "Search")
+    FlowFinIconButton(onClick = onSettings, icon = FlowFinIcons.Settings, contentDescription = "Settings")
+  }
 }
 
-@Preview(name = "Home", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 400, heightDp = 820)
+@Preview(name = "Home", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
 private fun PreviewHome() = FlowFinTheme {
   HomeScreen(
     state = HomeUiState.Content(
-      totalWhole = "2,00,000",
+      totalWhole = "47,000",
       totalDecimal = ".00",
-      allocated = "Rs 10,000.00",
-      accounts = listOf(
-        AccountCardUi(AccountId(Uuid.random()), "Bank", "Account", "1,83,000", ".00", "bank", "bank", isBudget = false),
-        AccountCardUi(AccountId(Uuid.random()), "Food", "Budget", "10,000", ".00", "wallet", "food", isBudget = true),
+      allocated = "Rs 16,000",
+      trend = HomeTrend(percent = "+12%", rising = true),
+      realTotal = "Rs 47,000",
+      realAccounts = listOf(
+        AccountCardUi(AccountId(Uuid.random()), "Bank", "", "40,000", ".00", "bank", "bank", isBudget = false),
+        AccountCardUi(AccountId(Uuid.random()), "Cash", "", "7,000", ".00", "wallet", "cash", isBudget = false),
+      ),
+      budgetTotal = "Rs 16,000",
+      budgetAccounts = listOf(
+        AccountCardUi(AccountId(Uuid.random()), "Food", "Bank", "9,000", ".00", "restaurant", "food", isBudget = true),
+        AccountCardUi(AccountId(Uuid.random()), "Transport", "Bank", "4,500", ".00", "directions_bus", "transport", isBudget = true),
+        AccountCardUi(AccountId(Uuid.random()), "Fun", "Bank", "2,500", ".00", "movie", "fun", isBudget = true),
+      ),
+      pending = listOf(
+        PendingRowUi(RecurringScheduleId(Uuid.random()), "Gym Membership", "Rs 5,000 · Bank", "Due today", PendingUrgency.Due),
+        PendingRowUi(RecurringScheduleId(Uuid.random()), "Netflix", "Rs 1,500 · Bank", "3 days late", PendingUrgency.Late),
       ),
       recent = listOf(
-        TxRowUi(TransactionId(Uuid.random()), "Salary", "Bank", "+1,50,000", ".00", TransactionKind.Income, "payments", "salary"),
-        TxRowUi(TransactionId(Uuid.random()), "Groceries", "Bank", "−5,000", ".00", TransactionKind.Expense, "shopping_cart", "grocery"),
+        RecentGroup(
+          dateLabel = "Today · 27 Dec",
+          rows = listOf(
+            TxRowUi(TransactionId(Uuid.random()), "Mess Lunch", "Food", "−500", ".00", TransactionKind.Expense, "restaurant", "food"),
+            TxRowUi(TransactionId(Uuid.random()), "ATM Withdrawal", "Bank → Cash", "5,000", ".00", TransactionKind.Transfer, "sync_alt", null),
+          ),
+        ),
+        RecentGroup(
+          dateLabel = "Yesterday · 26 Dec",
+          rows = listOf(
+            TxRowUi(TransactionId(Uuid.random()), "December Salary", "Bank", "+150,000", ".00", TransactionKind.Income, "payments", "salary"),
+          ),
+        ),
       ),
     ),
   )

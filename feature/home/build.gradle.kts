@@ -5,3 +5,7 @@ plugins {
 android {
   namespace = "com.flowfin.feature.home"
 }
+
+dependencies {
+  implementation(libs.kotlinx.datetime)
+}
