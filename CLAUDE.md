@@ -6,7 +6,7 @@ FlowFin is an Android personal-finance app: Kotlin 2.3, Jetpack Compose + Materi
 
 - `app/` — Application + MainActivity entry point.
 - `core/database/` — SQLDelight `.sq` files in `src/main/sqldelight/com/flowfin/core/database/`, Kotlin adapters/IDs/enums in `src/main/kotlin/…/`.
-- `core/designsystem/` — `theme/` for tokens (`FlowFinTheme`, `FlowFinColors`, `FlowFinTypography`), `component/` for the Compose component library, each with co-located `@Preview`s.
+- `core/designsystem/` — `theme/` for tokens (`FlowFinTheme`, `FlowFinColors`, `FlowFinTypography`), `component/` for the Compose component library, `icon/FlowFinIcons.kt` for the line-icon set, each with co-located `@Preview`s.
 - `core/{common, model, domain, data}/` — JVM-only libraries except `data` which is android-library for the DB driver context. Currently empty scaffolds — models, repositories, and use cases aren't built yet (domain design is the next effort). Note: the typed IDs and schema enums presently live in `core/database`; relocating them so `core/model` can share them is part of that design.
 - `feature/{home, accounts, transactions, recurring, debts, reports, settings}/` — one module per tab.
 - `docs/` — PRD, data model, decisions, design-system progress, empty-state inventory.
@@ -29,6 +29,7 @@ SDK path comes from `local.properties` (gitignored).
 - **Compute on read.** Balances and debt-remaining are queries, not stored counters. No caching layers (Store-style) at the data tier; in-memory caches arrive only when a benchmark proves a need.
 - **Each `.sq` file uses `AS Type` annotations** so generated row classes hold strongly-typed ids and enums; adapters are wired in `core/database/.../DatabaseFactory.kt`.
 - **Design system components** mirror M3 shape — stateless, M3 under the hood, FlowFin prefix (`FlowFinButton`, `FlowFinSwitch`). One file per concept, previews colocated. The library is complete — all 23 sections of `design/system/components.html` are ported; feature screens compose from it.
+- **Icons are FlowFin's line set, not Material.** `FlowFinIcons` (`core/designsystem/icon/`) holds the thin line icons ported from `design/system/icons.html`; reach for them via `categoryIcon()` (`core/ui`) for category/account keys or directly for UI glyphs, and fall back to Material only for icons the set doesn't yet cover. The set is generated — edit `design/tools/gen_flowfin_icons.py` (or the source SVGs) and re-run, don't hand-edit `FlowFinIcons.kt`.
 - **Delegate complex M3 mechanics to M3.** Don't rebuild scrim/gesture/state machinery — e.g. `FlowFinModalBottomSheet` wraps M3's `ModalBottomSheet`, adding only FlowFin shape/color/handle; we supply the bespoke content (sheet headers, etc.).
 - **Driver applies `PRAGMA foreign_keys = ON` and `journal_mode = WAL` on every connection.** Both are per-connection in SQLite — not persistent.
 
