@@ -25,9 +25,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.isoDayNumber
+import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlin.math.roundToInt
@@ -54,6 +57,7 @@ class HomeViewModel(
   private val today = clock.now().toLocalDateTime(zone).date
   private val monthStart = LocalDate(today.year, today.month, 1).atStartOfDayIn(zone)
   private val monthEnd = LocalDate(today.year, today.month, 1).plus(1, DateTimeUnit.MONTH).atStartOfDayIn(zone)
+  private val weekStart = today.minus(today.dayOfWeek.isoDayNumber - 1, DateTimeUnit.DAY)
 
   val uiState: StateFlow<HomeUiState> = combine(
     accounts.observeBalances(),
@@ -90,26 +94,61 @@ class HomeViewModel(
       totalWhole = money.whole(total),
       totalDecimal = money.fraction(total),
       allocated = plain(budgetSum),
-      trend = trendOf(total, net),
+      aside = heroAside(total, net, daysSinceStart(balances)),
       realTotal = plain(real.fold(Money.ZERO) { sum, b -> sum + b.balance }),
       realAccounts = real.map { it.toCardUi(accountsById) },
       budgetTotal = plain(budgetSum),
       budgetAccounts = budget.map { it.toCardUi(accountsById) },
       pending = pending.map { it.toPendingUi(accountsById) },
-      recent = groupRecent(recent, accountsById, categoriesById),
+      recent = recentSection(recent, accountsById, categoriesById),
     )
   }
 
+  /** Home shows this week's activity. With nothing this week it asks which empty
+   *  it is: nothing ever logged ([RecentSection.NoEntries]) or just a lull
+   *  ([RecentSection.Quiet], dated off the newest entry). */
+  private fun recentSection(
+    recent: List<Transaction>,
+    accountsById: Map<AccountId, Account>,
+    categoriesById: Map<CategoryId, Category>,
+  ): RecentSection {
+    val thisWeek = recent.filter { it.recordedAt.toLocalDateTime(zone).date >= weekStart }
+    return when {
+      thisWeek.isNotEmpty() -> RecentSection.Activity(groupRecent(thisWeek, accountsById, categoriesById))
+      recent.isEmpty() -> RecentSection.NoEntries
+      else -> RecentSection.Quiet(lastEntry = daysAgo(recent.first().recordedAt))
+    }
+  }
+
+  private fun daysAgo(instant: Instant): String =
+    when (val days = today.toEpochDays() - instant.toLocalDateTime(zone).date.toEpochDays()) {
+      0 -> "today"
+      1 -> "1 day ago"
+      else -> "$days days ago"
+    }
+
+  /** Days the user has been tracking, 1-indexed from the oldest account (its
+   *  creation day is "Day 1"). */
+  private fun daysSinceStart(balances: List<AccountBalance>): Int {
+    val firstDay = balances.minOf { it.account.createdAt }.toLocalDateTime(zone).date
+    return (today.toEpochDays() - firstDay.toEpochDays() + 1).coerceAtLeast(1)
+  }
+
+  /** Before there's enough history to compare months, the hero owns its early days
+   *  ("Day 5, building a picture"); after that it shows the month delta. */
+  private fun heroAside(total: Money, net: Money, daysSinceStart: Int): HeroAside? =
+    if (daysSinceStart < SETTLING_DAYS) HeroAside.Settling("Day $daysSinceStart") else trendOf(total, net)
+
   /** A delta vs the month's starting total, or null when there's nothing honest to
    *  show (no change, or the month opened at zero so a percentage is meaningless). */
-  private fun trendOf(total: Money, net: Money): HomeTrend? {
+  private fun trendOf(total: Money, net: Money): HeroAside.Trend? {
     if (net.isZero) return null
     val startTotal = total.minorUnits - net.minorUnits
     if (startTotal <= 0L) return null
     val pct = (net.minorUnits.toDouble() / startTotal.toDouble() * 100).roundToInt()
     if (pct == 0) return null
     val sign = if (pct > 0) "+" else "" // a negative pct already carries its '−'
-    return HomeTrend(percent = "$sign$pct%", rising = net.isPositive)
+    return HeroAside.Trend(percent = "$sign$pct%", rising = net.isPositive)
   }
 
   private fun AccountBalance.toCardUi(accountsById: Map<AccountId, Account>): AccountCardUi {
@@ -224,3 +263,7 @@ private fun String.titleCase3(): String =
 
 private const val RECENT_LIMIT = 20L
 private const val STOP_TIMEOUT_MS = 5_000L
+
+/** Below this many days of history, the hero reads "Day N" instead of a month
+ *  trend — a month-over-month delta isn't meaningful in the first few weeks. */
+private const val SETTLING_DAYS = 28

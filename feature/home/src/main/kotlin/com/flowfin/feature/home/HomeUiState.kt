@@ -6,7 +6,7 @@ import com.flowfin.core.ui.TxRowUi
 
 /**
  * Home's states, derived in the ViewModel. [Empty] is the F full-empty treatment
- * (no accounts yet); within [Content], an empty [recent] is the S section hint and
+ * (no accounts yet); within [Content], [recent] carries its own empty variants and
  * an empty [pending] simply drops the Pending section.
  * There is no error state — a read failure is catastrophic, not a Home state.
  */
@@ -19,19 +19,38 @@ sealed interface HomeUiState {
     val totalWhole: String,
     val totalDecimal: String,
     val allocated: String,
-    val trend: HomeTrend?,
+    val aside: HeroAside?,
     val realTotal: String,
     val realAccounts: List<AccountCardUi>,
     val budgetTotal: String,
     val budgetAccounts: List<AccountCardUi>,
     val pending: List<PendingRowUi>,
-    val recent: List<RecentGroup>,
+    val recent: RecentSection,
   ) : HomeUiState
 }
 
-/** [percent] omits the "this month" suffix so the hero can render the two parts
- *  in different colors. */
-data class HomeTrend(val percent: String, val rising: Boolean)
+/** The Recent section's content. Home's feed is this calendar week's activity;
+ *  the two empty variants turn on whether anything was ever logged. */
+sealed interface RecentSection {
+  /** This week's transactions, grouped by day. */
+  data class Activity(val groups: List<RecentGroup>) : RecentSection
+
+  /** No transactions exist yet — shows the "first entry" prompt. */
+  data object NoEntries : RecentSection
+
+  /** History exists, but nothing this week. [lastEntry] e.g. "6 days ago". */
+  data class Quiet(val lastEntry: String) : RecentSection
+}
+
+/** The hero's right-hand aside beside "Allocated". */
+sealed interface HeroAside {
+  /** Established history: the month-over-month delta. [percent] omits the "this
+   *  month" suffix so the hero can color the two parts differently. */
+  data class Trend(val percent: String, val rising: Boolean) : HeroAside
+
+  /** Too little history for an honest trend yet — e.g. "Day 5", building a picture. */
+  data class Settling(val dayLabel: String) : HeroAside
+}
 
 /** [Due] maps to the warning tint, [Late] to the negative tint. */
 enum class PendingUrgency { Due, Late }

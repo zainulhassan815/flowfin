@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -23,9 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -47,40 +51,77 @@ private val HORIZONTAL = 24.dp
 
 fun LazyListScope.heroItem(state: HomeUiState.Content) {
   item(key = "hero", contentType = "hero") {
-    Hero(state.totalWhole, state.totalDecimal, state.allocated, state.trend)
+    Hero(state.totalWhole, state.totalDecimal, state.allocated, state.aside)
   }
 }
 
 @Composable
-private fun Hero(whole: String, decimal: String, allocated: String, trend: HomeTrend?) {
-  val palette = FlowFinTheme.colors
+private fun Hero(whole: String, decimal: String, allocated: String, aside: HeroAside?) {
   Column(
     modifier = Modifier
       .fillMaxWidth()
       .padding(start = HORIZONTAL, end = HORIZONTAL, top = 16.dp, bottom = 24.dp),
   ) {
     HeroLabel("Available balance")
-    Row(modifier = Modifier.padding(top = 14.dp)) {
-      Text(
-        text = "Rs",
-        modifier = Modifier.alignByBaseline(),
-        style = FlowFinTheme.typography.h2.copy(fontSize = 24.sp, fontWeight = FontWeight.Light),
-        color = palette.textMute,
-      )
-      Text(
-        text = whole,
-        modifier = Modifier.alignByBaseline().padding(start = 10.dp),
-        style = FlowFinTheme.typography.hero.copy(fontSize = 56.sp, lineHeight = 56.sp),
-        color = palette.text,
-      )
-      Text(
-        text = decimal,
-        modifier = Modifier.alignByBaseline().padding(start = 4.dp),
-        style = FlowFinTheme.typography.monoNum.copy(fontSize = 24.sp, fontWeight = FontWeight.Light),
-        color = palette.textMute,
-      )
+    HeroFigure(whole, decimal, dimmed = false)
+    HeroMeta(allocated, aside)
+  }
+}
+
+/** The hero before any account exists: a dimmed Rs 0.00 over a "no accounts yet ·
+ *  day one" line, standing in for the live allocated/trend meta. */
+@Composable
+fun EmptyHero() {
+  val palette = FlowFinTheme.colors
+  val metaStyle = FlowFinTheme.typography.caption.copy(fontSize = 11.sp, letterSpacing = 0.14.em)
+  Column(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(start = HORIZONTAL, end = HORIZONTAL, top = 16.dp, bottom = 24.dp),
+  ) {
+    HeroLabel("Available balance")
+    HeroFigure(whole = "0", decimal = ".00", dimmed = true)
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 16.dp)
+        .dashedTopRule(palette.borderStrong)
+        .padding(top = 16.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+      Text("No accounts yet".uppercase(), style = metaStyle, color = palette.textFaint)
+      Box(Modifier.size(3.dp).clip(CircleShape).background(palette.textFaint))
+      Text("Day one".uppercase(), style = metaStyle, color = palette.textFaint)
     }
-    HeroMeta(allocated, trend)
+  }
+}
+
+@Composable
+private fun HeroFigure(whole: String, decimal: String, dimmed: Boolean) {
+  val palette = FlowFinTheme.colors
+  val currencyColor = if (dimmed) palette.textFaint else palette.textMute
+  val amountColor = if (dimmed) palette.textSoft else palette.text
+  val fractionColor = if (dimmed) palette.textFaint else palette.textMute
+  Row(modifier = Modifier.padding(top = 14.dp)) {
+    Text(
+      text = "Rs",
+      modifier = Modifier.alignByBaseline(),
+      style = FlowFinTheme.typography.h2.copy(fontSize = 24.sp, fontWeight = FontWeight.Light),
+      color = currencyColor,
+    )
+    Text(
+      text = whole,
+      modifier = Modifier.alignByBaseline().padding(start = 10.dp),
+      style = FlowFinTheme.typography.hero.copy(fontSize = 56.sp, lineHeight = 56.sp),
+      color = amountColor,
+    )
+    Text(
+      text = decimal,
+      modifier = Modifier.alignByBaseline().padding(start = 4.dp),
+      style = FlowFinTheme.typography.monoNum.copy(fontSize = 24.sp, fontWeight = FontWeight.Light),
+      color = fractionColor,
+    )
   }
 }
 
@@ -99,22 +140,14 @@ private fun HeroLabel(text: String) {
 }
 
 @Composable
-private fun HeroMeta(allocated: String, trend: HomeTrend?) {
+private fun HeroMeta(allocated: String, aside: HeroAside?) {
   val palette = FlowFinTheme.colors
   val metaStyle = FlowFinTheme.typography.caption.copy(fontSize = 11.sp, letterSpacing = 0.05.em)
   Row(
     modifier = Modifier
       .fillMaxWidth()
       .padding(top = 16.dp)
-      .drawBehind {
-        drawLine(
-          color = palette.borderStrong,
-          start = Offset(0f, 0f),
-          end = Offset(size.width, 0f),
-          strokeWidth = 1.dp.toPx(),
-          pathEffect = PathEffect.dashPathEffect(floatArrayOf(4.dp.toPx(), 4.dp.toPx())),
-        )
-      }
+      .dashedTopRule(palette.borderStrong)
       .padding(top = 16.dp),
     horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically,
@@ -123,21 +156,54 @@ private fun HeroMeta(allocated: String, trend: HomeTrend?) {
       Text("Allocated", style = metaStyle, color = palette.textMute)
       Text(allocated, style = metaStyle, color = palette.text)
     }
-    if (trend != null) {
-      val trendColor = if (trend.rising) palette.positive else palette.negative
-      Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-          Icon(
-            imageVector = if (trend.rising) FlowFinIcons.TrendUp else FlowFinIcons.TrendDown,
-            contentDescription = null,
-            tint = trendColor,
-            modifier = Modifier.size(11.dp),
-          )
-          Text(trend.percent, style = metaStyle, color = trendColor)
-        }
-        Text("this month", style = metaStyle, color = palette.textMute)
+    when (aside) {
+      is HeroAside.Trend -> {
+        val trendColor = if (aside.rising) palette.positive else palette.negative
+        HeroAsideRow(
+          icon = if (aside.rising) FlowFinIcons.TrendUp else FlowFinIcons.TrendDown,
+          iconTint = trendColor,
+          label = aside.percent,
+          labelColor = trendColor,
+          trailing = "this month",
+          trailingItalic = false,
+        )
       }
+      is HeroAside.Settling -> HeroAsideRow(
+        icon = FlowFinIcons.Clock,
+        iconTint = palette.textSoft,
+        label = aside.dayLabel,
+        labelColor = palette.textSoft,
+        trailing = "building a picture",
+        trailingItalic = true,
+      )
+      null -> Unit
     }
+  }
+}
+
+/** The hero's right aside: a small icon + [label], then a quieter [trailing]
+ *  phrase. Shared by the trend and the early-days "building a picture" variants. */
+@Composable
+private fun HeroAsideRow(
+  icon: ImageVector,
+  iconTint: Color,
+  label: String,
+  labelColor: Color,
+  trailing: String,
+  trailingItalic: Boolean,
+) {
+  val palette = FlowFinTheme.colors
+  val style = FlowFinTheme.typography.caption.copy(fontSize = 11.sp, letterSpacing = 0.05.em)
+  Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+      Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(11.dp))
+      Text(label, style = style, color = labelColor)
+    }
+    Text(
+      text = trailing,
+      style = if (trailingItalic) style.copy(fontStyle = FontStyle.Italic) else style,
+      color = palette.textMute,
+    )
   }
 }
 
@@ -326,36 +392,50 @@ fun LazyListScope.recentSection(state: HomeUiState.Content, onTransactionClick: 
   item(key = "recent-header", contentType = "header") {
     SectionHeader(title = "Recent")
   }
-  if (state.recent.isEmpty()) {
-    item(key = "recent-empty", contentType = "empty") {
-      Box(Modifier.padding(horizontal = HORIZONTAL, vertical = 4.dp)) {
-        FlowFinSectionEmptyHint(eyebrow = "First entry", title = "Nothing logged yet.")
+  when (val recent = state.recent) {
+    is RecentSection.Activity -> recent.groups.forEach { group ->
+      item(key = "date-${group.dateLabel}", contentType = "date") {
+        RecentDateHeader(group.dateLabel)
+      }
+      itemsIndexed(
+        items = group.rows,
+        key = { _, row -> "tx-${row.id.value}" },
+        contentType = { _, _ -> "transaction" },
+      ) { index, row ->
+        Column(modifier = Modifier.padding(horizontal = HORIZONTAL)) {
+          FlowFinTransactionRow(
+            icon = categoryIcon(row.iconKey),
+            name = row.name,
+            meta = row.meta,
+            amount = row.amount,
+            kind = row.kind,
+            decimal = row.decimal,
+            tint = row.colorKey?.let { categoryColor(it) },
+            onClick = { onTransactionClick(row.id) },
+          )
+          if (index < group.rows.lastIndex) RowDivider()
+        }
       }
     }
-    return
+
+    RecentSection.NoEntries -> recentEmptyHint(
+      eyebrow = "First entry",
+      title = "Nothing logged yet.",
+      body = "Tap + below to record an income, an expense, or a transfer between your accounts.",
+    )
+
+    is RecentSection.Quiet -> recentEmptyHint(
+      eyebrow = "A quiet stretch",
+      title = "Nothing logged this week.",
+      body = "Your last entry was ${recent.lastEntry}. Tap + to add today's.",
+    )
   }
-  state.recent.forEach { group ->
-    item(key = "date-${group.dateLabel}", contentType = "date") {
-      RecentDateHeader(group.dateLabel)
-    }
-    itemsIndexed(
-      items = group.rows,
-      key = { _, row -> "tx-${row.id.value}" },
-      contentType = { _, _ -> "transaction" },
-    ) { index, row ->
-      Column(modifier = Modifier.padding(horizontal = HORIZONTAL)) {
-        FlowFinTransactionRow(
-          icon = categoryIcon(row.iconKey),
-          name = row.name,
-          meta = row.meta,
-          amount = row.amount,
-          kind = row.kind,
-          decimal = row.decimal,
-          tint = row.colorKey?.let { categoryColor(it) },
-          onClick = { onTransactionClick(row.id) },
-        )
-        if (index < group.rows.lastIndex) RowDivider()
-      }
+}
+
+private fun LazyListScope.recentEmptyHint(eyebrow: String, title: String, body: String) {
+  item(key = "recent-empty", contentType = "empty") {
+    Box(Modifier.padding(horizontal = HORIZONTAL, vertical = 4.dp)) {
+      FlowFinSectionEmptyHint(eyebrow = eyebrow, title = title, body = body)
     }
   }
 }
@@ -421,4 +501,15 @@ private fun SectionHeader(title: String, count: Int? = null, onAll: (() -> Unit)
 @Composable
 private fun RowDivider() {
   Box(Modifier.fillMaxWidth().height(1.dp).background(FlowFinTheme.colors.border))
+}
+
+/** A dashed hairline along the top edge — the hero's meta divider. */
+private fun Modifier.dashedTopRule(color: Color): Modifier = drawBehind {
+  drawLine(
+    color = color,
+    start = Offset(0f, 0f),
+    end = Offset(size.width, 0f),
+    strokeWidth = 1.dp.toPx(),
+    pathEffect = PathEffect.dashPathEffect(floatArrayOf(4.dp.toPx(), 4.dp.toPx())),
+  )
 }

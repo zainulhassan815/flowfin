@@ -47,19 +47,22 @@ fun HomeScreen(
     HomeTopBar(onSearch = onSearch, onSettings = onSettings)
     when (state) {
       HomeUiState.Loading -> Box(Modifier.weight(1f).fillMaxWidth())
-      HomeUiState.Empty -> Box(
-        modifier = Modifier.weight(1f).fillMaxWidth(),
-        contentAlignment = Alignment.Center,
-      ) {
-        FlowFinEmptyState(
-          eyebrow = "Get started",
-          title = "Money lives somewhere. Tell us where.",
-          body = "Add a real account to start tracking what you actually have.",
-          actionLabel = "Add an account",
-          onAction = onAddAccount,
-          emphasis = "Tell us where.",
-          modifier = Modifier.padding(horizontal = 24.dp),
-        )
+      HomeUiState.Empty -> Column(Modifier.weight(1f).fillMaxWidth()) {
+        EmptyHero()
+        Box(
+          modifier = Modifier.weight(1f).fillMaxWidth(),
+          contentAlignment = Alignment.Center,
+        ) {
+          FlowFinEmptyState(
+            eyebrow = "Begin",
+            title = "Money lives somewhere. Tell us where.",
+            body = "Add the first place — your bank, the cash in your wallet, a mobile " +
+              "wallet. Every transaction starts from an account.",
+            actionLabel = "Add an account",
+            onAction = onAddAccount,
+            emphasis = "somewhere.",
+          )
+        }
       }
       is HomeUiState.Content ->
         HomeContent(state, Modifier.weight(1f), onTransactionClick, onAccountClick, onPayPending)
@@ -120,7 +123,7 @@ private fun PreviewHome() = FlowFinTheme {
       totalWhole = "47,000",
       totalDecimal = ".00",
       allocated = "Rs 16,000",
-      trend = HomeTrend(percent = "+12%", rising = true),
+      aside = HeroAside.Trend(percent = "+12%", rising = true),
       realTotal = "Rs 47,000",
       realAccounts = listOf(
         AccountCardUi(AccountId(Uuid.random()), "Bank", "", "40,000", ".00", "bank", "bank", isBudget = false),
@@ -136,18 +139,107 @@ private fun PreviewHome() = FlowFinTheme {
         PendingRowUi(RecurringScheduleId(Uuid.random()), "Gym Membership", "Rs 5,000 · Bank", "Due today", PendingUrgency.Due),
         PendingRowUi(RecurringScheduleId(Uuid.random()), "Netflix", "Rs 1,500 · Bank", "3 days late", PendingUrgency.Late),
       ),
-      recent = listOf(
-        RecentGroup(
-          dateLabel = "Today · 27 Dec",
-          rows = listOf(
-            TxRowUi(TransactionId(Uuid.random()), "Mess Lunch", "Food", "−500", ".00", TransactionKind.Expense, "restaurant", "food"),
-            TxRowUi(TransactionId(Uuid.random()), "ATM Withdrawal", "Bank → Cash", "5,000", ".00", TransactionKind.Transfer, "sync_alt", null),
+      recent = RecentSection.Activity(
+        listOf(
+          RecentGroup(
+            dateLabel = "Today · 27 Dec",
+            rows = listOf(
+              TxRowUi(TransactionId(Uuid.random()), "Mess Lunch", "Food", "−500", ".00", TransactionKind.Expense, "restaurant", "food"),
+              TxRowUi(TransactionId(Uuid.random()), "ATM Withdrawal", "Bank → Cash", "5,000", ".00", TransactionKind.Transfer, "sync_alt", null),
+            ),
+          ),
+          RecentGroup(
+            dateLabel = "Yesterday · 26 Dec",
+            rows = listOf(
+              TxRowUi(TransactionId(Uuid.random()), "December Salary", "Bank", "+150,000", ".00", TransactionKind.Income, "payments", "salary"),
+            ),
           ),
         ),
-        RecentGroup(
-          dateLabel = "Yesterday · 26 Dec",
-          rows = listOf(
-            TxRowUi(TransactionId(Uuid.random()), "December Salary", "Bank", "+150,000", ".00", TransactionKind.Income, "payments", "salary"),
+      ),
+    ),
+  )
+}
+
+@Preview(name = "Home · empty", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
+@Composable
+private fun PreviewHomeEmpty() = FlowFinTheme {
+  HomeScreen(state = HomeUiState.Empty)
+}
+
+@Preview(name = "Home · no entries", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
+@Composable
+private fun PreviewHomeNoEntries() = FlowFinTheme {
+  HomeScreen(
+    state = HomeUiState.Content(
+      totalWhole = "47,000",
+      totalDecimal = ".00",
+      allocated = "Rs 16,000",
+      aside = HeroAside.Settling(dayLabel = "Day 1"),
+      realTotal = "Rs 47,000",
+      realAccounts = listOf(
+        AccountCardUi(AccountId(Uuid.random()), "Bank", "", "40,000", ".00", "bank", "bank", isBudget = false),
+        AccountCardUi(AccountId(Uuid.random()), "Cash", "", "7,000", ".00", "wallet", "cash", isBudget = false),
+      ),
+      budgetTotal = "Rs 16,000",
+      budgetAccounts = listOf(
+        AccountCardUi(AccountId(Uuid.random()), "Food", "Bank", "16,000", ".00", "restaurant", "food", isBudget = true),
+      ),
+      pending = emptyList(),
+      recent = RecentSection.NoEntries,
+    ),
+  )
+}
+
+@Preview(name = "Home · quiet week", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
+@Composable
+private fun PreviewHomeQuiet() = FlowFinTheme {
+  HomeScreen(
+    state = HomeUiState.Content(
+      totalWhole = "47,000",
+      totalDecimal = ".00",
+      allocated = "Rs 16,000",
+      aside = HeroAside.Trend(percent = "+12%", rising = true),
+      realTotal = "Rs 47,000",
+      realAccounts = listOf(
+        AccountCardUi(AccountId(Uuid.random()), "Bank", "", "40,000", ".00", "bank", "bank", isBudget = false),
+        AccountCardUi(AccountId(Uuid.random()), "Cash", "", "7,000", ".00", "wallet", "cash", isBudget = false),
+      ),
+      budgetTotal = "Rs 16,000",
+      budgetAccounts = listOf(
+        AccountCardUi(AccountId(Uuid.random()), "Food", "Bank", "16,000", ".00", "restaurant", "food", isBudget = true),
+      ),
+      pending = emptyList(),
+      recent = RecentSection.Quiet(lastEntry = "6 days ago"),
+    ),
+  )
+}
+
+@Preview(name = "Home · early data", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
+@Composable
+private fun PreviewHomeEarlyData() = FlowFinTheme {
+  HomeScreen(
+    state = HomeUiState.Content(
+      totalWhole = "47,000",
+      totalDecimal = ".00",
+      allocated = "Rs 16,000",
+      aside = HeroAside.Settling(dayLabel = "Day 5"),
+      realTotal = "Rs 47,000",
+      realAccounts = listOf(
+        AccountCardUi(AccountId(Uuid.random()), "Bank", "", "40,000", ".00", "bank", "bank", isBudget = false),
+        AccountCardUi(AccountId(Uuid.random()), "Cash", "", "7,000", ".00", "wallet", "cash", isBudget = false),
+      ),
+      budgetTotal = "Rs 16,000",
+      budgetAccounts = listOf(
+        AccountCardUi(AccountId(Uuid.random()), "Food", "Bank", "16,000", ".00", "restaurant", "food", isBudget = true),
+      ),
+      pending = emptyList(),
+      recent = RecentSection.Activity(
+        listOf(
+          RecentGroup(
+            dateLabel = "Today · 5 Jan",
+            rows = listOf(
+              TxRowUi(TransactionId(Uuid.random()), "Mess Lunch", "Food", "−500", ".00", TransactionKind.Expense, "restaurant", "food"),
+            ),
           ),
         ),
       ),
