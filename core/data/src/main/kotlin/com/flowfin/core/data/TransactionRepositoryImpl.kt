@@ -115,12 +115,15 @@ private fun TransactionDraft.toAccountId(): AccountId? = when (this) {
 private fun TransactionDraft.categoryId(): CategoryId? = when (this) {
   is TransactionDraft.Income -> category
   is TransactionDraft.Expense -> category
-  else -> null
+  is TransactionDraft.Transfer -> null
+  is TransactionDraft.Allocation -> null
+  is TransactionDraft.Reallocation -> null
 }
 
 private fun TransactionDraft.note(): String? = when (this) {
   is TransactionDraft.Income -> note
   is TransactionDraft.Expense -> note
   is TransactionDraft.Transfer -> note
-  else -> null
+  is TransactionDraft.Allocation -> null
+  is TransactionDraft.Reallocation -> null
 }

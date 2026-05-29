@@ -28,9 +28,7 @@ class RecordRepayment(
   ): Either<DebtError, Unit> = either {
     ensure(amount.isPositive) { DebtError.AmountNotPositive }
     val debt = debts.getById(debtId) ?: raise(DebtError.DebtNotFound(debtId))
-    val real = accounts.getById(account) ?: raise(DebtError.AccountNotFound(account))
-    ensure(real.isReal) { DebtError.AccountNotReal }
-    ensure(!real.isArchived) { DebtError.ArchivedAccount(account) }
+    val real = requireRealActiveAccount(accounts, account)
     ensure(real.currency == debt.currency) { DebtError.CurrencyMismatch }
     debts.recordRepayment(debt, account, amount, recordedAt).bind()
   }

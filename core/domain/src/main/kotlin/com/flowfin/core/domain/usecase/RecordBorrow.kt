@@ -30,9 +30,7 @@ class RecordBorrow(
   ): Either<DebtError, Debt> = either {
     ensure(amount.isPositive) { DebtError.AmountNotPositive }
     ensureNotNull(persons.getById(personId)) { DebtError.PersonNotFound(personId) }
-    val account = accounts.getById(intoAccount) ?: raise(DebtError.AccountNotFound(intoAccount))
-    ensure(account.isReal) { DebtError.AccountNotReal }
-    ensure(!account.isArchived) { DebtError.ArchivedAccount(intoAccount) }
+    val account = requireRealActiveAccount(accounts, intoAccount)
     debts.open(
       direction = DebtDirection.I_OWE,
       personId = personId,

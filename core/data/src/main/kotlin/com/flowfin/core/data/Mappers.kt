@@ -12,10 +12,16 @@ import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountBalance
 import com.flowfin.core.model.Category
 import com.flowfin.core.model.Debt
+import com.flowfin.core.model.DebtDirection
+import com.flowfin.core.model.DebtId
+import com.flowfin.core.model.DebtStatus
 import com.flowfin.core.model.DebtWithRemaining
 import com.flowfin.core.model.Money
 import com.flowfin.core.model.Person
+import com.flowfin.core.model.PersonId
 import com.flowfin.core.model.Transaction
+import com.flowfin.core.model.TransactionId
+import kotlinx.datetime.Instant
 
 /**
  * SQLDelight row → domain model. The database stays in primitive `Long` minor
@@ -106,38 +112,48 @@ internal fun Debts.toModel(): Debt = Debt(
   settledAt = settled_at,
 )
 
-internal fun SelectAllWithRemaining.toDebtWithRemaining(): DebtWithRemaining = DebtWithRemaining(
-  debt = Debt(
-    id = id,
-    personId = person_id,
-    direction = direction,
-    originalAmount = Money(original_amount_minor),
-    currency = currency,
-    reason = reason,
-    status = status,
-    originTransactionId = origin_transaction_id,
-    createdAt = created_at,
-    updatedAt = updated_at,
-    settledAt = settled_at,
-  ),
-  paid = Money(paid_minor),
-  remaining = Money(remaining_minor),
-)
+// The two `*WithRemaining` queries are distinct generated types with identical
+// columns, so both map through one builder.
+internal fun SelectAllWithRemaining.toDebtWithRemaining(): DebtWithRemaining =
+  debtWithRemaining(
+    id, person_id, direction, original_amount_minor, currency, reason, status,
+    origin_transaction_id, created_at, updated_at, settled_at, paid_minor, remaining_minor,
+  )
 
-internal fun SelectByDirectionWithRemaining.toDebtWithRemaining(): DebtWithRemaining = DebtWithRemaining(
+internal fun SelectByDirectionWithRemaining.toDebtWithRemaining(): DebtWithRemaining =
+  debtWithRemaining(
+    id, person_id, direction, original_amount_minor, currency, reason, status,
+    origin_transaction_id, created_at, updated_at, settled_at, paid_minor, remaining_minor,
+  )
+
+private fun debtWithRemaining(
+  id: DebtId,
+  personId: PersonId,
+  direction: DebtDirection,
+  originalAmountMinor: Long,
+  currency: String,
+  reason: String?,
+  status: DebtStatus,
+  originTransactionId: TransactionId,
+  createdAt: Instant,
+  updatedAt: Instant,
+  settledAt: Instant?,
+  paidMinor: Long,
+  remainingMinor: Long,
+): DebtWithRemaining = DebtWithRemaining(
   debt = Debt(
     id = id,
-    personId = person_id,
+    personId = personId,
     direction = direction,
-    originalAmount = Money(original_amount_minor),
+    originalAmount = Money(originalAmountMinor),
     currency = currency,
     reason = reason,
     status = status,
-    originTransactionId = origin_transaction_id,
-    createdAt = created_at,
-    updatedAt = updated_at,
-    settledAt = settled_at,
+    originTransactionId = originTransactionId,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+    settledAt = settledAt,
   ),
-  paid = Money(paid_minor),
-  remaining = Money(remaining_minor),
+  paid = Money(paidMinor),
+  remaining = Money(remainingMinor),
 )
