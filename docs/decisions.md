@@ -15,10 +15,20 @@ A running list of choices made before any Kotlin gets written. Update this when 
 
 ## Errors
 
-- Anything that can fail returns `Either<DomainError, T>`.
+- **Writes return `Either<DomainError, T>`.** An operation that can fail by a domain
+  rule (duplicate name, wrong category scope, archived account, …) returns `Either`,
+  and the `Left` carries an actionable, typed error.
+- **Reads are plain `Flow<T>` / suspend `T?`, not `Either`.** A local SQLite read has
+  no recoverable *domain* failure — a failed read is catastrophic (corrupt DB), not
+  something a feature branches on, so wrapping it in `Either<DomainError, T>` would put
+  a contentless `Unexpected` in every `Left` and tax every collect site for nothing.
+  Loading / empty / error are *UI* concerns, modelled at the ViewModel with a
+  `Result`/`asResult` (Loading / Content / Error) — the Now in Android pattern — not in
+  the repository. (When a fallible source like sync/remote arrives, it gets its own
+  error type *then*; we don't pre-empt it on local reads.)
 - Each feature has its own sealed `DomainError`. No app-wide error type.
-- Flows carry it through: `Flow<Either<DomainError, T>>`. No extra wrappers in between, no mapping between forms.
-- `try / catch` only at the real edges (database, file I/O). Mapped to `Either` there and never seen again.
+- `try / catch` only at the real edges (database, file I/O). Mapped to `Either` (writes)
+  or caught by `asResult` (read streams) there, and never seen again above.
 
 ## Architecture
 
