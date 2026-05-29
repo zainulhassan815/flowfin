@@ -153,6 +153,7 @@ private fun PreviewHome() = FlowFinTheme {
         PendingRowUi(RecurringScheduleId(Uuid.random()), "Gym Membership", "Rs 5,000 · Bank", "Due today", PendingUrgency.Due),
         PendingRowUi(RecurringScheduleId(Uuid.random()), "Netflix", "Rs 1,500 · Bank", "3 days late", PendingUrgency.Late),
       ),
+      pendingTotal = 2,
       recent = RecentSection.Activity(
         listOf(
           RecentGroup(
@@ -199,6 +200,7 @@ private fun PreviewHomeNoEntries() = FlowFinTheme {
         AccountCardUi(AccountId(Uuid.random()), "Food", "Bank", "16,000", ".00", "restaurant", "food", isBudget = true),
       ),
       pending = emptyList(),
+      pendingTotal = 0,
       recent = RecentSection.NoEntries,
     ),
   )
@@ -223,6 +225,7 @@ private fun PreviewHomeQuiet() = FlowFinTheme {
         AccountCardUi(AccountId(Uuid.random()), "Food", "Bank", "16,000", ".00", "restaurant", "food", isBudget = true),
       ),
       pending = emptyList(),
+      pendingTotal = 0,
       recent = RecentSection.Quiet(lastEntry = "6 days ago"),
     ),
   )
@@ -247,6 +250,7 @@ private fun PreviewHomeEarlyData() = FlowFinTheme {
         AccountCardUi(AccountId(Uuid.random()), "Food", "Bank", "16,000", ".00", "restaurant", "food", isBudget = true),
       ),
       pending = emptyList(),
+      pendingTotal = 0,
       recent = RecentSection.Activity(
         listOf(
           RecentGroup(

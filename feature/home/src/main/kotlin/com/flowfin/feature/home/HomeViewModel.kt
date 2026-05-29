@@ -53,61 +53,60 @@ class HomeViewModel(
   private val money: MoneyFormatter,
 ) : ViewModel() {
 
+  private val now = clock.now()
   private val zone = TimeZone.currentSystemDefault()
-  private val today = clock.now().toLocalDateTime(zone).date
+  private val today = now.toLocalDateTime(zone).date
   private val monthStart = LocalDate(today.year, today.month, 1).atStartOfDayIn(zone)
   private val monthEnd = LocalDate(today.year, today.month, 1).plus(1, DateTimeUnit.MONTH).atStartOfDayIn(zone)
   private val weekStart = today.minus(today.dayOfWeek.isoDayNumber - 1, DateTimeUnit.DAY)
 
   val uiState: StateFlow<HomeUiState> = combine(
     accounts.observeBalances(),
-    accounts.observeTotalBalance(),
     transactions.recentFeed(RECENT_LIMIT),
     categories.observeAll(),
-    recurring.observePending(clock.now()),
-  ) { balances, total, recent, categoryList, pending ->
-    Inputs(balances, total, recent, categoryList, pending)
-  }.combine(transactions.observeNetChange(monthStart, monthEnd)) { inputs, net ->
-    inputs.toState(net)
+    recurring.observePending(now),
+    transactions.observeNetChange(monthStart, monthEnd),
+  ) { balances, recent, categoryList, pending, net ->
+    buildState(balances, recent, categoryList, pending, net)
   }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), HomeUiState.Loading)
 
-  /** The five account/feed streams, bundled so a sixth (net change) can join them. */
-  private data class Inputs(
-    val balances: List<AccountBalance>,
-    val total: Money,
-    val recent: List<Transaction>,
-    val categories: List<Category>,
-    val pending: List<RecurringSchedule>,
-  )
-
-  private fun Inputs.toState(net: Money): HomeUiState {
+  private fun buildState(
+    balances: List<AccountBalance>,
+    recent: List<Transaction>,
+    categoryList: List<Category>,
+    pending: List<RecurringSchedule>,
+    net: Money,
+  ): HomeUiState {
     if (balances.isEmpty()) return HomeUiState.Empty
 
     val accountsById = balances.associate { it.account.id to it.account }
-    val categoriesById = categories.associateBy(Category::id)
+    val categoriesById = categoryList.associateBy(Category::id)
 
     val real = balances.filter { it.account.isReal }
     val budget = balances.filter { it.account.isBudget }
+    val realSum = real.fold(Money.ZERO) { sum, b -> sum + b.balance }
     val budgetSum = budget.fold(Money.ZERO) { sum, b -> sum + b.balance }
+    val total = realSum + budgetSum // the headline total is exactly the sum of every account
 
     return HomeUiState.Content(
       totalWhole = money.whole(total),
       totalDecimal = money.fraction(total),
-      allocated = plain(budgetSum),
+      allocated = money.displayWhole(budgetSum),
       aside = heroAside(total, net, daysSinceStart(balances)),
-      realTotal = plain(real.fold(Money.ZERO) { sum, b -> sum + b.balance }),
+      realTotal = money.displayWhole(realSum),
       realAccounts = real.map { it.toCardUi(accountsById) },
-      budgetTotal = plain(budgetSum),
+      budgetTotal = money.displayWhole(budgetSum),
       budgetAccounts = budget.map { it.toCardUi(accountsById) },
-      pending = pending.map { it.toPendingUi(accountsById) },
-      recent = recentSection(recent, accountsById, categoriesById),
+      pending = pending.take(PENDING_LIMIT).map { it.toPendingUi(accountsById) },
+      pendingTotal = pending.size,
+      recent = classifyRecent(recent, accountsById, categoriesById),
     )
   }
 
   /** Home shows this week's activity. With nothing this week it asks which empty
    *  it is: nothing ever logged ([RecentSection.NoEntries]) or just a lull
    *  ([RecentSection.Quiet], dated off the newest entry). */
-  private fun recentSection(
+  private fun classifyRecent(
     recent: List<Transaction>,
     accountsById: Map<AccountId, Account>,
     categoriesById: Map<CategoryId, Category>,
@@ -179,7 +178,7 @@ class HomeViewModel(
       else -> "$daysLate days late" to PendingUrgency.Late
     }
     val amountAccount = buildString {
-      append(plain(amount))
+      append(money.displayWhole(amount))
       if (accountName.isNotEmpty()) append(" · ").append(accountName)
     }
     return PendingRowUi(id, name, amountAccount, statusText, urgency)
@@ -252,9 +251,6 @@ class HomeViewModel(
       },
     )
   }
-
-  /** Like [MoneyFormatter.display] but without the fraction: "Rs 16,000". */
-  private fun plain(amount: Money): String = "${money.symbol} ${money.whole(amount)}"
 }
 
 /** "MONDAY" → "Mon", "DECEMBER" → "Dec". */
@@ -263,6 +259,10 @@ private fun String.titleCase3(): String =
 
 private const val RECENT_LIMIT = 20L
 private const val STOP_TIMEOUT_MS = 5_000L
+
+/** Home surfaces only the most pressing pending payments; the count badge keeps
+ *  the true total and "All" opens the rest. */
+private const val PENDING_LIMIT = 3
 
 /** Below this many days of history, the hero reads "Day N" instead of a month
  *  trend — a month-over-month delta isn't meaningful in the first few weeks. */

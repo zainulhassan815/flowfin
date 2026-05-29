@@ -314,7 +314,7 @@ fun LazyListScope.pendingSection(
 ) {
   if (state.pending.isEmpty()) return
   item(key = "pending-header", contentType = "header") {
-    SectionHeader(title = "Pending", count = state.pending.size, onAll = onAll)
+    SectionHeader(title = "Pending", count = state.pendingTotal, onAll = onAll)
   }
   item(key = "pending-strip", contentType = "pending") {
     PendingStrip(state.pending, onPay)

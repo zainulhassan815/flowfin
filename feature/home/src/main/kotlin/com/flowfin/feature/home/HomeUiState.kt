@@ -25,6 +25,7 @@ sealed interface HomeUiState {
     val budgetTotal: String,
     val budgetAccounts: List<AccountCardUi>,
     val pending: List<PendingRowUi>,
+    val pendingTotal: Int,
     val recent: RecentSection,
   ) : HomeUiState
 }
