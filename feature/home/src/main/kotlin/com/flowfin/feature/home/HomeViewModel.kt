@@ -16,9 +16,11 @@ import com.flowfin.core.model.Money
 import com.flowfin.core.model.RecurringSchedule
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.model.TransactionKind
+import com.flowfin.core.resources.R
 import com.flowfin.core.ui.AccountCardUi
 import com.flowfin.core.ui.MoneyFormatter
 import com.flowfin.core.ui.TxRowUi
+import com.flowfin.core.ui.UiText
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -53,61 +55,61 @@ class HomeViewModel(
   private val money: MoneyFormatter,
 ) : ViewModel() {
 
+  private val now = clock.now()
   private val zone = TimeZone.currentSystemDefault()
-  private val today = clock.now().toLocalDateTime(zone).date
+  private val today = now.toLocalDateTime(zone).date
   private val monthStart = LocalDate(today.year, today.month, 1).atStartOfDayIn(zone)
   private val monthEnd = LocalDate(today.year, today.month, 1).plus(1, DateTimeUnit.MONTH).atStartOfDayIn(zone)
   private val weekStart = today.minus(today.dayOfWeek.isoDayNumber - 1, DateTimeUnit.DAY)
 
   val uiState: StateFlow<HomeUiState> = combine(
     accounts.observeBalances(),
-    accounts.observeTotalBalance(),
     transactions.recentFeed(RECENT_LIMIT),
     categories.observeAll(),
-    recurring.observePending(clock.now()),
-  ) { balances, total, recent, categoryList, pending ->
-    Inputs(balances, total, recent, categoryList, pending)
-  }.combine(transactions.observeNetChange(monthStart, monthEnd)) { inputs, net ->
-    inputs.toState(net)
+    recurring.observePending(now),
+    transactions.observeNetChange(monthStart, monthEnd),
+  ) { balances, recent, categoryList, pending, net ->
+    buildState(balances, recent, categoryList, pending, net)
   }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), HomeUiState.Loading)
 
-  /** The five account/feed streams, bundled so a sixth (net change) can join them. */
-  private data class Inputs(
-    val balances: List<AccountBalance>,
-    val total: Money,
-    val recent: List<Transaction>,
-    val categories: List<Category>,
-    val pending: List<RecurringSchedule>,
-  )
-
-  private fun Inputs.toState(net: Money): HomeUiState {
-    if (balances.isEmpty()) return HomeUiState.Empty
+  private fun buildState(
+    balances: List<AccountBalance>,
+    recent: List<Transaction>,
+    categoryList: List<Category>,
+    pending: List<RecurringSchedule>,
+    net: Money,
+  ): HomeUiState {
+    if (balances.isEmpty()) return HomeUiState.Empty(money.symbol)
 
     val accountsById = balances.associate { it.account.id to it.account }
-    val categoriesById = categories.associateBy(Category::id)
+    val categoriesById = categoryList.associateBy(Category::id)
 
     val real = balances.filter { it.account.isReal }
     val budget = balances.filter { it.account.isBudget }
+    val realSum = real.fold(Money.ZERO) { sum, b -> sum + b.balance }
     val budgetSum = budget.fold(Money.ZERO) { sum, b -> sum + b.balance }
+    val total = realSum + budgetSum // the headline total is exactly the sum of every account
 
     return HomeUiState.Content(
+      currency = money.symbol,
       totalWhole = money.whole(total),
       totalDecimal = money.fraction(total),
-      allocated = plain(budgetSum),
+      allocated = money.displayWhole(budgetSum),
       aside = heroAside(total, net, daysSinceStart(balances)),
-      realTotal = plain(real.fold(Money.ZERO) { sum, b -> sum + b.balance }),
+      realTotal = money.displayWhole(realSum),
       realAccounts = real.map { it.toCardUi(accountsById) },
-      budgetTotal = plain(budgetSum),
+      budgetTotal = money.displayWhole(budgetSum),
       budgetAccounts = budget.map { it.toCardUi(accountsById) },
-      pending = pending.map { it.toPendingUi(accountsById) },
-      recent = recentSection(recent, accountsById, categoriesById),
+      pending = pending.take(PENDING_LIMIT).map { it.toPendingUi(accountsById) },
+      pendingTotal = pending.size,
+      recent = classifyRecent(recent, accountsById, categoriesById),
     )
   }
 
   /** Home shows this week's activity. With nothing this week it asks which empty
    *  it is: nothing ever logged ([RecentSection.NoEntries]) or just a lull
    *  ([RecentSection.Quiet], dated off the newest entry). */
-  private fun recentSection(
+  private fun classifyRecent(
     recent: List<Transaction>,
     accountsById: Map<AccountId, Account>,
     categoriesById: Map<CategoryId, Category>,
@@ -120,12 +122,10 @@ class HomeViewModel(
     }
   }
 
-  private fun daysAgo(instant: Instant): String =
-    when (val days = today.toEpochDays() - instant.toLocalDateTime(zone).date.toEpochDays()) {
-      0 -> "today"
-      1 -> "1 day ago"
-      else -> "$days days ago"
-    }
+  private fun daysAgo(instant: Instant): UiText {
+    val days = today.toEpochDays() - instant.toLocalDateTime(zone).date.toEpochDays()
+    return if (days == 0) UiText.Res(R.string.home_days_ago_today) else UiText.Plural(R.plurals.home_days_ago, days)
+  }
 
   /** Days the user has been tracking, 1-indexed from the oldest account (its
    *  creation day is "Day 1"). */
@@ -137,7 +137,11 @@ class HomeViewModel(
   /** Before there's enough history to compare months, the hero owns its early days
    *  ("Day 5, building a picture"); after that it shows the month delta. */
   private fun heroAside(total: Money, net: Money, daysSinceStart: Int): HeroAside? =
-    if (daysSinceStart < SETTLING_DAYS) HeroAside.Settling("Day $daysSinceStart") else trendOf(total, net)
+    if (daysSinceStart < SETTLING_DAYS) {
+      HeroAside.Settling(UiText.Res(R.string.home_hero_day, listOf(daysSinceStart)))
+    } else {
+      trendOf(total, net)
+    }
 
   /** A delta vs the month's starting total, or null when there's nothing honest to
    *  show (no change, or the month opened at zero so a percentage is meaningless). */
@@ -173,13 +177,13 @@ class HomeViewModel(
     val accountId = toAccountId ?: fromAccountId
     val accountName = accountId?.let { accountsById[it]?.name }.orEmpty()
     val daysLate = today.toEpochDays() - nextDueAt.toLocalDateTime(zone).date.toEpochDays()
-    val (statusText, urgency) = when {
-      daysLate <= 0 -> "Due today" to PendingUrgency.Due
-      daysLate == 1 -> "1 day late" to PendingUrgency.Late
-      else -> "$daysLate days late" to PendingUrgency.Late
+    val (statusText, urgency) = if (daysLate <= 0) {
+      UiText.Res(R.string.home_pending_due_today) to PendingUrgency.Due
+    } else {
+      UiText.Plural(R.plurals.home_pending_days_late, daysLate) to PendingUrgency.Late
     }
     val amountAccount = buildString {
-      append(plain(amount))
+      append(money.displayWhole(amount))
       if (accountName.isNotEmpty()) append(" · ").append(accountName)
     }
     return PendingRowUi(id, name, amountAccount, statusText, urgency)
@@ -199,13 +203,15 @@ class HomeViewModel(
         )
       }
 
-  private fun dateLabel(date: LocalDate): String {
+  private fun dateLabel(date: LocalDate): UiText {
     val prefix = when (date.toEpochDays()) {
-      today.toEpochDays() -> "Today"
-      today.toEpochDays() - 1 -> "Yesterday"
-      else -> date.dayOfWeek.name.titleCase3()
+      today.toEpochDays() -> UiText.Res(R.string.home_date_today)
+      today.toEpochDays() - 1 -> UiText.Res(R.string.home_date_yesterday)
+      // The weekday/month abbreviations are still English enum names — full
+      // date localization is a separate effort, tracked apart from this pass.
+      else -> UiText.Raw(date.dayOfWeek.name.titleCase3())
     }
-    return "$prefix · ${date.dayOfMonth} ${date.month.name.titleCase3()}"
+    return UiText.Res(R.string.home_date_label, listOf(prefix, date.dayOfMonth, date.month.name.titleCase3()))
   }
 
   private fun Transaction.toRowUi(
@@ -221,12 +227,13 @@ class HomeViewModel(
     return TxRowUi(
       id = id,
       name = when (kind) {
-        TransactionKind.INCOME, TransactionKind.EXPENSE -> category?.name ?: "—"
-        TransactionKind.TRANSFER -> "Transfer"
-        TransactionKind.ALLOCATION -> "Allocation"
-        TransactionKind.REALLOCATION -> "Reallocation"
+        TransactionKind.INCOME, TransactionKind.EXPENSE ->
+          category?.name?.let(UiText::Raw) ?: UiText.Res(R.string.home_tx_uncategorized)
+        TransactionKind.TRANSFER -> UiText.Res(R.string.home_tx_transfer)
+        TransactionKind.ALLOCATION -> UiText.Res(R.string.home_tx_allocation)
+        TransactionKind.REALLOCATION -> UiText.Res(R.string.home_tx_reallocation)
         TransactionKind.DEBT_BORROW, TransactionKind.DEBT_LEND,
-        TransactionKind.DEBT_REPAY_OUT, TransactionKind.DEBT_REPAY_IN -> "Debt"
+        TransactionKind.DEBT_REPAY_OUT, TransactionKind.DEBT_REPAY_IN -> UiText.Res(R.string.home_tx_debt)
       },
       meta = when (kind) {
         TransactionKind.INCOME -> toName
@@ -252,9 +259,6 @@ class HomeViewModel(
       },
     )
   }
-
-  /** Like [MoneyFormatter.display] but without the fraction: "Rs 16,000". */
-  private fun plain(amount: Money): String = "${money.symbol} ${money.whole(amount)}"
 }
 
 /** "MONDAY" → "Mon", "DECEMBER" → "Dec". */
@@ -263,6 +267,10 @@ private fun String.titleCase3(): String =
 
 private const val RECENT_LIMIT = 20L
 private const val STOP_TIMEOUT_MS = 5_000L
+
+/** Home surfaces only the most pressing pending payments; the count badge keeps
+ *  the true total and "All" opens the rest. */
+private const val PENDING_LIMIT = 3
 
 /** Below this many days of history, the hero reads "Day N" instead of a month
  *  trend — a month-over-month delta isn't meaningful in the first few weeks. */

@@ -43,3 +43,4 @@ SDK path comes from `local.properties` (gitignored).
 - [`docs/data-model.md`](docs/data-model.md) — six tables, the kinds, the triggers, the why.
 - [`docs/decisions.md`](docs/decisions.md) — stack, architecture, error handling, quality bar.
 - [`docs/design-system.md`](docs/design-system.md) — the component library (all 23 sections shipped).
+- [`docs/localization.md`](docs/localization.md) — where strings live (`:core:resources`) and how `UiText` carries copy out of ViewModels.

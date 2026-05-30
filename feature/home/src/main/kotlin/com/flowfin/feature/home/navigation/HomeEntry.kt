@@ -22,6 +22,9 @@ fun EntryProviderScope<NavKey>.homeEntry(navigator: Navigator) {
       onAllAccounts = { navigator.navigate(AccountsRoute) },
       onAllPending = { navigator.navigate(RecurringRoute) },
       onAllRecent = { navigator.navigate(TransactionsRoute) },
+      // TODO: wire once their destinations exist — onAccountClick/onTransactionClick
+      //  (detail screens), onPayPending (fire-schedule flow), onSearch, onSettings,
+      //  onAddAccount. Until then they intentionally no-op.
     )
   }
 }

@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,8 +29,10 @@ import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.RecurringScheduleId
 import com.flowfin.core.model.TransactionId
+import com.flowfin.core.resources.R
 import com.flowfin.core.ui.AccountCardUi
 import com.flowfin.core.ui.TxRowUi
+import com.flowfin.core.ui.UiText
 import kotlin.uuid.Uuid
 
 @Composable
@@ -50,20 +53,19 @@ fun HomeScreen(
     HomeTopBar(onSearch = onSearch, onSettings = onSettings)
     when (state) {
       HomeUiState.Loading -> Box(Modifier.weight(1f).fillMaxWidth())
-      HomeUiState.Empty -> Column(Modifier.weight(1f).fillMaxWidth()) {
-        EmptyHero()
+      is HomeUiState.Empty -> Column(Modifier.weight(1f).fillMaxWidth()) {
+        EmptyHero(currency = state.currency)
         Box(
           modifier = Modifier.weight(1f).fillMaxWidth(),
           contentAlignment = Alignment.Center,
         ) {
           FlowFinEmptyState(
-            eyebrow = "Begin",
-            title = "Money lives somewhere. Tell us where.",
-            body = "Add the first place — your bank, the cash in your wallet, a mobile " +
-              "wallet. Every transaction starts from an account.",
-            actionLabel = "Add an account",
+            eyebrow = stringResource(R.string.home_empty_eyebrow),
+            title = stringResource(R.string.home_empty_title),
+            body = stringResource(R.string.home_empty_body),
+            actionLabel = stringResource(R.string.home_empty_action),
             onAction = onAddAccount,
-            emphasis = "somewhere.",
+            emphasis = stringResource(R.string.home_empty_emphasis),
           )
         }
       }
@@ -124,8 +126,16 @@ private fun HomeTopBar(onSearch: () -> Unit, onSettings: () -> Unit) {
       )
     }
     Spacer(Modifier.weight(1f))
-    FlowFinIconButton(onClick = onSearch, icon = FlowFinIcons.Search, contentDescription = "Search")
-    FlowFinIconButton(onClick = onSettings, icon = FlowFinIcons.Settings, contentDescription = "Settings")
+    FlowFinIconButton(
+      onClick = onSearch,
+      icon = FlowFinIcons.Search,
+      contentDescription = stringResource(R.string.home_action_search),
+    )
+    FlowFinIconButton(
+      onClick = onSettings,
+      icon = FlowFinIcons.Settings,
+      contentDescription = stringResource(R.string.home_action_settings),
+    )
   }
 }
 
@@ -134,6 +144,7 @@ private fun HomeTopBar(onSearch: () -> Unit, onSettings: () -> Unit) {
 private fun PreviewHome() = FlowFinTheme {
   HomeScreen(
     state = HomeUiState.Content(
+      currency = "Rs",
       totalWhole = "47,000",
       totalDecimal = ".00",
       allocated = "Rs 16,000",
@@ -150,22 +161,23 @@ private fun PreviewHome() = FlowFinTheme {
         AccountCardUi(AccountId(Uuid.random()), "Fun", "Bank", "2,500", ".00", "movie", "fun", isBudget = true),
       ),
       pending = listOf(
-        PendingRowUi(RecurringScheduleId(Uuid.random()), "Gym Membership", "Rs 5,000 · Bank", "Due today", PendingUrgency.Due),
-        PendingRowUi(RecurringScheduleId(Uuid.random()), "Netflix", "Rs 1,500 · Bank", "3 days late", PendingUrgency.Late),
+        PendingRowUi(RecurringScheduleId(Uuid.random()), "Gym Membership", "Rs 5,000 · Bank", UiText.Raw("Due today"), PendingUrgency.Due),
+        PendingRowUi(RecurringScheduleId(Uuid.random()), "Netflix", "Rs 1,500 · Bank", UiText.Raw("3 days late"), PendingUrgency.Late),
       ),
+      pendingTotal = 2,
       recent = RecentSection.Activity(
         listOf(
           RecentGroup(
-            dateLabel = "Today · 27 Dec",
+            dateLabel = UiText.Raw("Today · 27 Dec"),
             rows = listOf(
-              TxRowUi(TransactionId(Uuid.random()), "Mess Lunch", "Food", "−500", ".00", TransactionKind.Expense, "restaurant", "food"),
-              TxRowUi(TransactionId(Uuid.random()), "ATM Withdrawal", "Bank → Cash", "5,000", ".00", TransactionKind.Transfer, "sync_alt", null),
+              TxRowUi(TransactionId(Uuid.random()), UiText.Raw("Mess Lunch"), "Food", "−500", ".00", TransactionKind.Expense, "restaurant", "food"),
+              TxRowUi(TransactionId(Uuid.random()), UiText.Raw("ATM Withdrawal"), "Bank → Cash", "5,000", ".00", TransactionKind.Transfer, "sync_alt", null),
             ),
           ),
           RecentGroup(
-            dateLabel = "Yesterday · 26 Dec",
+            dateLabel = UiText.Raw("Yesterday · 26 Dec"),
             rows = listOf(
-              TxRowUi(TransactionId(Uuid.random()), "December Salary", "Bank", "+150,000", ".00", TransactionKind.Income, "payments", "salary"),
+              TxRowUi(TransactionId(Uuid.random()), UiText.Raw("December Salary"), "Bank", "+150,000", ".00", TransactionKind.Income, "payments", "salary"),
             ),
           ),
         ),
@@ -177,7 +189,7 @@ private fun PreviewHome() = FlowFinTheme {
 @Preview(name = "Home · empty", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
 private fun PreviewHomeEmpty() = FlowFinTheme {
-  HomeScreen(state = HomeUiState.Empty)
+  HomeScreen(state = HomeUiState.Empty(currency = "Rs"))
 }
 
 @Preview(name = "Home · no entries", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
@@ -185,10 +197,11 @@ private fun PreviewHomeEmpty() = FlowFinTheme {
 private fun PreviewHomeNoEntries() = FlowFinTheme {
   HomeScreen(
     state = HomeUiState.Content(
+      currency = "Rs",
       totalWhole = "47,000",
       totalDecimal = ".00",
       allocated = "Rs 16,000",
-      aside = HeroAside.Settling(dayLabel = "Day 1"),
+      aside = HeroAside.Settling(dayLabel = UiText.Raw("Day 1")),
       realTotal = "Rs 47,000",
       realAccounts = listOf(
         AccountCardUi(AccountId(Uuid.random()), "Bank", "", "40,000", ".00", "bank", "bank", isBudget = false),
@@ -199,6 +212,7 @@ private fun PreviewHomeNoEntries() = FlowFinTheme {
         AccountCardUi(AccountId(Uuid.random()), "Food", "Bank", "16,000", ".00", "restaurant", "food", isBudget = true),
       ),
       pending = emptyList(),
+      pendingTotal = 0,
       recent = RecentSection.NoEntries,
     ),
   )
@@ -209,6 +223,7 @@ private fun PreviewHomeNoEntries() = FlowFinTheme {
 private fun PreviewHomeQuiet() = FlowFinTheme {
   HomeScreen(
     state = HomeUiState.Content(
+      currency = "Rs",
       totalWhole = "47,000",
       totalDecimal = ".00",
       allocated = "Rs 16,000",
@@ -223,7 +238,8 @@ private fun PreviewHomeQuiet() = FlowFinTheme {
         AccountCardUi(AccountId(Uuid.random()), "Food", "Bank", "16,000", ".00", "restaurant", "food", isBudget = true),
       ),
       pending = emptyList(),
-      recent = RecentSection.Quiet(lastEntry = "6 days ago"),
+      pendingTotal = 0,
+      recent = RecentSection.Quiet(lastEntry = UiText.Raw("6 days ago")),
     ),
   )
 }
@@ -233,10 +249,11 @@ private fun PreviewHomeQuiet() = FlowFinTheme {
 private fun PreviewHomeEarlyData() = FlowFinTheme {
   HomeScreen(
     state = HomeUiState.Content(
+      currency = "Rs",
       totalWhole = "47,000",
       totalDecimal = ".00",
       allocated = "Rs 16,000",
-      aside = HeroAside.Settling(dayLabel = "Day 5"),
+      aside = HeroAside.Settling(dayLabel = UiText.Raw("Day 5")),
       realTotal = "Rs 47,000",
       realAccounts = listOf(
         AccountCardUi(AccountId(Uuid.random()), "Bank", "", "40,000", ".00", "bank", "bank", isBudget = false),
@@ -247,12 +264,13 @@ private fun PreviewHomeEarlyData() = FlowFinTheme {
         AccountCardUi(AccountId(Uuid.random()), "Food", "Bank", "16,000", ".00", "restaurant", "food", isBudget = true),
       ),
       pending = emptyList(),
+      pendingTotal = 0,
       recent = RecentSection.Activity(
         listOf(
           RecentGroup(
-            dateLabel = "Today · 5 Jan",
+            dateLabel = UiText.Raw("Today · 5 Jan"),
             rows = listOf(
-              TxRowUi(TransactionId(Uuid.random()), "Mess Lunch", "Food", "−500", ".00", TransactionKind.Expense, "restaurant", "food"),
+              TxRowUi(TransactionId(Uuid.random()), UiText.Raw("Mess Lunch"), "Food", "−500", ".00", TransactionKind.Expense, "restaurant", "food"),
             ),
           ),
         ),
