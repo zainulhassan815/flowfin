@@ -3,6 +3,7 @@ package com.flowfin.feature.home
 import com.flowfin.core.model.RecurringScheduleId
 import com.flowfin.core.ui.AccountCardUi
 import com.flowfin.core.ui.TxRowUi
+import com.flowfin.core.ui.UiText
 
 /**
  * Home's states, derived in the ViewModel. [Empty] is the F full-empty treatment
@@ -13,9 +14,11 @@ import com.flowfin.core.ui.TxRowUi
 sealed interface HomeUiState {
   data object Loading : HomeUiState
 
-  data object Empty : HomeUiState
+  /** [currency] is the hero's symbol, sourced from the money formatter. */
+  data class Empty(val currency: String) : HomeUiState
 
   data class Content(
+    val currency: String,
     val totalWhole: String,
     val totalDecimal: String,
     val allocated: String,
@@ -40,7 +43,7 @@ sealed interface RecentSection {
   data object NoEntries : RecentSection
 
   /** History exists, but nothing this week. [lastEntry] e.g. "6 days ago". */
-  data class Quiet(val lastEntry: String) : RecentSection
+  data class Quiet(val lastEntry: UiText) : RecentSection
 }
 
 /** The hero's right-hand aside beside "Allocated". */
@@ -50,7 +53,7 @@ sealed interface HeroAside {
   data class Trend(val percent: String, val rising: Boolean) : HeroAside
 
   /** Too little history for an honest trend yet — e.g. "Day 5", building a picture. */
-  data class Settling(val dayLabel: String) : HeroAside
+  data class Settling(val dayLabel: UiText) : HeroAside
 }
 
 /** [Due] maps to the warning tint, [Late] to the negative tint. */
@@ -62,11 +65,11 @@ data class PendingRowUi(
   val id: RecurringScheduleId,
   val name: String,
   val amountAccount: String,
-  val statusText: String,
+  val statusText: UiText,
   val urgency: PendingUrgency,
 )
 
 data class RecentGroup(
-  val dateLabel: String,
+  val dateLabel: UiText,
   val rows: List<TxRowUi>,
 )

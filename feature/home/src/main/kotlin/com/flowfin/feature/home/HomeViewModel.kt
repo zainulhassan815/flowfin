@@ -16,9 +16,11 @@ import com.flowfin.core.model.Money
 import com.flowfin.core.model.RecurringSchedule
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.model.TransactionKind
+import com.flowfin.core.resources.R
 import com.flowfin.core.ui.AccountCardUi
 import com.flowfin.core.ui.MoneyFormatter
 import com.flowfin.core.ui.TxRowUi
+import com.flowfin.core.ui.UiText
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -77,7 +79,7 @@ class HomeViewModel(
     pending: List<RecurringSchedule>,
     net: Money,
   ): HomeUiState {
-    if (balances.isEmpty()) return HomeUiState.Empty
+    if (balances.isEmpty()) return HomeUiState.Empty(money.symbol)
 
     val accountsById = balances.associate { it.account.id to it.account }
     val categoriesById = categoryList.associateBy(Category::id)
@@ -89,6 +91,7 @@ class HomeViewModel(
     val total = realSum + budgetSum // the headline total is exactly the sum of every account
 
     return HomeUiState.Content(
+      currency = money.symbol,
       totalWhole = money.whole(total),
       totalDecimal = money.fraction(total),
       allocated = money.displayWhole(budgetSum),
@@ -119,12 +122,10 @@ class HomeViewModel(
     }
   }
 
-  private fun daysAgo(instant: Instant): String =
-    when (val days = today.toEpochDays() - instant.toLocalDateTime(zone).date.toEpochDays()) {
-      0 -> "today"
-      1 -> "1 day ago"
-      else -> "$days days ago"
-    }
+  private fun daysAgo(instant: Instant): UiText {
+    val days = today.toEpochDays() - instant.toLocalDateTime(zone).date.toEpochDays()
+    return if (days == 0) UiText.Res(R.string.home_days_ago_today) else UiText.Plural(R.plurals.home_days_ago, days)
+  }
 
   /** Days the user has been tracking, 1-indexed from the oldest account (its
    *  creation day is "Day 1"). */
@@ -136,7 +137,11 @@ class HomeViewModel(
   /** Before there's enough history to compare months, the hero owns its early days
    *  ("Day 5, building a picture"); after that it shows the month delta. */
   private fun heroAside(total: Money, net: Money, daysSinceStart: Int): HeroAside? =
-    if (daysSinceStart < SETTLING_DAYS) HeroAside.Settling("Day $daysSinceStart") else trendOf(total, net)
+    if (daysSinceStart < SETTLING_DAYS) {
+      HeroAside.Settling(UiText.Res(R.string.home_hero_day, listOf(daysSinceStart)))
+    } else {
+      trendOf(total, net)
+    }
 
   /** A delta vs the month's starting total, or null when there's nothing honest to
    *  show (no change, or the month opened at zero so a percentage is meaningless). */
@@ -172,10 +177,10 @@ class HomeViewModel(
     val accountId = toAccountId ?: fromAccountId
     val accountName = accountId?.let { accountsById[it]?.name }.orEmpty()
     val daysLate = today.toEpochDays() - nextDueAt.toLocalDateTime(zone).date.toEpochDays()
-    val (statusText, urgency) = when {
-      daysLate <= 0 -> "Due today" to PendingUrgency.Due
-      daysLate == 1 -> "1 day late" to PendingUrgency.Late
-      else -> "$daysLate days late" to PendingUrgency.Late
+    val (statusText, urgency) = if (daysLate <= 0) {
+      UiText.Res(R.string.home_pending_due_today) to PendingUrgency.Due
+    } else {
+      UiText.Plural(R.plurals.home_pending_days_late, daysLate) to PendingUrgency.Late
     }
     val amountAccount = buildString {
       append(money.displayWhole(amount))
@@ -198,13 +203,15 @@ class HomeViewModel(
         )
       }
 
-  private fun dateLabel(date: LocalDate): String {
+  private fun dateLabel(date: LocalDate): UiText {
     val prefix = when (date.toEpochDays()) {
-      today.toEpochDays() -> "Today"
-      today.toEpochDays() - 1 -> "Yesterday"
-      else -> date.dayOfWeek.name.titleCase3()
+      today.toEpochDays() -> UiText.Res(R.string.home_date_today)
+      today.toEpochDays() - 1 -> UiText.Res(R.string.home_date_yesterday)
+      // The weekday/month abbreviations are still English enum names — full
+      // date localization is a separate effort, tracked apart from this pass.
+      else -> UiText.Raw(date.dayOfWeek.name.titleCase3())
     }
-    return "$prefix · ${date.dayOfMonth} ${date.month.name.titleCase3()}"
+    return UiText.Res(R.string.home_date_label, listOf(prefix, date.dayOfMonth, date.month.name.titleCase3()))
   }
 
   private fun Transaction.toRowUi(
@@ -220,12 +227,13 @@ class HomeViewModel(
     return TxRowUi(
       id = id,
       name = when (kind) {
-        TransactionKind.INCOME, TransactionKind.EXPENSE -> category?.name ?: "—"
-        TransactionKind.TRANSFER -> "Transfer"
-        TransactionKind.ALLOCATION -> "Allocation"
-        TransactionKind.REALLOCATION -> "Reallocation"
+        TransactionKind.INCOME, TransactionKind.EXPENSE ->
+          category?.name?.let(UiText::Raw) ?: UiText.Res(R.string.home_tx_uncategorized)
+        TransactionKind.TRANSFER -> UiText.Res(R.string.home_tx_transfer)
+        TransactionKind.ALLOCATION -> UiText.Res(R.string.home_tx_allocation)
+        TransactionKind.REALLOCATION -> UiText.Res(R.string.home_tx_reallocation)
         TransactionKind.DEBT_BORROW, TransactionKind.DEBT_LEND,
-        TransactionKind.DEBT_REPAY_OUT, TransactionKind.DEBT_REPAY_IN -> "Debt"
+        TransactionKind.DEBT_REPAY_OUT, TransactionKind.DEBT_REPAY_IN -> UiText.Res(R.string.home_tx_debt)
       },
       meta = when (kind) {
         TransactionKind.INCOME -> toName

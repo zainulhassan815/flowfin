@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.annotation.StringRes
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -27,6 +28,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -43,7 +45,10 @@ import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.RecurringScheduleId
 import com.flowfin.core.model.TransactionId
+import com.flowfin.core.resources.R
 import com.flowfin.core.ui.AccountCardUi
+import com.flowfin.core.ui.UiText
+import com.flowfin.core.ui.asString
 import com.flowfin.core.ui.categoryColor
 import com.flowfin.core.ui.categoryIcon
 
@@ -51,19 +56,19 @@ private val HORIZONTAL = 24.dp
 
 fun LazyListScope.heroItem(state: HomeUiState.Content) {
   item(key = "hero", contentType = "hero") {
-    Hero(state.totalWhole, state.totalDecimal, state.allocated, state.aside)
+    Hero(state.currency, state.totalWhole, state.totalDecimal, state.allocated, state.aside)
   }
 }
 
 @Composable
-private fun Hero(whole: String, decimal: String, allocated: String, aside: HeroAside?) {
+private fun Hero(currency: String, whole: String, decimal: String, allocated: String, aside: HeroAside?) {
   Column(
     modifier = Modifier
       .fillMaxWidth()
       .padding(start = HORIZONTAL, end = HORIZONTAL, top = 16.dp, bottom = 24.dp),
   ) {
-    HeroLabel("Available balance")
-    HeroFigure(whole, decimal, dimmed = false)
+    HeroLabel(stringResource(R.string.home_hero_available))
+    HeroFigure(currency, whole, decimal, dimmed = false)
     HeroMeta(allocated, aside)
   }
 }
@@ -71,7 +76,7 @@ private fun Hero(whole: String, decimal: String, allocated: String, aside: HeroA
 /** The hero before any account exists: a dimmed Rs 0.00 over a "no accounts yet ·
  *  day one" line, standing in for the live allocated/trend meta. */
 @Composable
-fun EmptyHero() {
+fun EmptyHero(currency: String) {
   val palette = FlowFinTheme.colors
   val metaStyle = FlowFinTheme.typography.caption.copy(fontSize = 11.sp, letterSpacing = 0.14.em)
   Column(
@@ -79,8 +84,8 @@ fun EmptyHero() {
       .fillMaxWidth()
       .padding(start = HORIZONTAL, end = HORIZONTAL, top = 16.dp, bottom = 24.dp),
   ) {
-    HeroLabel("Available balance")
-    HeroFigure(whole = "0", decimal = ".00", dimmed = true)
+    HeroLabel(stringResource(R.string.home_hero_available))
+    HeroFigure(currency = currency, whole = "0", decimal = ".00", dimmed = true)
     Row(
       modifier = Modifier
         .fillMaxWidth()
@@ -90,22 +95,22 @@ fun EmptyHero() {
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-      Text("No accounts yet".uppercase(), style = metaStyle, color = palette.textFaint)
+      Text(stringResource(R.string.home_hero_no_accounts).uppercase(), style = metaStyle, color = palette.textFaint)
       Box(Modifier.size(3.dp).clip(CircleShape).background(palette.textFaint))
-      Text("Day one".uppercase(), style = metaStyle, color = palette.textFaint)
+      Text(stringResource(R.string.home_hero_day_one).uppercase(), style = metaStyle, color = palette.textFaint)
     }
   }
 }
 
 @Composable
-private fun HeroFigure(whole: String, decimal: String, dimmed: Boolean) {
+private fun HeroFigure(currency: String, whole: String, decimal: String, dimmed: Boolean) {
   val palette = FlowFinTheme.colors
   val currencyColor = if (dimmed) palette.textFaint else palette.textMute
   val amountColor = if (dimmed) palette.textSoft else palette.text
   val fractionColor = if (dimmed) palette.textFaint else palette.textMute
   Row(modifier = Modifier.padding(top = 14.dp)) {
     Text(
-      text = "Rs",
+      text = currency,
       modifier = Modifier.alignByBaseline(),
       style = FlowFinTheme.typography.h2.copy(fontSize = 24.sp, fontWeight = FontWeight.Light),
       color = currencyColor,
@@ -153,7 +158,7 @@ private fun HeroMeta(allocated: String, aside: HeroAside?) {
     verticalAlignment = Alignment.CenterVertically,
   ) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-      Text("Allocated", style = metaStyle, color = palette.textMute)
+      Text(stringResource(R.string.home_hero_allocated), style = metaStyle, color = palette.textMute)
       Text(allocated, style = metaStyle, color = palette.text)
     }
     when (aside) {
@@ -164,16 +169,16 @@ private fun HeroMeta(allocated: String, aside: HeroAside?) {
           iconTint = trendColor,
           label = aside.percent,
           labelColor = trendColor,
-          trailing = "this month",
+          trailing = stringResource(R.string.home_hero_trend_suffix),
           trailingItalic = false,
         )
       }
       is HeroAside.Settling -> HeroAsideRow(
         icon = FlowFinIcons.Clock,
         iconTint = palette.textSoft,
-        label = aside.dayLabel,
+        label = aside.dayLabel.asString(),
         labelColor = palette.textSoft,
-        trailing = "building a picture",
+        trailing = stringResource(R.string.home_hero_settling_suffix),
         trailingItalic = true,
       )
       null -> Unit
@@ -213,21 +218,21 @@ fun LazyListScope.accountsSection(
   onAll: () -> Unit,
 ) {
   item(key = "accounts-header", contentType = "header") {
-    SectionHeader(title = "Accounts", onAll = onAll)
+    SectionHeader(title = stringResource(R.string.home_section_accounts), onAll = onAll)
   }
-  segment("Real", state.realTotal, state.realAccounts, onAccountClick)
-  segment("Budget", state.budgetTotal, state.budgetAccounts, onAccountClick)
+  segment(R.string.home_segment_real, state.realTotal, state.realAccounts, onAccountClick)
+  segment(R.string.home_segment_budget, state.budgetTotal, state.budgetAccounts, onAccountClick)
 }
 
 private fun LazyListScope.segment(
-  label: String,
+  @StringRes labelRes: Int,
   total: String,
   rows: List<AccountCardUi>,
   onAccountClick: (AccountId) -> Unit,
 ) {
   if (rows.isEmpty()) return
-  item(key = "segment-$label", contentType = "segment") {
-    SegmentLabel(label, total)
+  item(key = "segment-$labelRes", contentType = "segment") {
+    SegmentLabel(stringResource(labelRes), total)
   }
   itemsIndexed(
     items = rows,
@@ -314,7 +319,7 @@ fun LazyListScope.pendingSection(
 ) {
   if (state.pending.isEmpty()) return
   item(key = "pending-header", contentType = "header") {
-    SectionHeader(title = "Pending", count = state.pendingTotal, onAll = onAll)
+    SectionHeader(title = stringResource(R.string.home_section_pending), count = state.pendingTotal, onAll = onAll)
   }
   item(key = "pending-strip", contentType = "pending") {
     PendingStrip(state.pending, onPay)
@@ -345,6 +350,7 @@ private fun PendingStrip(rows: List<PendingRowUi>, onPay: (RecurringScheduleId) 
 private fun PendingRow(ui: PendingRowUi, onPay: () -> Unit, showDivider: Boolean) {
   val palette = FlowFinTheme.colors
   val markerColor = if (ui.urgency == PendingUrgency.Due) palette.warning else palette.negative
+  val status = ui.statusText.asString()
   Column {
     Row(
       modifier = Modifier.fillMaxWidth().padding(14.dp),
@@ -358,7 +364,7 @@ private fun PendingRow(ui: PendingRowUi, onPay: () -> Unit, showDivider: Boolean
           text = buildAnnotatedString {
             append(ui.amountAccount)
             append(" · ")
-            withStyle(SpanStyle(color = markerColor)) { append(ui.statusText) }
+            withStyle(SpanStyle(color = markerColor)) { append(status) }
           },
           modifier = Modifier.padding(top = 4.dp),
           style = FlowFinTheme.typography.caption.copy(
@@ -389,7 +395,7 @@ private fun PayButton(onClick: () -> Unit) {
       .padding(horizontal = 13.dp, vertical = 9.dp),
   ) {
     Text(
-      text = "Pay".uppercase(),
+      text = stringResource(R.string.home_pending_pay).uppercase(),
       style = FlowFinTheme.typography.caption.copy(letterSpacing = 0.16.em, fontWeight = FontWeight.SemiBold),
       color = palette.text,
     )
@@ -404,16 +410,17 @@ fun LazyListScope.recentSection(
   val recent = state.recent
   item(key = "recent-header", contentType = "header") {
     SectionHeader(
-      title = "Recent",
+      title = stringResource(R.string.home_section_recent),
       // "History" once entries have aged out of this week; no link when nothing was ever logged.
-      linkLabel = if (recent is RecentSection.Quiet) "History" else "All",
+      linkLabel = stringResource(if (recent is RecentSection.Quiet) R.string.home_link_history else R.string.home_link_all),
       onAll = if (recent is RecentSection.NoEntries) null else onAll,
     )
   }
   when (recent) {
     is RecentSection.Activity -> recent.groups.forEach { group ->
-      item(key = "date-${group.dateLabel}", contentType = "date") {
-        RecentDateHeader(group.dateLabel)
+      // A group always has ≥1 row, so the first row's id is a stable, unique header key.
+      item(key = "date-${group.rows.first().id.value}", contentType = "date") {
+        RecentDateHeader(group.dateLabel.asString())
       }
       itemsIndexed(
         items = group.rows,
@@ -423,7 +430,7 @@ fun LazyListScope.recentSection(
         Column(modifier = Modifier.padding(horizontal = HORIZONTAL)) {
           FlowFinTransactionRow(
             icon = categoryIcon(row.iconKey),
-            name = row.name,
+            name = row.name.asString(),
             meta = row.meta,
             amount = row.amount,
             kind = row.kind,
@@ -437,23 +444,23 @@ fun LazyListScope.recentSection(
     }
 
     RecentSection.NoEntries -> recentEmptyHint(
-      eyebrow = "First entry",
-      title = "Nothing logged yet.",
-      body = "Tap + below to record an income, an expense, or a transfer between your accounts.",
+      eyebrow = UiText.Res(R.string.home_recent_empty_eyebrow),
+      title = UiText.Res(R.string.home_recent_empty_title),
+      body = UiText.Res(R.string.home_recent_empty_body),
     )
 
     is RecentSection.Quiet -> recentEmptyHint(
-      eyebrow = "A quiet stretch",
-      title = "Nothing logged this week.",
-      body = "Your last entry was ${recent.lastEntry}. Tap + to add today's.",
+      eyebrow = UiText.Res(R.string.home_recent_quiet_eyebrow),
+      title = UiText.Res(R.string.home_recent_quiet_title),
+      body = UiText.Res(R.string.home_recent_quiet_body, listOf(recent.lastEntry)),
     )
   }
 }
 
-private fun LazyListScope.recentEmptyHint(eyebrow: String, title: String, body: String) {
+private fun LazyListScope.recentEmptyHint(eyebrow: UiText, title: UiText, body: UiText) {
   item(key = "recent-empty", contentType = "empty") {
     Box(Modifier.padding(horizontal = HORIZONTAL, vertical = 4.dp)) {
-      FlowFinSectionEmptyHint(eyebrow = eyebrow, title = title, body = body)
+      FlowFinSectionEmptyHint(eyebrow = eyebrow.asString(), title = title.asString(), body = body.asString())
     }
   }
 }
@@ -472,7 +479,7 @@ private fun RecentDateHeader(label: String) {
 private fun SectionHeader(
   title: String,
   count: Int? = null,
-  linkLabel: String = "All",
+  linkLabel: String = stringResource(R.string.home_link_all),
   onAll: (() -> Unit)? = null,
 ) {
   val palette = FlowFinTheme.colors

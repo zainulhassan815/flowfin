@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <!-- Home · top bar -->
+  <string name="home_action_search">Search</string>
+  <string name="home_action_settings">Settings</string>
+
+  <!-- Home · hero -->
+  <string name="home_hero_available">Available balance</string>
+  <string name="home_hero_allocated">Allocated</string>
+  <string name="home_hero_trend_suffix">this month</string>
+  <string name="home_hero_settling_suffix">building a picture</string>
+  <!-- "Day 5" while there's too little history for a month-over-month trend. -->
+  <string name="home_hero_day">Day %1$d</string>
+  <!-- The empty hero, before any account exists. -->
+  <string name="home_hero_no_accounts">No accounts yet</string>
+  <string name="home_hero_day_one">Day one</string>
+
+  <!-- Home · empty state (no accounts) -->
+  <string name="home_empty_eyebrow">Begin</string>
+  <string name="home_empty_title">Money lives somewhere. Tell us where.</string>
+  <!-- A substring of home_empty_title that the empty state emphasises. -->
+  <string name="home_empty_emphasis">somewhere.</string>
+  <string name="home_empty_body">Add the first place — your bank, the cash in your wallet, a mobile wallet. Every transaction starts from an account.</string>
+  <string name="home_empty_action">Add an account</string>
+
+  <!-- Home · section headers -->
+  <string name="home_section_accounts">Accounts</string>
+  <string name="home_section_pending">Pending</string>
+  <string name="home_section_recent">Recent</string>
+  <string name="home_link_all">All</string>
+  <string name="home_link_history">History</string>
+
+  <!-- Home · accounts -->
+  <string name="home_segment_real">Real</string>
+  <string name="home_segment_budget">Budget</string>
+
+  <!-- Home · pending -->
+  <string name="home_pending_pay">Pay</string>
+  <string name="home_pending_due_today">Due today</string>
+  <plurals name="home_pending_days_late">
+    <item quantity="one">%1$d day late</item>
+    <item quantity="other">%1$d days late</item>
+  </plurals>
+
+  <!-- Home · recent feed -->
+  <string name="home_date_today">Today</string>
+  <string name="home_date_yesterday">Yesterday</string>
+  <!-- A day's heading in the feed: prefix · day month, e.g. "Today · 27 Dec". -->
+  <string name="home_date_label">%1$s · %2$d %3$s</string>
+  <string name="home_days_ago_today">today</string>
+  <plurals name="home_days_ago">
+    <item quantity="one">%1$d day ago</item>
+    <item quantity="other">%1$d days ago</item>
+  </plurals>
+
+  <!-- Home · transaction-kind row names (no user-named category of their own) -->
+  <string name="home_tx_transfer">Transfer</string>
+  <string name="home_tx_allocation">Allocation</string>
+  <string name="home_tx_reallocation">Reallocation</string>
+  <string name="home_tx_debt">Debt</string>
+  <!-- Fallback when an income/expense has no category. -->
+  <string name="home_tx_uncategorized">—</string>
+
+  <!-- Home · recent empty variants -->
+  <string name="home_recent_empty_eyebrow">First entry</string>
+  <string name="home_recent_empty_title">Nothing logged yet.</string>
+  <string name="home_recent_empty_body">Tap + below to record an income, an expense, or a transfer between your accounts.</string>
+  <string name="home_recent_quiet_eyebrow">A quiet stretch</string>
+  <string name="home_recent_quiet_title">Nothing logged this week.</string>
+  <string name="home_recent_quiet_body">Your last entry was %1$s. Tap + to add today\'s.</string>
+
+</resources>
