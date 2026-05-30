@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Add Account / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  --cat-bank: #82C5D4;
+  --cat-cash: #C5D982;
+  --cat-mobile: #C98ED4;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.caption {
+  position: fixed;
+  top: 28px;
+  left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 10;
+  font-weight: 500;
+}
+.caption em {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 400;
+  opacity: 0.85;
+}
+.caption-r {
+  position: fixed;
+  bottom: 28px;
+  left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--text-mute);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  z-index: 10;
+  font-weight: 500;
+}
+
+/* ===== Phone frame ===== */
+.phone {
+  width: 390px;
+  height: 844px;
+  background: var(--bg);
+  border-radius: 52px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E,
+    0 0 0 12px #0A0A0C,
+    0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28),
+    0 6px 14px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+}
+.notch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 32px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 30;
+}
+
+.status-bar {
+  height: 50px;
+  padding: 18px 32px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+  z-index: 5;
+  flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Screen ===== */
+.screen {
+  flex: 1;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+}
+
+/* Kind variants — swap the name's example placeholder */
+.screen[data-kind="bank"]   .is-cash,
+.screen[data-kind="bank"]   .is-mobile { display: none; }
+.screen[data-kind="cash"]   .is-bank,
+.screen[data-kind="cash"]   .is-mobile { display: none; }
+.screen[data-kind="mobile"] .is-bank,
+.screen[data-kind="mobile"] .is-cash { display: none; }
+
+/* Centered-title app bar — shared with the other screens. */
+.app-header {
+  height: 56px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.btn-back {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-mute);
+  cursor: pointer;
+  margin-left: -8px;
+  transition: color .15s;
+}
+.btn-back:hover { color: var(--text); }
+.app-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.header-spacer { width: 30px; }
+
+.body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 24px 24px;
+}
+
+/* ===== Name hero (the focus) ===== */
+.name-hero {
+  padding: 22px 0 6px;
+}
+.name-col { min-width: 0; }
+.name-line {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+}
+.name-text {
+  font-family: var(--font-serif), serif;
+  font-size: 25px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.name-ph {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 25px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: var(--text-faint);
+}
+.name-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 26px;
+  background: var(--text);
+  border-radius: 1px;
+  margin-right: 2px;
+  animation: blink 1s infinite;
+}
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.name-hero .field-label { margin-bottom: 12px; }
+/* Neutral while empty — an empty required field shouldn't read as valid. */
+.name-rule {
+  height: 1px;
+  margin-top: 10px;
+  background: var(--border-strong);
+  border-radius: 1px;
+}
+
+/* ===== Kind preset chooser ===== */
+.kind-label { margin: 30px 0 12px; }
+.kind-row {
+  display: flex;
+  gap: 8px;
+}
+.kind-chip {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 8px;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.kind-chip .chip-ic { color: var(--text-soft); transition: color .15s; }
+.kind-chip .chip-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+  transition: color .15s;
+}
+.kind-chip[data-kind="bank"].on   { border-color: var(--cat-bank);   background: rgba(130,197,212,0.07); }
+.kind-chip[data-kind="cash"].on   { border-color: var(--cat-cash);   background: rgba(197,217,130,0.07); }
+.kind-chip[data-kind="mobile"].on { border-color: var(--cat-mobile); background: rgba(201,142,212,0.07); }
+.kind-chip[data-kind="bank"].on   .chip-ic, .kind-chip[data-kind="bank"].on   .chip-label { color: var(--cat-bank); }
+.kind-chip[data-kind="cash"].on   .chip-ic, .kind-chip[data-kind="cash"].on   .chip-label { color: var(--cat-cash); }
+.kind-chip[data-kind="mobile"].on .chip-ic, .kind-chip[data-kind="mobile"].on .chip-label { color: var(--cat-mobile); }
+
+/* ===== Opening balance (inline field — no drill-down) ===== */
+.field-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+.balance-field { margin-top: 30px; }
+.balance-field .field-label { margin-bottom: 12px; }
+.balance-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.balance-cur {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 19px;
+  font-weight: 400;
+  color: var(--text-mute);
+  letter-spacing: -0.02em;
+}
+.balance-amount {
+  font-family: var(--font-mono), monospace;
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--text-soft);
+}
+/* Once a non-zero balance is typed, the figure reads in full text colour. */
+.balance-amount.filled { color: var(--text); }
+.balance-rule {
+  height: 1px;
+  margin-top: 10px;
+  background: var(--border-strong);
+  border-radius: 1px;
+}
+
+/* ===== Primary CTA ===== */
+.cta-area {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-top: 20px;
+}
+.cta-note {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 500;
+}
+.cta-primary {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+/* Disabled (the canonical empty state — name not yet entered) */
+.cta-primary[disabled] {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-faint);
+  cursor: not-allowed;
+}
+/* Enabled preview */
+.cta-primary.ready {
+  background: var(--accent);
+  color: #0A0A0B;
+  cursor: pointer;
+}
+
+/* ===== Invalid name (duplicate) ===== */
+.name-rule.error { background: var(--neg); }
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 11px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--neg);
+  letter-spacing: -0.005em;
+}
+.field-error svg { flex-shrink: 0; }
+
+/* ===== Two-up state layout ===== */
+.stage {
+  display: flex;
+  gap: 64px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.phone-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 500;
+  text-align: center;
+}
+.phone-label em {
+  display: block;
+  margin-top: 5px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-soft);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Home indicator */
+.home-indicator {
+  position: absolute;
+  bottom: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  background: var(--text);
+  border-radius: 3px;
+  opacity: 0.4;
+  z-index: 40;
+}
+
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 16b<br>
+  <em>Add account — Name-led · states</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="stage">
+
+  <div class="frame">
+  <div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <section class="screen" data-kind="bank">
+
+    <div class="app-header">
+      <button class="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18L9 12L15 6"/>
+        </svg>
+      </button>
+      <div class="app-title">New account</div>
+      <div class="header-spacer"></div>
+    </div>
+
+    <div class="body">
+
+      <!-- Name — the focus -->
+      <div class="name-hero">
+        <div class="field-label">Account name</div>
+        <div class="name-col">
+          <div class="name-line">
+            <span class="name-cursor"></span>
+            <span class="name-ph is-bank">e.g. HBL Savings</span>
+            <span class="name-ph is-cash">e.g. Cash in hand</span>
+            <span class="name-ph is-mobile">e.g. JazzCash</span>
+          </div>
+          <div class="name-rule"></div>
+        </div>
+      </div>
+
+      <!-- Kind preset -->
+      <div class="field-label kind-label">Kind</div>
+      <div class="kind-row">
+        <button class="kind-chip on" data-kind="bank">
+          <span class="chip-ic">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+            </svg>
+          </span>
+          <span class="chip-label">Bank</span>
+        </button>
+        <button class="kind-chip" data-kind="cash">
+          <span class="chip-ic">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/>
+              <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/>
+              <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+            </svg>
+          </span>
+          <span class="chip-label">Cash</span>
+        </button>
+        <button class="kind-chip" data-kind="mobile">
+          <span class="chip-ic">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="6" y="2" width="12" height="20" rx="2"/>
+              <line x1="11" y1="18" x2="13" y2="18"/>
+            </svg>
+          </span>
+          <span class="chip-label">Mobile</span>
+        </button>
+      </div>
+
+      <!-- Opening balance — inline field, defaults to zero -->
+      <div class="balance-field">
+        <div class="field-label">Opening balance</div>
+        <div class="balance-line">
+          <span class="balance-cur">Rs</span>
+          <span class="balance-amount">0.00</span>
+        </div>
+        <div class="balance-rule"></div>
+      </div>
+
+      <!-- Primary action — disabled until a name exists -->
+      <div class="cta-area">
+        <span class="cta-note">Name it to continue</span>
+        <button class="cta-primary" disabled>Add account</button>
+      </div>
+
+    </div>
+
+  </section>
+
+  <div class="home-indicator"></div>
+  </div>
+  <div class="phone-label">Empty · first run<em>no name yet — Add disabled</em></div>
+  </div>
+
+  <div class="frame">
+  <div class="phone">
+    <div class="notch"></div>
+
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+          <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+          <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+          <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+          <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+        </svg>
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+          <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+          <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        </svg>
+        <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+          <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+          <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+          <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+        </svg>
+      </div>
+    </div>
+
+    <section class="screen" data-kind="cash">
+
+      <div class="app-header">
+        <button class="btn-back" aria-label="Back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18L9 12L15 6"/>
+          </svg>
+        </button>
+        <div class="app-title">New account</div>
+        <div class="header-spacer"></div>
+      </div>
+
+      <div class="body">
+
+        <!-- Name — duplicate, invalid -->
+        <div class="name-hero">
+          <div class="field-label">Account name</div>
+          <div class="name-col">
+            <div class="name-line">
+              <span class="name-text">Cash</span>
+              <span class="name-cursor"></span>
+            </div>
+            <div class="name-rule error"></div>
+            <div class="field-error">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              An account called “Cash” already exists
+            </div>
+          </div>
+        </div>
+
+        <!-- Kind preset -->
+        <div class="field-label kind-label">Kind</div>
+        <div class="kind-row">
+          <button class="kind-chip" data-kind="bank">
+            <span class="chip-ic">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+              </svg>
+            </span>
+            <span class="chip-label">Bank</span>
+          </button>
+          <button class="kind-chip on" data-kind="cash">
+            <span class="chip-ic">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/>
+                <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/>
+                <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+              </svg>
+            </span>
+            <span class="chip-label">Cash</span>
+          </button>
+          <button class="kind-chip" data-kind="mobile">
+            <span class="chip-ic">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="2" width="12" height="20" rx="2"/>
+                <line x1="11" y1="18" x2="13" y2="18"/>
+              </svg>
+            </span>
+            <span class="chip-label">Mobile</span>
+          </button>
+        </div>
+
+        <!-- Opening balance -->
+        <div class="balance-field">
+          <div class="field-label">Opening balance</div>
+          <div class="balance-line">
+            <span class="balance-cur">Rs</span>
+            <span class="balance-amount">0.00</span>
+          </div>
+          <div class="balance-rule"></div>
+        </div>
+
+        <!-- Primary action — blocked by the duplicate name -->
+        <div class="cta-area">
+          <button class="cta-primary" disabled>Add account</button>
+        </div>
+
+      </div>
+
+    </section>
+
+    <div class="home-indicator"></div>
+  </div>
+  <div class="phone-label">Name taken<em>duplicate — inline error, Add disabled</em></div>
+  </div>
+
+</div>
+
+<script>
+  (function() {
+    document.querySelectorAll('.screen').forEach(screen => {
+      const chips = screen.querySelectorAll('.kind-chip');
+      chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          screen.dataset.kind = chip.dataset.kind;
+          chips.forEach(c => c.classList.toggle('on', c === chip));
+        });
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
