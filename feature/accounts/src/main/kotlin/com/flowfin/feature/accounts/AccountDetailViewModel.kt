@@ -15,7 +15,11 @@ import com.flowfin.core.model.Transaction
 import com.flowfin.core.resources.R
 import com.flowfin.core.ui.MoneyFormatter
 import com.flowfin.core.ui.UiText
+import com.flowfin.core.ui.colorKey
 import com.flowfin.core.ui.dateLabel
+import com.flowfin.core.ui.iconKey
+import com.flowfin.core.ui.monthShortLabel
+import com.flowfin.core.ui.parentName
 import com.flowfin.core.ui.toRowUi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -51,7 +55,7 @@ class AccountDetailViewModel(
   private val today = now.toLocalDateTime(zone).date
   private val monthStart = LocalDate(today.year, today.month, 1).atStartOfDayIn(zone)
   private val monthEnd = LocalDate(today.year, today.month, 1).plus(1, DateTimeUnit.MONTH).atStartOfDayIn(zone)
-  private val monthLabel = today.month.name.titleCase3()
+  private val monthLabel = monthShortLabel(today)
 
   val uiState: StateFlow<AccountDetailUiState> = combine(
     accounts.observeBalances(),
@@ -78,8 +82,8 @@ class AccountDetailViewModel(
       typeLabel = UiText.Res(if (account.isBudget) R.string.account_detail_type_budget else R.string.account_detail_type_real),
       typeTag = UiText.Res(if (account.isBudget) R.string.account_detail_tag_budget else R.string.account_detail_tag_real),
       meta = account.parentName(accountsById),
-      iconKey = account.icon ?: if (account.isBudget) "wallet" else "bank",
-      colorKey = account.color ?: if (account.isBudget) "other" else "bank",
+      iconKey = account.iconKey(),
+      colorKey = account.colorKey(),
       isBudget = account.isBudget,
       currency = money.symbol,
       balanceWhole = money.whole(self.balance),
@@ -89,9 +93,6 @@ class AccountDetailViewModel(
       activity = feed.groupActivity(accountsById, categoriesById),
     )
   }
-
-  private fun Account.parentName(accountsById: Map<AccountId, Account>): String =
-    if (isBudget) parentAccountId?.let { accountsById[it]?.name }.orEmpty() else ""
 
   /** The strip drops entirely when nothing moved this month — there's nothing to
    *  summarise, and a row of zeros reads as noise. */
@@ -113,13 +114,9 @@ class AccountDetailViewModel(
   ): List<TxGroup> =
     groupBy { it.recordedAt.toLocalDateTime(zone).date } // newest-first feed → dates stay descending
       .map { (date, txns) ->
-        TxGroup(dateLabel(date, today), txns.map { it.toRowUi(accountsById, categoriesById, money) })
+        TxGroup(dateLabel(date, today), txns.map { it.toRowUi(accountsById, categoriesById, money, perspective = accountId) })
       }
 }
-
-/** "DECEMBER" → "Dec". */
-private fun String.titleCase3(): String =
-  take(3).lowercase().replaceFirstChar { it.uppercase() }
 
 /** A single generous page of history — real pagination arrives only if a benchmark
  *  shows an account's ledger outgrowing it. */

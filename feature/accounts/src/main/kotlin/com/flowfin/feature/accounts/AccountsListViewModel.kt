@@ -5,12 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.flowfin.core.designsystem.component.BudgetProgress
 import com.flowfin.core.domain.repository.AccountRepository
 import com.flowfin.core.domain.repository.TransactionRepository
-import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountBalance
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.Money
-import com.flowfin.core.ui.AccountCardUi
 import com.flowfin.core.ui.MoneyFormatter
+import com.flowfin.core.ui.toCardUi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -54,25 +53,12 @@ class AccountsListViewModel(
       realTotal = money.displayWhole(realSum),
       budgetTotal = money.displayWhole(budgetSum),
       accountCount = balances.size,
-      real = real.map { it.toCardUi(accountsById, spendByAccount) },
-      budgets = budget.map { it.toCardUi(accountsById, spendByAccount) },
+      real = real.map { it.toCardUi(accountsById, money) },
+      budgets = budget.map {
+        it.toCardUi(accountsById, money, progress = budgetProgress(it.balance, spendByAccount[it.account.id] ?: Money.ZERO))
+      },
     )
   }
-
-  private fun AccountBalance.toCardUi(
-    accountsById: Map<AccountId, Account>,
-    spendByAccount: Map<AccountId, Money>,
-  ): AccountCardUi = AccountCardUi(
-    id = account.id,
-    meta = if (account.isBudget) account.parentAccountId?.let { accountsById[it]?.name }.orEmpty() else "",
-    name = account.name,
-    balanceWhole = money.whole(balance),
-    balanceDecimal = money.fraction(balance),
-    iconKey = account.icon ?: if (account.isBudget) "wallet" else "bank",
-    colorKey = account.color ?: if (account.isBudget) "other" else "bank",
-    isBudget = account.isBudget,
-    progress = if (account.isBudget) budgetProgress(balance, spendByAccount[account.id] ?: Money.ZERO) else null,
-  )
 
   /** Envelope progress: spent of funded, where funded is what's left plus what's gone. */
   private fun budgetProgress(remaining: Money, spent: Money): BudgetProgress {

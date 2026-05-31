@@ -98,12 +98,14 @@ fun FlowFinTransactionRow(
         style = FlowFinTheme.typography.bodyLg.copy(fontSize = 16.sp),
         color = palette.text,
       )
-      Text(
-        text = meta.uppercase(),
-        modifier = Modifier.padding(top = 4.dp),
-        style = FlowFinTheme.typography.caption.copy(letterSpacing = 0.08.em),
-        color = palette.textMute,
-      )
+      if (meta.isNotBlank()) {
+        Text(
+          text = meta.uppercase(),
+          modifier = Modifier.padding(top = 4.dp),
+          style = FlowFinTheme.typography.caption.copy(letterSpacing = 0.08.em),
+          color = palette.textMute,
+        )
+      }
     }
 
     Text(

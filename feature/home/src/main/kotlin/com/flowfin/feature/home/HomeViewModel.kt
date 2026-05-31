@@ -15,10 +15,10 @@ import com.flowfin.core.model.Money
 import com.flowfin.core.model.RecurringSchedule
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.resources.R
-import com.flowfin.core.ui.AccountCardUi
 import com.flowfin.core.ui.MoneyFormatter
 import com.flowfin.core.ui.UiText
 import com.flowfin.core.ui.dateLabel
+import com.flowfin.core.ui.toCardUi
 import com.flowfin.core.ui.toRowUi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -96,9 +96,9 @@ class HomeViewModel(
       allocated = money.displayWhole(budgetSum),
       aside = heroAside(total, net, daysSinceStart(balances)),
       realTotal = money.displayWhole(realSum),
-      realAccounts = real.map { it.toCardUi(accountsById) },
+      realAccounts = real.map { it.toCardUi(accountsById, money) },
       budgetTotal = money.displayWhole(budgetSum),
-      budgetAccounts = budget.map { it.toCardUi(accountsById) },
+      budgetAccounts = budget.map { it.toCardUi(accountsById, money) },
       pending = pending.take(PENDING_LIMIT).map { it.toPendingUi(accountsById) },
       pendingTotal = pending.size,
       recent = classifyRecent(recent, accountsById, categoriesById),
@@ -152,24 +152,6 @@ class HomeViewModel(
     if (pct == 0) return null
     val sign = if (pct > 0) "+" else "" // a negative pct already carries its '−'
     return HeroAside.Trend(percent = "$sign$pct%", rising = net.isPositive)
-  }
-
-  private fun AccountBalance.toCardUi(accountsById: Map<AccountId, Account>): AccountCardUi {
-    val meta = if (account.isBudget) {
-      account.parentAccountId?.let { accountsById[it]?.name }.orEmpty()
-    } else {
-      ""
-    }
-    return AccountCardUi(
-      id = account.id,
-      name = account.name,
-      meta = meta,
-      balanceWhole = money.whole(balance),
-      balanceDecimal = money.fraction(balance),
-      iconKey = account.icon ?: if (account.isBudget) "wallet" else "bank",
-      colorKey = account.color ?: if (account.isBudget) "other" else "bank",
-      isBudget = account.isBudget,
-    )
   }
 
   private fun RecurringSchedule.toPendingUi(accountsById: Map<AccountId, Account>): PendingRowUi {

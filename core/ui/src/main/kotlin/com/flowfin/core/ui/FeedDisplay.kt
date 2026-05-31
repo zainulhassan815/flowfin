@@ -21,13 +21,15 @@ fun Transaction.toRowUi(
   accountsById: Map<AccountId, Account>,
   categoriesById: Map<CategoryId, Category>,
   money: MoneyFormatter,
+  perspective: AccountId? = null,
 ): TxRowUi {
   val category = categoryId?.let { categoriesById[it] }
   val fromName = fromAccountId?.let { accountsById[it]?.name }.orEmpty()
   val toName = toAccountId?.let { accountsById[it]?.name }.orEmpty()
-  val moneyIn = kind == TransactionKind.INCOME ||
-    kind == TransactionKind.DEBT_BORROW ||
-    kind == TransactionKind.DEBT_REPAY_IN
+  // Money enters an account iff it's the destination. Viewed from one account
+  // ([perspective]) this flips an internal move's sign — a transfer reads +in on the
+  // receiver and −out on the payer; the global feed keeps its by-kind convention.
+  val moneyIn = if (perspective != null) toAccountId == perspective else kind.isExternalInflow()
   return TxRowUi(
     id = id,
     name = when (kind) {
@@ -39,13 +41,7 @@ fun Transaction.toRowUi(
       TransactionKind.DEBT_BORROW, TransactionKind.DEBT_LEND,
       TransactionKind.DEBT_REPAY_OUT, TransactionKind.DEBT_REPAY_IN -> UiText.Res(R.string.tx_debt)
     },
-    meta = when (kind) {
-      TransactionKind.INCOME -> toName
-      TransactionKind.EXPENSE -> fromName
-      TransactionKind.TRANSFER, TransactionKind.ALLOCATION, TransactionKind.REALLOCATION ->
-        "$fromName → $toName"
-      else -> ""
-    },
+    meta = rowMeta(perspective, fromName, toName),
     amount = (if (moneyIn) "+" else "−") + money.whole(amount),
     decimal = money.fraction(amount),
     kind = when (kind) {
@@ -78,6 +74,30 @@ fun dateLabel(date: LocalDate, today: LocalDate): UiText {
   }
   return UiText.Res(R.string.date_label, listOf(prefix, date.dayOfMonth, date.month.name.titleCase3()))
 }
+
+/** Money entering the system from outside, for the global (perspective-less) feed. */
+private fun TransactionKind.isExternalInflow(): Boolean =
+  this == TransactionKind.INCOME || this == TransactionKind.DEBT_BORROW || this == TransactionKind.DEBT_REPAY_IN
+
+/**
+ * A row's secondary line. The global feed names the account(s); from one account's
+ * view ([perspective]) an internal move names the counterparty, and income/expense
+ * surface the note (the title already names the category).
+ */
+private fun Transaction.rowMeta(perspective: AccountId?, fromName: String, toName: String): String = when {
+  perspective == null -> when (kind) {
+    TransactionKind.INCOME -> toName
+    TransactionKind.EXPENSE -> fromName
+    TransactionKind.TRANSFER, TransactionKind.ALLOCATION, TransactionKind.REALLOCATION -> "$fromName → $toName"
+    else -> ""
+  }
+  kind == TransactionKind.TRANSFER || kind == TransactionKind.ALLOCATION || kind == TransactionKind.REALLOCATION ->
+    if (toAccountId == perspective) "From $fromName" else "To $toName"
+  else -> note.orEmpty()
+}
+
+/** A month's short label — "Dec". Shared by feeds and the Account-detail flow strip. */
+fun monthShortLabel(date: LocalDate): String = date.month.name.titleCase3()
 
 /** "MONDAY" → "Mon", "DECEMBER" → "Dec". */
 private fun String.titleCase3(): String =
