@@ -1,0 +1,84 @@
+package com.flowfin.core.ui
+
+import com.flowfin.core.designsystem.component.TransactionKind as RowKind
+import com.flowfin.core.model.Account
+import com.flowfin.core.model.AccountId
+import com.flowfin.core.model.Category
+import com.flowfin.core.model.CategoryId
+import com.flowfin.core.model.Transaction
+import com.flowfin.core.model.TransactionKind
+import com.flowfin.core.resources.R
+import kotlinx.datetime.LocalDate
+
+/**
+ * Display mapping shared by every transaction feed (Home, Account detail). A row
+ * is joined in-memory against the supplied account and category lookups; the +/−
+ * sign and the 3-way colour bucket ([RowKind]) follow from the domain
+ * [TransactionKind]. Money is already formatted by [money]; the screen resolves
+ * the [UiText] name and the icon/colour keys.
+ */
+fun Transaction.toRowUi(
+  accountsById: Map<AccountId, Account>,
+  categoriesById: Map<CategoryId, Category>,
+  money: MoneyFormatter,
+): TxRowUi {
+  val category = categoryId?.let { categoriesById[it] }
+  val fromName = fromAccountId?.let { accountsById[it]?.name }.orEmpty()
+  val toName = toAccountId?.let { accountsById[it]?.name }.orEmpty()
+  val moneyIn = kind == TransactionKind.INCOME ||
+    kind == TransactionKind.DEBT_BORROW ||
+    kind == TransactionKind.DEBT_REPAY_IN
+  return TxRowUi(
+    id = id,
+    name = when (kind) {
+      TransactionKind.INCOME, TransactionKind.EXPENSE ->
+        category?.name?.let(UiText::Raw) ?: UiText.Res(R.string.tx_uncategorized)
+      TransactionKind.TRANSFER -> UiText.Res(R.string.tx_transfer)
+      TransactionKind.ALLOCATION -> UiText.Res(R.string.tx_allocation)
+      TransactionKind.REALLOCATION -> UiText.Res(R.string.tx_reallocation)
+      TransactionKind.DEBT_BORROW, TransactionKind.DEBT_LEND,
+      TransactionKind.DEBT_REPAY_OUT, TransactionKind.DEBT_REPAY_IN -> UiText.Res(R.string.tx_debt)
+    },
+    meta = when (kind) {
+      TransactionKind.INCOME -> toName
+      TransactionKind.EXPENSE -> fromName
+      TransactionKind.TRANSFER, TransactionKind.ALLOCATION, TransactionKind.REALLOCATION ->
+        "$fromName → $toName"
+      else -> ""
+    },
+    amount = (if (moneyIn) "+" else "−") + money.whole(amount),
+    decimal = money.fraction(amount),
+    kind = when (kind) {
+      TransactionKind.INCOME, TransactionKind.DEBT_BORROW, TransactionKind.DEBT_REPAY_IN -> RowKind.Income
+      TransactionKind.EXPENSE, TransactionKind.DEBT_LEND, TransactionKind.DEBT_REPAY_OUT -> RowKind.Expense
+      TransactionKind.TRANSFER, TransactionKind.ALLOCATION, TransactionKind.REALLOCATION -> RowKind.Transfer
+    },
+    iconKey = when (kind) {
+      TransactionKind.INCOME, TransactionKind.EXPENSE -> category?.icon
+      else -> "sync_alt"
+    },
+    colorKey = when (kind) {
+      TransactionKind.INCOME, TransactionKind.EXPENSE -> category?.color
+      else -> null
+    },
+  )
+}
+
+/**
+ * A day's heading in a transaction feed — "Today · 27 Dec", "Mon · 22 Dec".
+ * [today] is sampled once by the caller so "Today" / "Yesterday" stay stable for
+ * the screen's life. Weekday/month names are still English enum short forms;
+ * full date localization is a separate effort.
+ */
+fun dateLabel(date: LocalDate, today: LocalDate): UiText {
+  val prefix = when (date.toEpochDays()) {
+    today.toEpochDays() -> UiText.Res(R.string.date_today)
+    today.toEpochDays() - 1 -> UiText.Res(R.string.date_yesterday)
+    else -> UiText.Raw(date.dayOfWeek.name.titleCase3())
+  }
+  return UiText.Res(R.string.date_label, listOf(prefix, date.dayOfMonth, date.month.name.titleCase3()))
+}
+
+/** "MONDAY" → "Mon", "DECEMBER" → "Dec". */
+private fun String.titleCase3(): String =
+  take(3).lowercase().replaceFirstChar { it.uppercase() }

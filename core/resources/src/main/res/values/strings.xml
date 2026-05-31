@@ -46,24 +46,27 @@
     <item quantity="other">%1$d days late</item>
   </plurals>
 
-  <!-- Home · recent feed -->
-  <string name="home_date_today">Today</string>
-  <string name="home_date_yesterday">Yesterday</string>
+  <!-- Transaction feed · day headings (shared by Home and Account detail) -->
+  <string name="date_today">Today</string>
+  <string name="date_yesterday">Yesterday</string>
   <!-- A day's heading in the feed: prefix · day month, e.g. "Today · 27 Dec". -->
-  <string name="home_date_label">%1$s · %2$d %3$s</string>
+  <string name="date_label">%1$s · %2$d %3$s</string>
+
+  <!-- Home · recent feed -->
   <string name="home_days_ago_today">today</string>
   <plurals name="home_days_ago">
     <item quantity="one">%1$d day ago</item>
     <item quantity="other">%1$d days ago</item>
   </plurals>
 
-  <!-- Home · transaction-kind row names (no user-named category of their own) -->
-  <string name="home_tx_transfer">Transfer</string>
-  <string name="home_tx_allocation">Allocation</string>
-  <string name="home_tx_reallocation">Reallocation</string>
-  <string name="home_tx_debt">Debt</string>
+  <!-- Transaction-kind row names — kinds with no user-named category of their
+       own (shared by Home and Account detail). -->
+  <string name="tx_transfer">Transfer</string>
+  <string name="tx_allocation">Allocation</string>
+  <string name="tx_reallocation">Reallocation</string>
+  <string name="tx_debt">Debt</string>
   <!-- Fallback when an income/expense has no category. -->
-  <string name="home_tx_uncategorized">—</string>
+  <string name="tx_uncategorized">—</string>
 
   <!-- Home · recent empty variants -->
   <string name="home_recent_empty_eyebrow">First entry</string>
@@ -113,5 +116,37 @@
   <string name="accounts_empty_title">No accounts yet.</string>
   <string name="accounts_empty_body">Add the first place your money sits — a bank, the cash in your wallet, a mobile wallet.</string>
   <string name="accounts_empty_action">Add an account</string>
+
+  <!-- Account detail -->
+  <string name="account_detail_type_real">Real account</string>
+  <string name="account_detail_type_budget">Budget</string>
+  <string name="account_detail_tag_real">Real</string>
+  <string name="account_detail_tag_budget">Budget</string>
+  <string name="account_detail_balance_label">Current balance</string>
+  <!-- Tag on the balance before any activity — the figure is the opening balance. -->
+  <string name="account_detail_balance_opening">Opening</string>
+  <!-- This month's movement strip. The In / Out cells append the month, e.g. "In · Dec". -->
+  <string name="account_detail_flow_in">In</string>
+  <string name="account_detail_flow_out">Out</string>
+  <string name="account_detail_flow_net">Net</string>
+  <!-- A label joined with the current month: "In · Dec". -->
+  <string name="account_detail_flow_period">%1$s · %2$s</string>
+  <!-- Quick actions -->
+  <string name="account_detail_qa_income_label">Income</string>
+  <string name="account_detail_qa_income_sub">money in</string>
+  <string name="account_detail_qa_expense_label">Expense</string>
+  <string name="account_detail_qa_expense_sub">spend</string>
+  <string name="account_detail_qa_transfer_label">Transfer</string>
+  <string name="account_detail_qa_transfer_sub">to / from</string>
+  <!-- Activity section -->
+  <string name="account_detail_activity_title">Activity</string>
+  <string name="account_detail_activity_awaiting">Awaiting first entry</string>
+  <!-- Activity empty (no transactions yet) -->
+  <string name="account_detail_empty_eyebrow">First entry</string>
+  <string name="account_detail_empty_title">Nothing logged here yet.</string>
+  <string name="account_detail_empty_body">Tap an action above to record your first transaction. Entries appear here newest-first, grouped by day.</string>
+  <!-- The account is no longer available (archived or removed). -->
+  <string name="account_detail_not_found_title">Account unavailable</string>
+  <string name="account_detail_not_found_body">This account is no longer active.</string>
 
 </resources>

@@ -27,6 +27,7 @@ import com.flowfin.core.navigation.ReportsRoute
 import com.flowfin.core.navigation.TOP_LEVEL_ROUTES
 import com.flowfin.core.navigation.rememberNavigationState
 import com.flowfin.core.navigation.toEntries
+import com.flowfin.feature.accounts.navigation.accountDetailEntry
 import com.flowfin.feature.accounts.navigation.accountsEntry
 import com.flowfin.feature.accounts.navigation.addAccountEntry
 import com.flowfin.feature.debts.navigation.debtsEntry
@@ -59,6 +60,7 @@ fun FlowFinApp() {
   val entryProvider = entryProvider {
     homeEntry(navigator)
     accountsEntry(navigator)
+    accountDetailEntry(navigator)
     recurringEntry()
     debtsEntry()
     reportsEntry()

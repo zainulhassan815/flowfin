@@ -32,3 +32,15 @@ data class AccountBalance(
   val account: Account,
   val balance: Money,
 )
+
+/**
+ * One account's movement over a window — the In / Out / Net strip on Account
+ * detail. [inflow] sums rows where the account received, [outflow] where it
+ * paid; [net] (inflow − outflow) is exactly the balance change over the window.
+ */
+data class AccountFlow(
+  val inflow: Money,
+  val outflow: Money,
+) {
+  val net: Money get() = inflow - outflow
+}
