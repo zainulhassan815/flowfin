@@ -83,6 +83,7 @@ object FlowFinIcons {
   val ChevronRight: ImageVector by lazy { lineIcon("M9 18l6-6-6-6") }
   val Bank: ImageVector by lazy { lineIcon("M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3") }
   val Wallet: ImageVector by lazy { lineIcon("M20 12V8H6a2 2 0 0 1 0-4h12v4 M4 6v12c0 1.1.9 2 2 2h14v-4 M18 12a2 2 0 0 0 0 4h4v-4Z") }
+  val Mobile: ImageVector by lazy { lineIcon("M 8 2 L 16 2 A 2 2 0 0 1 18 4 L 18 20 A 2 2 0 0 1 16 22 L 8 22 A 2 2 0 0 1 6 20 L 6 4 A 2 2 0 0 1 8 2 Z M 11 18 L 13 18") }
   val Food: ImageVector by lazy { lineIcon("M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12") }
   val Groceries: ImageVector by lazy { lineIcon("M 8 20 a 1 1 0 1 0 2 0 a 1 1 0 1 0 -2 0 M 17 20 a 1 1 0 1 0 2 0 a 1 1 0 1 0 -2 0 M2 4h2.5l3 13h12L22 7H6") }
   val Rent: ImageVector by lazy { lineIcon("M3 11l9-8 9 8v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9z M9 22V12h6v10") }
@@ -167,6 +168,7 @@ private fun PreviewFlowFinIcons() = FlowFinTheme {
     "ChevronRight" to FlowFinIcons.ChevronRight,
     "Bank" to FlowFinIcons.Bank,
     "Wallet" to FlowFinIcons.Wallet,
+    "Mobile" to FlowFinIcons.Mobile,
     "Food" to FlowFinIcons.Food,
     "Groceries" to FlowFinIcons.Groceries,
     "Rent" to FlowFinIcons.Rent,

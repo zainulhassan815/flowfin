@@ -40,56 +40,90 @@ import com.flowfin.core.designsystem.theme.FlowFinTheme
  * lightweight prose entry where the surrounding surface already provides
  * enough containment. The cursor takes the cream accent so it reads as the
  * active focal point on the dark surface.
+ *
+ * Pass [label] for a mono caption above the field, [errorMessage] to mark it invalid
+ * (the underline and cursor turn negative and the message shows beneath), and [prefix]
+ * for a leading slot on the input line — e.g. a currency symbol like "Rs".
  */
 @Composable
 fun FlowFinTextField(
   value: String,
   onValueChange: (String) -> Unit,
   modifier: Modifier = Modifier,
+  label: String? = null,
   placeholder: String? = null,
+  errorMessage: String? = null,
+  prefix: (@Composable () -> Unit)? = null,
   enabled: Boolean = true,
   keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
   keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
   val palette = FlowFinTheme.colors
+  val isError = errorMessage != null
   val textStyle = FlowFinTheme.typography.bodyLg.copy(
     color = palette.text,
     fontSize = 20.sp,
   )
 
-  BasicTextField(
-    value = value,
-    onValueChange = onValueChange,
-    modifier = modifier
-      .fillMaxWidth()
-      .padding(top = 8.dp, bottom = 12.dp),
-    enabled = enabled,
-    singleLine = true,
-    textStyle = textStyle,
-    cursorBrush = SolidColor(palette.accent),
-    keyboardOptions = keyboardOptions,
-    keyboardActions = keyboardActions,
-    decorationBox = { inner ->
-      Column(modifier = Modifier.fillMaxWidth()) {
-        Box {
-          if (value.isEmpty() && placeholder != null) {
-            Text(
-              text = placeholder,
-              style = textStyle.copy(color = palette.textSoft),
-            )
+  Column(modifier = modifier.fillMaxWidth()) {
+    if (label != null) {
+      Text(
+        text = label.uppercase(),
+        modifier = Modifier.padding(bottom = 4.dp),
+        style = FlowFinTheme.typography.label,
+        color = palette.textSoft,
+      )
+    }
+
+    BasicTextField(
+      value = value,
+      onValueChange = onValueChange,
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 8.dp, bottom = 12.dp),
+      enabled = enabled,
+      singleLine = true,
+      textStyle = textStyle,
+      cursorBrush = SolidColor(if (isError) palette.negative else palette.accent),
+      keyboardOptions = keyboardOptions,
+      keyboardActions = keyboardActions,
+      decorationBox = { inner ->
+        Column(modifier = Modifier.fillMaxWidth()) {
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            if (prefix != null) {
+              prefix()
+              Spacer(Modifier.width(8.dp))
+            }
+            Box(modifier = Modifier.weight(1f)) {
+              if (value.isEmpty() && placeholder != null) {
+                Text(
+                  text = placeholder,
+                  style = textStyle.copy(color = palette.textSoft),
+                )
+              }
+              inner()
+            }
           }
-          inner()
+          Spacer(Modifier.size(8.dp))
+          Box(
+            modifier = Modifier
+              .fillMaxWidth()
+              .size(width = 0.dp, height = 1.dp)
+              .background(if (isError) palette.negative else palette.borderStrong),
+          )
         }
-        Spacer(Modifier.size(8.dp))
-        Box(
-          modifier = Modifier
-            .fillMaxWidth()
-            .size(width = 0.dp, height = 1.dp)
-            .background(palette.borderStrong),
-        )
-      }
-    },
-  )
+      },
+    )
+
+    if (errorMessage != null) {
+      Text(
+        text = errorMessage,
+        modifier = Modifier.padding(top = 8.dp),
+        style = FlowFinTheme.typography.caption,
+        color = palette.negative,
+      )
+    }
+  }
 }
 
 /**
@@ -164,6 +198,37 @@ private fun PreviewTextInputs() = FlowFinTheme {
 
     var empty by remember { mutableStateOf("") }
     FlowFinTextField(value = empty, onValueChange = { empty = it }, placeholder = "Add a note…")
+
+    var labelled by remember { mutableStateOf("HBL Savings") }
+    FlowFinTextField(
+      value = labelled,
+      onValueChange = { labelled = it },
+      label = "Account name",
+      placeholder = "e.g. HBL Savings",
+    )
+
+    var taken by remember { mutableStateOf("Cash") }
+    FlowFinTextField(
+      value = taken,
+      onValueChange = { taken = it },
+      label = "Account name",
+      errorMessage = "An account called “Cash” already exists",
+    )
+
+    var amount by remember { mutableStateOf("40,000") }
+    FlowFinTextField(
+      value = amount,
+      onValueChange = { amount = it },
+      label = "Opening balance",
+      placeholder = "0.00",
+      prefix = {
+        Text(
+          text = "Rs",
+          style = FlowFinTheme.typography.h2.copy(fontSize = 18.sp),
+          color = FlowFinTheme.colors.textMute,
+        )
+      },
+    )
 
     var query by remember { mutableStateOf("") }
     FlowFinSearchField(value = query, onValueChange = { query = it }, placeholder = "Search categories…")

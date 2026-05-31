@@ -21,6 +21,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object AddTransactionRoute : NavKey
 
+@Serializable data object AddAccountRoute : NavKey
+
 @Serializable data object TransactionsRoute : NavKey
 
 @Serializable data object SettingsRoute : NavKey

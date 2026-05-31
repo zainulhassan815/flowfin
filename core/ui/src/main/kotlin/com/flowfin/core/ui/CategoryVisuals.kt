@@ -32,6 +32,7 @@ fun categoryColor(key: String?): Color {
     "care" -> categories.care
     "bank" -> categories.bank
     "cash" -> categories.cash
+    "mobile" -> categories.mobile
     "debt" -> categories.debt
     else -> categories.other
   }
@@ -57,5 +58,6 @@ fun categoryIcon(key: String?): ImageVector = when (key) {
   "undo" -> FlowFinIcons.Transfer
   "bank" -> FlowFinIcons.Bank
   "wallet" -> FlowFinIcons.Wallet
+  "mobile" -> FlowFinIcons.Mobile
   else -> FlowFinIcons.Other
 }

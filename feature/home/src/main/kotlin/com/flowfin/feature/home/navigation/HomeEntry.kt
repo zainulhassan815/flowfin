@@ -5,6 +5,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.flowfin.core.navigation.AccountsRoute
+import com.flowfin.core.navigation.AddAccountRoute
 import com.flowfin.core.navigation.HomeRoute
 import com.flowfin.core.navigation.Navigator
 import com.flowfin.core.navigation.RecurringRoute
@@ -22,9 +23,10 @@ fun EntryProviderScope<NavKey>.homeEntry(navigator: Navigator) {
       onAllAccounts = { navigator.navigate(AccountsRoute) },
       onAllPending = { navigator.navigate(RecurringRoute) },
       onAllRecent = { navigator.navigate(TransactionsRoute) },
+      onAddAccount = { navigator.navigate(AddAccountRoute) },
       // TODO: wire once their destinations exist — onAccountClick/onTransactionClick
-      //  (detail screens), onPayPending (fire-schedule flow), onSearch, onSettings,
-      //  onAddAccount. Until then they intentionally no-op.
+      //  (detail screens), onPayPending (fire-schedule flow), onSearch, onSettings.
+      //  Until then they intentionally no-op.
     )
   }
 }

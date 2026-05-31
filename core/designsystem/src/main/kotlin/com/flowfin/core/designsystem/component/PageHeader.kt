@@ -45,6 +45,7 @@ fun FlowFinPageHeader(
   title: String,
   modifier: Modifier = Modifier,
   onBack: (() -> Unit)? = null,
+  backContentDescription: String = "Back",
   actionLabel: String? = null,
   actionTint: Color = FlowFinTheme.colors.accent,
   onAction: () -> Unit = {},
@@ -68,7 +69,7 @@ fun FlowFinPageHeader(
         FlowFinOutlinedIconButton(
           onClick = onBack,
           icon = Icons.Rounded.ChevronLeft,
-          contentDescription = "Back",
+          contentDescription = backContentDescription,
         )
       } else {
         Box(Modifier)

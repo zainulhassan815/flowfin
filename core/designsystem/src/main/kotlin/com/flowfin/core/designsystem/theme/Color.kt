@@ -47,6 +47,7 @@ data class FlowFinColors(
 data class CategoryColors(
   val bank: Color,
   val cash: Color,
+  val mobile: Color,
   val food: Color,
   val grocery: Color,
   val transport: Color,
@@ -106,6 +107,7 @@ val flowFinDarkColors = FlowFinColors(
   categories = CategoryColors(
     bank      = Color(0xFF82C5D4),
     cash      = Color(0xFFC5D982),
+    mobile    = Color(0xFFC98ED4),
     food      = Color(0xFFE8A87B),
     grocery   = Color(0xFFA8D479),
     transport = Color(0xFF8AB4E0),

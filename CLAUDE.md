@@ -44,3 +44,4 @@ SDK path comes from `local.properties` (gitignored).
 - [`docs/decisions.md`](docs/decisions.md) — stack, architecture, error handling, quality bar.
 - [`docs/design-system.md`](docs/design-system.md) — the component library (all 23 sections shipped).
 - [`docs/localization.md`](docs/localization.md) — where strings live (`:core:resources`) and how `UiText` carries copy out of ViewModels.
+- [`docs/feature-anatomy.md`](docs/feature-anatomy.md) — how a `:feature:*` is built end to end (state, ViewModel, screen, navigation); the base shape for a new feature.
