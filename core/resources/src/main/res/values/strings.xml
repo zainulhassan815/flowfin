@@ -92,4 +92,26 @@
   <string name="account_kind_cash">Cash</string>
   <string name="account_kind_mobile">Mobile</string>
 
+  <!-- Accounts list (tab) -->
+  <string name="accounts_title">Accounts</string>
+  <string name="accounts_action_add">Add account</string>
+  <string name="accounts_total_label">Total holdings</string>
+  <string name="accounts_breakdown_real">Real</string>
+  <string name="accounts_breakdown_budget">Budget</string>
+  <string name="accounts_breakdown_count">Accounts</string>
+  <string name="accounts_section_real">Real</string>
+  <string name="accounts_section_budget">Budget</string>
+  <!-- Budget section when real accounts exist but no envelopes yet. -->
+  <string name="accounts_budgets_empty_eyebrow">Optional</string>
+  <string name="accounts_budgets_empty_title">No budgets set.</string>
+  <string name="accounts_budgets_empty_body">Set aside part of a real account to watch a category — Food, Transport, anything you want to keep an eye on.</string>
+  <string name="accounts_budgets_empty_action">Set a budget</string>
+  <!-- Faint section total when the budget section is empty. -->
+  <string name="accounts_budgets_total_empty">empty</string>
+  <!-- Whole-screen empty: no accounts at all. -->
+  <string name="accounts_empty_eyebrow">Where money lives</string>
+  <string name="accounts_empty_title">No accounts yet.</string>
+  <string name="accounts_empty_body">Add the first place your money sits — a bank, the cash in your wallet, a mobile wallet.</string>
+  <string name="accounts_empty_action">Add an account</string>
+
 </resources>

@@ -58,7 +58,7 @@ fun FlowFinApp() {
 
   val entryProvider = entryProvider {
     homeEntry(navigator)
-    accountsEntry()
+    accountsEntry(navigator)
     recurringEntry()
     debtsEntry()
     reportsEntry()
