@@ -1,5 +1,6 @@
 package com.flowfin.core.ui
 
+import android.content.Context
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
@@ -37,6 +38,27 @@ private fun resolveArgs(args: List<Any>): Array<Any> {
   for (i in args.indices) {
     val arg = args[i]
     resolved[i] = if (arg is UiText) arg.asString() else arg
+  }
+  @Suppress("UNCHECKED_CAST")
+  return resolved as Array<Any>
+}
+
+/**
+ * Resolve outside composition — for one-shot consumers like a snackbar shown from a
+ * coroutine, where [asString] (a composition API) can't be called.
+ */
+fun UiText.resolve(context: Context): String = when (this) {
+  is UiText.Raw -> value
+  is UiText.Res -> context.getString(id, *resolveArgs(context, args))
+  is UiText.Plural ->
+    context.resources.getQuantityString(id, count, *resolveArgs(context, args.ifEmpty { listOf(count) }))
+}
+
+private fun resolveArgs(context: Context, args: List<Any>): Array<Any> {
+  val resolved = arrayOfNulls<Any>(args.size)
+  for (i in args.indices) {
+    val arg = args[i]
+    resolved[i] = if (arg is UiText) arg.resolve(context) else arg
   }
   @Suppress("UNCHECKED_CAST")
   return resolved as Array<Any>

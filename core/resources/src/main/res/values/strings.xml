@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+  <!-- Common · shared across screens -->
+  <string name="action_back">Back</string>
+
   <!-- Home · top bar -->
   <string name="home_action_search">Search</string>
   <string name="home_action_settings">Settings</string>
@@ -69,5 +72,24 @@
   <string name="home_recent_quiet_eyebrow">A quiet stretch</string>
   <string name="home_recent_quiet_title">Nothing logged this week.</string>
   <string name="home_recent_quiet_body">Your last entry was %1$s. Tap + to add today\'s.</string>
+
+  <!-- Add account -->
+  <string name="add_account_title">New account</string>
+  <string name="add_account_name_label">Account name</string>
+  <string name="add_account_name_hint_bank">e.g. HBL Savings</string>
+  <string name="add_account_name_hint_cash">e.g. Cash in hand</string>
+  <string name="add_account_name_hint_mobile">e.g. JazzCash</string>
+  <string name="add_account_kind_label">Kind</string>
+  <string name="add_account_balance_label">Opening balance</string>
+  <string name="add_account_submit">Add account</string>
+  <!-- Inline error when the name collides with an existing active account. -->
+  <string name="add_account_duplicate_name">An account called “%1$s” already exists</string>
+  <!-- The unexpected/DB backstop, surfaced as a snackbar. -->
+  <string name="add_account_error_generic">Couldn\'t create the account. Please try again.</string>
+
+  <!-- Account kinds (real-account presets) -->
+  <string name="account_kind_bank">Bank</string>
+  <string name="account_kind_cash">Cash</string>
+  <string name="account_kind_mobile">Mobile</string>
 
 </resources>

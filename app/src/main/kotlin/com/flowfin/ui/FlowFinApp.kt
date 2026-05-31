@@ -28,6 +28,7 @@ import com.flowfin.core.navigation.TOP_LEVEL_ROUTES
 import com.flowfin.core.navigation.rememberNavigationState
 import com.flowfin.core.navigation.toEntries
 import com.flowfin.feature.accounts.navigation.accountsEntry
+import com.flowfin.feature.accounts.navigation.addAccountEntry
 import com.flowfin.feature.debts.navigation.debtsEntry
 import com.flowfin.feature.home.navigation.homeEntry
 import com.flowfin.feature.recurring.navigation.recurringEntry
@@ -62,6 +63,7 @@ fun FlowFinApp() {
     debtsEntry()
     reportsEntry()
     addTransactionEntry(navigator)
+    addAccountEntry(navigator)
     transactionsEntry()
   }
 

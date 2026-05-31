@@ -83,6 +83,7 @@ private fun PreviewCategories() = TokenPanel("Categories") {
     listOf(
       Swatch("bank", bank, "#82C5D4"),
       Swatch("cash", cash, "#C5D982"),
+      Swatch("mobile", mobile, "#C98ED4"),
       Swatch("food", food, "#E8A87B"),
       Swatch("grocery", grocery, "#A8D479"),
       Swatch("transport", transport, "#8AB4E0"),

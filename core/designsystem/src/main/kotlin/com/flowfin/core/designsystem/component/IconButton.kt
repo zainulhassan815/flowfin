@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.flowfin.core.designsystem.theme.FlowFinTheme
 
@@ -61,6 +62,7 @@ fun FlowFinOutlinedIconButton(
   contentDescription: String?,
   modifier: Modifier = Modifier,
   enabled: Boolean = true,
+  iconSize: Dp = 20.dp,
 ) {
   OutlinedIconButton(
     onClick = onClick,
@@ -79,7 +81,7 @@ fun FlowFinOutlinedIconButton(
     Icon(
       imageVector = icon,
       contentDescription = contentDescription,
-      modifier = Modifier.size(14.dp),
+      modifier = Modifier.size(iconSize),
     )
   }
 }

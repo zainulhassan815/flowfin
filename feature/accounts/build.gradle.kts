@@ -5,3 +5,12 @@ plugins {
 android {
   namespace = "com.flowfin.feature.accounts"
 }
+
+dependencies {
+  implementation(libs.arrow.core)
+
+  testImplementation(libs.kotlin.test)
+  testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.turbine)
+}

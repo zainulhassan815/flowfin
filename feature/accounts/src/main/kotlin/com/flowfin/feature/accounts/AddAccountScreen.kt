@@ -1,0 +1,215 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
+package com.flowfin.feature.accounts
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
+import com.flowfin.core.designsystem.component.FlowFinButton
+import com.flowfin.core.designsystem.component.FlowFinPageHeader
+import com.flowfin.core.designsystem.component.FlowFinTextField
+import com.flowfin.core.designsystem.theme.FlowFinTheme
+import com.flowfin.core.resources.R
+import com.flowfin.core.ui.categoryColor
+import com.flowfin.core.ui.categoryIcon
+import androidx.compose.ui.res.stringResource
+
+private val HORIZONTAL = 24.dp
+
+@Composable
+fun AddAccountScreen(
+  state: AddAccountUiState,
+  snackbarHostState: SnackbarHostState,
+  modifier: Modifier = Modifier,
+  onBack: () -> Unit = {},
+  onNameChange: (String) -> Unit = {},
+  onSelectKind: (AccountKind) -> Unit = {},
+  onBalanceChange: (String) -> Unit = {},
+  onSave: () -> Unit = {},
+) {
+  Scaffold(
+    modifier = modifier,
+    containerColor = FlowFinTheme.colors.bg,
+    topBar = {
+      FlowFinPageHeader(
+        title = stringResource(R.string.add_account_title),
+        onBack = onBack,
+        backContentDescription = stringResource(R.string.action_back),
+      )
+    },
+    bottomBar = { BottomActions(state, onSave) },
+    snackbarHost = { SnackbarHost(snackbarHostState) },
+  ) { innerPadding ->
+    Column(
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(innerPadding)
+        .verticalScroll(rememberScrollState())
+        .padding(horizontal = HORIZONTAL),
+    ) {
+      Spacer(Modifier.height(8.dp))
+      NameField(state, onNameChange)
+      Spacer(Modifier.height(28.dp))
+      KindChooser(state.kind, onSelectKind)
+      Spacer(Modifier.height(28.dp))
+      BalanceField(state, onBalanceChange)
+      Spacer(Modifier.height(24.dp))
+    }
+  }
+}
+
+/** Sticky footer: the primary action (disabled until the form is valid). */
+@Composable
+private fun BottomActions(state: AddAccountUiState, onSave: () -> Unit) {
+  FlowFinButton(
+    onClick = onSave,
+    text = stringResource(R.string.add_account_submit),
+    enabled = state.canSave,
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(horizontal = HORIZONTAL)
+      .padding(top = 8.dp, bottom = 20.dp),
+  )
+}
+
+@Composable
+private fun NameField(state: AddAccountUiState, onNameChange: (String) -> Unit) {
+  FlowFinTextField(
+    value = state.name,
+    onValueChange = onNameChange,
+    label = stringResource(R.string.add_account_name_label),
+    placeholder = stringResource(state.kind.nameHintRes),
+    errorMessage = if (state.nameError == NameError.Taken) {
+      stringResource(R.string.add_account_duplicate_name, state.name.trim())
+    } else {
+      null
+    },
+    keyboardOptions = KeyboardOptions(
+      capitalization = KeyboardCapitalization.Words,
+      imeAction = ImeAction.Done,
+    ),
+  )
+}
+
+@Composable
+private fun KindChooser(selected: AccountKind, onSelectKind: (AccountKind) -> Unit) {
+  Text(
+    text = stringResource(R.string.add_account_kind_label).uppercase(),
+    modifier = Modifier.padding(bottom = 10.dp),
+    style = FlowFinTheme.typography.label,
+    color = FlowFinTheme.colors.textSoft,
+  )
+  Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+    AccountKind.entries.forEach { kind ->
+      KindChip(
+        kind = kind,
+        selected = kind == selected,
+        onClick = { onSelectKind(kind) },
+        modifier = Modifier.weight(1f),
+      )
+    }
+  }
+}
+
+@Composable
+private fun KindChip(kind: AccountKind, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+  val palette = FlowFinTheme.colors
+  val color = categoryColor(kind.colorKey)
+  val shape = RoundedCornerShape(12.dp)
+  Row(
+    modifier = modifier
+      .clip(shape)
+      .border(1.dp, if (selected) color else palette.borderStrong, shape)
+      .background(if (selected) color.copy(alpha = 0.07f) else Color.Transparent)
+      .clickable(onClick = onClick)
+      .padding(vertical = 11.dp),
+    horizontalArrangement = Arrangement.Center,
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Icon(
+      imageVector = categoryIcon(kind.iconKey),
+      contentDescription = null,
+      tint = if (selected) color else palette.textSoft,
+      modifier = Modifier.size(16.dp),
+    )
+    Spacer(Modifier.size(8.dp))
+    Text(
+      text = stringResource(kind.labelRes).uppercase(),
+      style = FlowFinTheme.typography.caption.copy(letterSpacing = 0.14.em),
+      color = if (selected) color else palette.textSoft,
+    )
+  }
+}
+
+@Composable
+private fun BalanceField(state: AddAccountUiState, onBalanceChange: (String) -> Unit) {
+  FlowFinTextField(
+    value = state.balance,
+    onValueChange = onBalanceChange,
+    label = stringResource(R.string.add_account_balance_label),
+    placeholder = "0.00",
+    prefix = {
+      Text(
+        text = state.currency,
+        style = FlowFinTheme.typography.h2.copy(fontSize = 18.sp),
+        color = FlowFinTheme.colors.textMute,
+      )
+    },
+    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
+  )
+}
+
+@Preview(name = "Add account · empty", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
+@Composable
+private fun PreviewAddAccountEmpty() = FlowFinTheme {
+  AddAccountScreen(state = AddAccountUiState(currency = "Rs"), snackbarHostState = remember { SnackbarHostState() })
+}
+
+@Preview(name = "Add account · name taken", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
+@Composable
+private fun PreviewAddAccountTaken() = FlowFinTheme {
+  AddAccountScreen(
+    state = AddAccountUiState(name = "Cash", kind = AccountKind.Cash, nameError = NameError.Taken, currency = "Rs"),
+    snackbarHostState = remember { SnackbarHostState() },
+  )
+}
+
+@Preview(name = "Add account · ready", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
+@Composable
+private fun PreviewAddAccountReady() = FlowFinTheme {
+  AddAccountScreen(
+    state = AddAccountUiState(name = "HBL Savings", balance = "40000", nameError = null, currency = "Rs"),
+    snackbarHostState = remember { SnackbarHostState() },
+  )
+}
