@@ -203,6 +203,14 @@ SELECT COALESCE(SUM(
 FROM transactions
 WHERE recorded_at >= :startAt AND recorded_at < :endAt;
 
+-- Cumulative expense outflow per account — drives budget-envelope progress
+-- (spend vs. funded). Envelopes don't reset, so this is all-time, not ranged.
+expenseByAccount:
+SELECT from_account_id AS account_id, COALESCE(SUM(amount_minor), 0) AS spent_minor
+FROM transactions
+WHERE kind = 'EXPENSE' AND from_account_id IS NOT NULL
+GROUP BY from_account_id;
+
 -- Expense breakdown by category, for Reports.
 expensesByCategoryInRange:
 SELECT category_id, COALESCE(SUM(amount_minor), 0) AS total_minor, COUNT(*) AS count

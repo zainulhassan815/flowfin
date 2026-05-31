@@ -36,6 +36,11 @@ internal class TransactionRepositoryImpl(
   override fun observeByAccount(accountId: AccountId, limit: Long, offset: Long): Flow<List<Transaction>> =
     queries.byAccount(accountId, limit, offset).asFlow().mapToList(dispatcher).map { rows -> rows.map { it.toModel() } }
 
+  override fun observeExpenseByAccount(): Flow<Map<AccountId, Money>> =
+    queries.expenseByAccount().asFlow().mapToList(dispatcher).map { rows ->
+      rows.associate { it.account_id to Money(it.spent_minor) }
+    }
+
   override suspend fun getById(id: TransactionId): Transaction? = withContext(dispatcher) {
     queries.selectById(id).executeAsOneOrNull()?.toModel()
   }

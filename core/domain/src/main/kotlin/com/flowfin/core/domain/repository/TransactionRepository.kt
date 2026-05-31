@@ -32,6 +32,13 @@ interface TransactionRepository {
   /** Every row touching one account, for Account detail. */
   fun observeByAccount(accountId: AccountId, limit: Long, offset: Long): Flow<List<Transaction>>
 
+  /**
+   * Cumulative expense outflow per account, keyed by id. Drives budget-envelope
+   * progress on the Accounts list: a budget's `spent`, with `funded = balance + spent`.
+   * Accounts with no expenses are absent from the map.
+   */
+  fun observeExpenseByAccount(): Flow<Map<AccountId, Money>>
+
   suspend fun getById(id: TransactionId): Transaction?
 
   suspend fun record(draft: TransactionDraft): Either<TransactionError, Transaction>

@@ -1,5 +1,6 @@
 package com.flowfin.core.ui
 
+import com.flowfin.core.designsystem.component.BudgetProgress
 import com.flowfin.core.designsystem.component.TransactionKind
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.TransactionId
@@ -22,6 +23,8 @@ data class AccountCardUi(
   val iconKey: String?,
   val colorKey: String?,
   val isBudget: Boolean,
+  /** Set for budget envelopes shown as boxed cards (spend vs. funded); null elsewhere. */
+  val progress: BudgetProgress? = null,
 )
 
 data class TxRowUi(
