@@ -8,6 +8,7 @@ import com.flowfin.core.domain.repository.AccountRepository
 import com.flowfin.core.domain.repository.TransactionRepository
 import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountBalance
+import com.flowfin.core.model.AccountFlow
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.AccountType
 import com.flowfin.core.model.CategoryId
@@ -114,6 +115,7 @@ private class SpendRepo(private val spend: Map<AccountId, Money>) : TransactionR
   override fun recentFeed(limit: Long): Flow<List<Transaction>> = throw NotImplementedError()
   override fun observeNetChange(startAt: Instant, endAt: Instant): Flow<Money> = throw NotImplementedError()
   override fun observeByAccount(accountId: AccountId, limit: Long, offset: Long): Flow<List<Transaction>> = throw NotImplementedError()
+  override fun observeFlow(accountId: AccountId, startAt: Instant, endAt: Instant): Flow<AccountFlow> = throw NotImplementedError()
   override suspend fun getById(id: TransactionId): Transaction? = throw NotImplementedError()
   override suspend fun record(draft: TransactionDraft): Either<TransactionError, Transaction> = throw NotImplementedError()
   override suspend fun updateContent(id: TransactionId, amount: Money, categoryId: CategoryId?, note: String?, recordedAt: Instant): Either<TransactionError, Unit> = throw NotImplementedError()

@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import com.flowfin.core.navigation.AccountDetailRoute
 import com.flowfin.core.navigation.AccountsRoute
 import com.flowfin.core.navigation.AddAccountRoute
 import com.flowfin.core.navigation.Navigator
@@ -18,8 +19,8 @@ fun EntryProviderScope<NavKey>.accountsEntry(navigator: Navigator) {
     AccountsListScreen(
       state = state,
       onAddAccount = { navigator.navigate(AddAccountRoute) },
-      // TODO: no destinations yet — onAccountClick (account detail, FLO-15) and
-      //  onSetBudget (Add-Budget flow) no-op until those screens exist.
+      onAccountClick = { id -> navigator.navigate(AccountDetailRoute(id.value.toString())) },
+      // TODO: onSetBudget (Add-Budget flow) no-ops until that screen exists.
     )
   }
 }

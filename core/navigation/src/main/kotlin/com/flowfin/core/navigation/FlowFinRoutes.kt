@@ -23,6 +23,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object AddAccountRoute : NavKey
 
+/**
+ * Account detail, pushed within the Accounts tab. [accountId] is the account's
+ * id in its plain string form — navigation stays free of the `core:model` typed
+ * ids, and the feature reparses it at the entry boundary.
+ */
+@Serializable data class AccountDetailRoute(val accountId: String) : NavKey
+
 @Serializable data object TransactionsRoute : NavKey
 
 @Serializable data object SettingsRoute : NavKey

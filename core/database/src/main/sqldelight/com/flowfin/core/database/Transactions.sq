@@ -203,6 +203,18 @@ SELECT COALESCE(SUM(
 FROM transactions
 WHERE recorded_at >= :startAt AND recorded_at < :endAt;
 
+-- In/out flow for one account over [startAt, endAt). `in` sums rows where the
+-- account was the destination (its balance rose), `out` where it was the source
+-- (its balance fell); net = in − out is the balance change over the window.
+-- Drives the In / Out / Net strip on Account detail.
+flowByAccountInRange:
+SELECT
+  COALESCE(SUM(CASE WHEN to_account_id   = :accountId THEN amount_minor ELSE 0 END), 0) AS in_minor,
+  COALESCE(SUM(CASE WHEN from_account_id = :accountId THEN amount_minor ELSE 0 END), 0) AS out_minor
+FROM transactions
+WHERE (from_account_id = :accountId OR to_account_id = :accountId)
+  AND recorded_at >= :startAt AND recorded_at < :endAt;
+
 -- Cumulative expense outflow per account — drives budget-envelope progress
 -- (spend vs. funded). Envelopes don't reset, so this is all-time, not ranged.
 expenseByAccount:

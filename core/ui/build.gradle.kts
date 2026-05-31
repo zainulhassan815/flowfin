@@ -12,4 +12,6 @@ dependencies {
   api(projects.core.designsystem)
   api(projects.core.model)
   api(projects.core.resources)
+
+  implementation(libs.kotlinx.datetime)
 }

@@ -2,6 +2,7 @@ package com.flowfin.core.domain.repository
 
 import arrow.core.Either
 import com.flowfin.core.domain.error.TransactionError
+import com.flowfin.core.model.AccountFlow
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.CategoryId
 import com.flowfin.core.model.Money
@@ -31,6 +32,13 @@ interface TransactionRepository {
 
   /** Every row touching one account, for Account detail. */
   fun observeByAccount(accountId: AccountId, limit: Long, offset: Long): Flow<List<Transaction>>
+
+  /**
+   * Inflow / outflow for one account over `[startAt, endAt)` — the In / Out / Net
+   * strip on Account detail. Net (inflow − outflow) is the balance change across
+   * the window, computed on read like every other balance figure.
+   */
+  fun observeFlow(accountId: AccountId, startAt: Instant, endAt: Instant): Flow<AccountFlow>
 
   /**
    * Cumulative expense outflow per account, keyed by id. Drives budget-envelope

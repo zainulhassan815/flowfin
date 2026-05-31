@@ -2,7 +2,6 @@ package com.flowfin.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.flowfin.core.designsystem.component.TransactionKind as RowKind
 import com.flowfin.core.domain.repository.AccountRepository
 import com.flowfin.core.domain.repository.CategoryRepository
 import com.flowfin.core.domain.repository.RecurringRepository
@@ -15,12 +14,12 @@ import com.flowfin.core.model.CategoryId
 import com.flowfin.core.model.Money
 import com.flowfin.core.model.RecurringSchedule
 import com.flowfin.core.model.Transaction
-import com.flowfin.core.model.TransactionKind
 import com.flowfin.core.resources.R
 import com.flowfin.core.ui.AccountCardUi
 import com.flowfin.core.ui.MoneyFormatter
-import com.flowfin.core.ui.TxRowUi
 import com.flowfin.core.ui.UiText
+import com.flowfin.core.ui.dateLabel
+import com.flowfin.core.ui.toRowUi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -198,72 +197,11 @@ class HomeViewModel(
       .groupBy { it.recordedAt.toLocalDateTime(zone).date } // newest-first feed → dates stay descending
       .map { (date, txns) ->
         RecentGroup(
-          dateLabel = dateLabel(date),
-          rows = txns.map { it.toRowUi(accountsById, categoriesById) },
+          dateLabel = dateLabel(date, today),
+          rows = txns.map { it.toRowUi(accountsById, categoriesById, money) },
         )
       }
-
-  private fun dateLabel(date: LocalDate): UiText {
-    val prefix = when (date.toEpochDays()) {
-      today.toEpochDays() -> UiText.Res(R.string.home_date_today)
-      today.toEpochDays() - 1 -> UiText.Res(R.string.home_date_yesterday)
-      // The weekday/month abbreviations are still English enum names — full
-      // date localization is a separate effort, tracked apart from this pass.
-      else -> UiText.Raw(date.dayOfWeek.name.titleCase3())
-    }
-    return UiText.Res(R.string.home_date_label, listOf(prefix, date.dayOfMonth, date.month.name.titleCase3()))
-  }
-
-  private fun Transaction.toRowUi(
-    accountsById: Map<AccountId, Account>,
-    categoriesById: Map<CategoryId, Category>,
-  ): TxRowUi {
-    val category = categoryId?.let { categoriesById[it] }
-    val fromName = fromAccountId?.let { accountsById[it]?.name }.orEmpty()
-    val toName = toAccountId?.let { accountsById[it]?.name }.orEmpty()
-    val moneyIn = kind == TransactionKind.INCOME ||
-      kind == TransactionKind.DEBT_BORROW ||
-      kind == TransactionKind.DEBT_REPAY_IN
-    return TxRowUi(
-      id = id,
-      name = when (kind) {
-        TransactionKind.INCOME, TransactionKind.EXPENSE ->
-          category?.name?.let(UiText::Raw) ?: UiText.Res(R.string.home_tx_uncategorized)
-        TransactionKind.TRANSFER -> UiText.Res(R.string.home_tx_transfer)
-        TransactionKind.ALLOCATION -> UiText.Res(R.string.home_tx_allocation)
-        TransactionKind.REALLOCATION -> UiText.Res(R.string.home_tx_reallocation)
-        TransactionKind.DEBT_BORROW, TransactionKind.DEBT_LEND,
-        TransactionKind.DEBT_REPAY_OUT, TransactionKind.DEBT_REPAY_IN -> UiText.Res(R.string.home_tx_debt)
-      },
-      meta = when (kind) {
-        TransactionKind.INCOME -> toName
-        TransactionKind.EXPENSE -> fromName
-        TransactionKind.TRANSFER, TransactionKind.ALLOCATION, TransactionKind.REALLOCATION ->
-          "$fromName → $toName"
-        else -> ""
-      },
-      amount = (if (moneyIn) "+" else "−") + money.whole(amount),
-      decimal = money.fraction(amount),
-      kind = when (kind) {
-        TransactionKind.INCOME, TransactionKind.DEBT_BORROW, TransactionKind.DEBT_REPAY_IN -> RowKind.Income
-        TransactionKind.EXPENSE, TransactionKind.DEBT_LEND, TransactionKind.DEBT_REPAY_OUT -> RowKind.Expense
-        TransactionKind.TRANSFER, TransactionKind.ALLOCATION, TransactionKind.REALLOCATION -> RowKind.Transfer
-      },
-      iconKey = when (kind) {
-        TransactionKind.INCOME, TransactionKind.EXPENSE -> category?.icon
-        else -> "sync_alt"
-      },
-      colorKey = when (kind) {
-        TransactionKind.INCOME, TransactionKind.EXPENSE -> category?.color
-        else -> null
-      },
-    )
-  }
 }
-
-/** "MONDAY" → "Mon", "DECEMBER" → "Dec". */
-private fun String.titleCase3(): String =
-  take(3).lowercase().replaceFirstChar { it.uppercase() }
 
 private const val RECENT_LIMIT = 20L
 private const val STOP_TIMEOUT_MS = 5_000L

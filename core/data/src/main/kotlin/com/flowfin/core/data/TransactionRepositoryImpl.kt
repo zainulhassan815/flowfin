@@ -7,6 +7,7 @@ import arrow.core.Either
 import com.flowfin.core.database.TransactionsQueries
 import com.flowfin.core.domain.error.TransactionError
 import com.flowfin.core.domain.repository.TransactionRepository
+import com.flowfin.core.model.AccountFlow
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.CategoryId
 import com.flowfin.core.model.Money
@@ -35,6 +36,11 @@ internal class TransactionRepositoryImpl(
 
   override fun observeByAccount(accountId: AccountId, limit: Long, offset: Long): Flow<List<Transaction>> =
     queries.byAccount(accountId, limit, offset).asFlow().mapToList(dispatcher).map { rows -> rows.map { it.toModel() } }
+
+  override fun observeFlow(accountId: AccountId, startAt: Instant, endAt: Instant): Flow<AccountFlow> =
+    queries.flowByAccountInRange(accountId, startAt, endAt).asFlow().mapToOne(dispatcher).map {
+      AccountFlow(inflow = Money(it.in_minor), outflow = Money(it.out_minor))
+    }
 
   override fun observeExpenseByAccount(): Flow<Map<AccountId, Money>> =
     queries.expenseByAccount().asFlow().mapToList(dispatcher).map { rows ->
