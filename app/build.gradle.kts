@@ -53,6 +53,9 @@ dependencies {
   implementation(projects.feature.reports)
   implementation(projects.feature.settings)
 
+  // Debug-only developer tools (DB seeding / reset). Absent from release builds.
+  debugImplementation(projects.devtools)
+
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.core.splashscreen)

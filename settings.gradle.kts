@@ -51,6 +51,10 @@ include(":feature:debts")
 include(":feature:reports")
 include(":feature:settings")
 
+// Debug-only developer tools (DB seeding / reset). Pulled into the app via
+// debugImplementation only — never on the release classpath.
+include(":devtools")
+
 check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
   """
   FlowFin requires JDK 17+ but is currently using JDK ${JavaVersion.current()}.

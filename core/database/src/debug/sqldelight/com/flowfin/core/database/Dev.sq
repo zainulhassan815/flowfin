@@ -1,0 +1,32 @@
+import kotlinx.datetime.Instant;
+
+-- Debug-only queries (devtools seeding / reset). This file lives in the `debug`
+-- SQLDelight source set, so these generate only in the debug variant — the
+-- release database never carries them. Tables are declared in the main `.sq`
+-- files; the debug variant compiles main + debug together, so they resolve here.
+
+deleteAllTransactions:
+DELETE FROM transactions;
+
+deleteAllRecurring:
+DELETE FROM recurring_schedules;
+
+deleteAllDebts:
+DELETE FROM debts;
+
+-- Budgets reference a real parent, so clear them before the real accounts.
+deleteBudgets:
+DELETE FROM accounts WHERE type = 'BUDGET';
+
+deleteAllAccounts:
+DELETE FROM accounts;
+
+deleteAllCategories:
+DELETE FROM categories;
+
+deleteAllPersons:
+DELETE FROM persons;
+
+-- Backdate creation so "established" seed scenarios clear Home's settling window.
+backdateAccountsCreatedAt:
+UPDATE accounts SET created_at = :createdAt, updated_at = :createdAt;

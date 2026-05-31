@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.flowfin.core.designsystem.theme.FlowFinTheme
+import com.flowfin.ui.DevToolsHost
 import com.flowfin.ui.FlowFinApp
 import org.koin.compose.KoinContext
 
@@ -25,7 +26,10 @@ private fun FlowFinRoot() {
   KoinContext {
     FlowFinTheme {
       Surface(modifier = Modifier.fillMaxSize(), color = FlowFinTheme.colors.bg) {
-        FlowFinApp()
+        // Debug builds overlay a hideable dev-tools launcher; release is a passthrough.
+        DevToolsHost {
+          FlowFinApp()
+        }
       }
     }
   }
