@@ -9,6 +9,7 @@ FlowFin is an Android personal-finance app: Kotlin 2.3, Jetpack Compose + Materi
 - `core/designsystem/` — `theme/` for tokens (`FlowFinTheme`, `FlowFinColors`, `FlowFinTypography`), `component/` for the Compose component library, `icon/FlowFinIcons.kt` for the line-icon set, each with co-located `@Preview`s.
 - `core/{common, model, domain, data}/` — JVM-only libraries except `data` which is android-library for the DB driver context. Currently empty scaffolds — models, repositories, and use cases aren't built yet (domain design is the next effort). Note: the typed IDs and schema enums presently live in `core/database`; relocating them so `core/model` can share them is part of that design.
 - `feature/{home, accounts, transactions, recurring, debts, reports, settings}/` — one module per tab.
+- `devtools/` — debug-only DB seeding/reset (named scenarios, wipe, reseed). On the classpath via `debugImplementation` only; never in release. See [`docs/devtools.md`](docs/devtools.md).
 - `docs/` — PRD, data model, decisions, design-system progress, empty-state inventory.
 - `experiments/sqlite/` — schema/seed/queries/stress tests used to validate the model before SQLDelight wiring.
 
@@ -46,3 +47,4 @@ SDK path comes from `local.properties` (gitignored).
 - [`docs/design-system.md`](docs/design-system.md) — the component library (all 23 sections shipped).
 - [`docs/localization.md`](docs/localization.md) — where strings live (`:core:resources`) and how `UiText` carries copy out of ViewModels.
 - [`docs/feature-anatomy.md`](docs/feature-anatomy.md) — how a `:feature:*` is built end to end (state, ViewModel, screen, navigation); the base shape for a new feature.
+- [`docs/devtools.md`](docs/devtools.md) — the debug-only `:devtools` module: seed named DB scenarios, wipe, reseed.
