@@ -20,7 +20,7 @@ Progress through the components from `design/system/components.html`. Each row i
 | 14 | Insight cards | small dashboard cards (warning / positive / info) | small | done |
 | 15 | Hints, banners & people | hint banner · warn banner · notification preview · person avatars · timeline | medium | done |
 | 16 | Progress bars | linear progress with optional spend/budget framing | small | done |
-| 17 | Navigation | bottom nav bar (5 tabs + indicator) | medium | done |
+| 17 | Navigation | bottom nav bar (5 tabs + indicator) | medium | done — self-insets via `navigationBarsPadding()` |
 | 18 | Progress dots | onboarding pagination dots | trivial | done |
 | 19 | Charts | the pie + bar charts in Reports | medium-large | done |
 | 20 | Receipt thumbnail | small attachment preview | small | done |
@@ -36,6 +36,13 @@ Progress through the components from `design/system/components.html`. Each row i
 - **Calendar (9) + Charts (19)** unlock Reports.
 - **Bottom sheets (21)** is required by Form rows for picker UX.
 - **Empty states (22, 23)** are screen-level and consume other primitives; do them last.
+
+## App scaffolding (beyond `components.html`)
+
+Layout primitives the design didn't enumerate but every screen leans on. They own the app's window-inset standard so features don't re-derive it (full rules in [`feature-anatomy.md`](feature-anatomy.md#window-insets--edge-to-edge)).
+
+- `component/ScreenScaffold.kt` — `FlowFinScreenScaffold`, the shell for a pushed screen (detail / add / edit): a status-bar-padded `topBar`, a body that fills the middle, and an optional sticky `bottomBar` that lifts above the navigation bar and the keyboard (`navigationBarsPadding().imePadding()`). Pushed screens compose this instead of an M3 `Scaffold`.
+- The app draws edge-to-edge (`enableEdgeToEdge()` in `MainActivity`); the shell (`FlowFinApp`) consumes no vertical insets, so `FlowFinNavBar` (section 17 above) and each screen own theirs.
 
 ## Foundations
 

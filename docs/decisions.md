@@ -121,6 +121,14 @@ Built first, before any feature.
 - Storybook-like — every component has a `@Preview` so it can be looked at in isolation.
 - Covers: colour and type tokens, theme setup, fonts, the component library, and the four empty-state patterns.
 
+## Window insets / edge-to-edge
+
+The app draws edge-to-edge and follows the Now-in-Android inset model: **the shell owns no vertical insets — each screen clears the system bars itself.** Chosen over a shell-owns-insets scheme because it lets content scroll under the transparent bars and makes the nested-`Scaffold` double-padding (each pushed screen re-reading `systemBars`) structurally impossible.
+
+- `enableEdgeToEdge()` in `MainActivity` (transparent bars, light icons — the app is always dark). The shell `Scaffold` is `contentWindowInsets = WindowInsets(0)` and consumes only horizontal/cutout insets.
+- Pushed screens compose `FlowFinScreenScaffold` (it owns top / bottom / IME); tab screens add `statusBarsPadding()` to their top bar; chrome (`FlowFinNavBar`) self-insets. No feature touches `windowSoftInputMode` — the IME arrives as `WindowInsets.ime` and `imePadding()` handles it.
+- The how-to and the rules live in [`feature-anatomy.md`](feature-anatomy.md#window-insets--edge-to-edge); never start a screen with a bare M3 `Scaffold`.
+
 ## Empty states
 
 Four treatments. Names stay the same in code as in the mockups:

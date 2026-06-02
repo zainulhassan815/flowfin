@@ -1,15 +1,15 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
-
 package com.flowfin.feature.accounts
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.flowfin.core.designsystem.component.FlowFinPageHeader
+import com.flowfin.core.designsystem.component.FlowFinScreenScaffold
 import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.resources.R
 import com.flowfin.core.ui.TxRowUi
@@ -35,9 +36,8 @@ fun AccountDetailScreen(
   onBack: () -> Unit = {},
   onAddTransaction: () -> Unit = {},
 ) {
-  Scaffold(
+  FlowFinScreenScaffold(
     modifier = modifier,
-    containerColor = FlowFinTheme.colors.bg,
     topBar = {
       FlowFinPageHeader(
         title = (state as? AccountDetailUiState.Content)?.typeLabel?.asString().orEmpty(),
@@ -45,25 +45,25 @@ fun AccountDetailScreen(
         backContentDescription = stringResource(R.string.action_back),
       )
     },
-  ) { innerPadding ->
-    Box(Modifier.fillMaxSize().padding(innerPadding)) {
-      when (state) {
-        AccountDetailUiState.Loading -> Unit // a brief blank; the read resolves immediately
-        AccountDetailUiState.NotFound -> NotFound()
-        is AccountDetailUiState.Content -> Content(state, onAddTransaction)
-      }
+  ) {
+    when (state) {
+      AccountDetailUiState.Loading -> Unit // a brief blank; the read resolves immediately
+      AccountDetailUiState.NotFound -> NotFound()
+      is AccountDetailUiState.Content -> Content(state, onAddTransaction)
     }
   }
 }
 
 @Composable
 private fun Content(state: AccountDetailUiState.Content, onAddTransaction: () -> Unit) {
-  LazyColumn(contentPadding = PaddingValues(top = 4.dp, bottom = 96.dp)) {
+  LazyColumn(contentPadding = PaddingValues(top = 4.dp, bottom = 24.dp)) {
     item(key = "hero") { Hero(state) }
     item(key = "balance") { BalanceBlock(state) }
     if (state.flow != null) item(key = "flow") { FlowStrip(state.flow, state.currency) }
     item(key = "quick") { QuickActions(onAddTransaction) }
     activitySection(state)
+    // Last row clears the gesture bar (this is a pushed screen — no nav bar below).
+    item(key = "bottom-inset") { Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars)) }
   }
 }
 

@@ -1,12 +1,20 @@
 package com.flowfin.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.NavKey
@@ -73,7 +81,11 @@ fun FlowFinApp() {
   val onTabRoot = navState.currentKey == navState.currentTopLevelKey
 
   Scaffold(
-    containerColor = FlowFinTheme.colors.bg,
+    // The shell owns no vertical insets — it draws edge-to-edge and each screen
+    // (and the chrome below) clears the status / nav bars itself. Only display
+    // cutouts on the sides are consumed here, for the whole app at once.
+    containerColor = Color.Transparent,
+    contentWindowInsets = WindowInsets(0, 0, 0, 0),
     bottomBar = {
       if (onTabRoot) {
         FlowFinNavBar {
@@ -99,12 +111,18 @@ fun FlowFinApp() {
       }
     },
   ) { innerPadding ->
-    NavDisplay(
-      entries = navState.toEntries(entryProvider),
-      onBack = { navigator.goBack() },
+    Box(
       modifier = Modifier
         .fillMaxSize()
-        .padding(innerPadding),
-    )
+        .padding(innerPadding)
+        .consumeWindowInsets(innerPadding)
+        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
+    ) {
+      NavDisplay(
+        entries = navState.toEntries(entryProvider),
+        onBack = { navigator.goBack() },
+        modifier = Modifier.fillMaxSize(),
+      )
+    }
   }
 }

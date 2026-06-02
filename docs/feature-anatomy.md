@@ -96,11 +96,21 @@ fun HomeScreen(
 ) { … }
 ```
 
+- **Start from a scaffold, never a bare M3 `Scaffold`.** A pushed screen (detail / add / edit) wraps its body in `FlowFinScreenScaffold` (`:core:designsystem`) — top bar + scrollable body + optional sticky bottom action, with all window-inset handling built in. A tab screen is a `Column` whose top bar applies `Modifier.statusBarsPadding()`. The why and the rules are in [Window insets / edge-to-edge](#window-insets--edge-to-edge) below; the one-line takeaway is *don't hand-roll insets or nest your own `Scaffold`*.
 - **Route on the sealed state with an exhaustive `when`.** Each arm renders its own subtree (`Loading` → a blank weighted box; `Empty` → hero + empty-state; `Content` → the list).
 - **Lists use `LazyColumn`, and sections are `LazyListScope` extension functions** (`fun LazyListScope.accountsSection(...)`). This keeps each section independently testable/movable and lets the whole screen scroll as one list. Give every item a stable `key` (e.g. `"acct-${row.id.value}"`) and a `contentType` so Compose can recycle correctly.
 - **Compose from the design system; never rebuild M3 mechanics.** Reach for `FlowFinTileIcon`, `FlowFinTransactionRow`, `FlowFinEmptyState`, `FlowFinIconButton`, etc. Pull all color/typography from `FlowFinTheme.colors` / `FlowFinTheme.typography` — no hardcoded hex or `sp` magic outside small, local layout tweaks. Icons come from `FlowFinIcons`, resolved from string keys via `categoryIcon()` / `categoryColor()`.
 - **Resolve `UiText` at the point of use** with `.asString()`; resolve static copy with `stringResource(R.string.…)`. See [`localization.md`](localization.md).
 - **Co-locate `@Preview`s for every meaningful state.** Home previews Content, Empty, no-entries, quiet-week, and early-data — each wrapped in `FlowFinTheme`, with sample data inline (fixtures, not shipped strings).
+
+## Window insets / edge-to-edge
+
+The app draws edge-to-edge (`enableEdgeToEdge()` in `MainActivity`, transparent bars, light icons) and follows the Now-in-Android inset model: **the shell owns no vertical insets — each screen clears the system bars itself.** This is what makes content scroll under the transparent bars and removes the nested-`Scaffold` double-padding that used to hit pushed screens.
+
+- **The shell (`FlowFinApp`) consumes nothing vertically.** Its `Scaffold` is `containerColor = Transparent`, `contentWindowInsets = WindowInsets(0)`, and its content `Box` applies only `safeDrawing.only(Horizontal)` (display cutouts) plus `consumeWindowInsets(innerPadding)`. The bottom nav and FAB self-inset (`FlowFinNavBar` applies `navigationBarsPadding()` so its background still bleeds to the edge while the tab items lift).
+- **Pushed screens (detail / add / edit) use `FlowFinScreenScaffold`** (`:core:designsystem`). It owns the insets once: the `topBar` clears the status bar, an optional sticky `bottomBar` lifts above the nav bar *and* the keyboard (`navigationBarsPadding().imePadding()`), and the body fills the space between. Never wrap a pushed screen in its own M3 `Scaffold` — that re-reads `systemBars` and double-pads.
+- **Tab screens own their own top.** Home and the Accounts list add `Modifier.statusBarsPadding()` to their top bar; the shell's `innerPadding` still supplies bottom clearance for the nav bar. A scrolling body with no bottom bar ends with `Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))` so its last row clears the gesture bar.
+- **The IME is handled by `imePadding()`, not `adjustResize`.** Edge-to-edge sets `decorFitsSystemWindows = false`, so the keyboard arrives as `WindowInsets.ime` and the scaffold's sticky bottom action rises above it — no manifest `windowSoftInputMode` change.
 
 ## Display models and mapping
 
@@ -154,7 +164,7 @@ Writes call a use case and branch on `Either`: `Right` → emit a success effect
 1. `build.gradle.kts` — apply `flowfin.android.feature`, set namespace, add only extra deps.
 2. `XUiState.kt` — sealed `UiState` with `Loading` + data-derived states; feature display models; push empties to the smallest scope.
 3. `XViewModel.kt` — inject repositories + `MoneyFormatter` (+ `Clock`/`TimeZone` if time matters); `combine(...).stateIn(WhileSubscribed(5_000), Loading)`; pure `buildState`; private mapping extensions; sample `now` once.
-4. `XScreen.kt` — stateless, hoisted callbacks, `when` over state, `LazyListScope` sections with stable keys, design-system components + theme tokens, `@Preview` per state.
+4. `XScreen.kt` — stateless, hoisted callbacks, `when` over state, `LazyListScope` sections with stable keys, design-system components + theme tokens, `@Preview` per state. Pushed screen → `FlowFinScreenScaffold`; tab screen → top bar with `statusBarsPadding()`. Never a bare `Scaffold` (see [Window insets](#window-insets--edge-to-edge)).
 5. `di/XModule.kt` — `viewModelOf(::XViewModel)`.
 6. `navigation/XEntry.kt` — `EntryProviderScope.xEntry(navigator?)`, `koinViewModel`, `collectAsStateWithLifecycle`, wire callbacks; add a `LaunchedEffect` for effects if it's a write flow.
 7. Wire into `:core:navigation` routes and `FlowFinApp` (entryProvider + Koin modules + tabs).
