@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -29,6 +28,7 @@ import com.flowfin.core.designsystem.component.FlowFinHeroAmount
 import com.flowfin.core.designsystem.component.FlowFinModalBottomSheet
 import com.flowfin.core.designsystem.component.FlowFinPageHeader
 import com.flowfin.core.designsystem.component.FlowFinPickerRow
+import com.flowfin.core.designsystem.component.FlowFinScreenScaffold
 import com.flowfin.core.designsystem.component.FlowFinSheetHeader
 import com.flowfin.core.designsystem.component.FlowFinTextField
 import com.flowfin.core.designsystem.component.FlowFinScopeTabs
@@ -65,19 +65,27 @@ fun AddTransactionScreen(
     EntryType.Transfer -> palette.transfer
   }
 
-  Scaffold(
+  FlowFinScreenScaffold(
     modifier = modifier,
-    containerColor = palette.bg,
+    topBar = { FlowFinPageHeader(title = "Add", onBack = onBack) },
+    bottomBar = {
+      FlowFinButton(
+        onClick = onSave,
+        text = "Save",
+        enabled = state.canSave,
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 24.dp)
+          .padding(top = 8.dp, bottom = 12.dp),
+      )
+    },
     snackbarHost = { SnackbarHost(snackbarHostState) },
-  ) { innerPadding ->
+  ) {
     Column(
       modifier = Modifier
         .fillMaxSize()
-        .padding(innerPadding)
         .verticalScroll(rememberScrollState()),
     ) {
-      FlowFinPageHeader(title = "Add", onBack = onBack)
-
       FlowFinScopeTabs(
         options = EntryType.entries,
         selected = state.type,
@@ -124,16 +132,6 @@ fun AddTransactionScreen(
         onKey = onKey,
         tint = tint,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
-      )
-
-      FlowFinButton(
-        onClick = onSave,
-        text = "Save",
-        enabled = state.canSave,
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 24.dp)
-          .padding(bottom = 24.dp),
       )
     }
   }

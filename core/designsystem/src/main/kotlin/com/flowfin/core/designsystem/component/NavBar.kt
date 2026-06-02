@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -57,7 +58,6 @@ fun FlowFinNavBar(
   Row(
     modifier = modifier
       .fillMaxWidth()
-      .height(88.dp)
       .background(palette.bg.copy(alpha = 0.92f))
       .drawBehind {
         drawRect(
@@ -66,7 +66,11 @@ fun FlowFinNavBar(
           size = Size(size.width, 1.dp.toPx()),
         )
       }
-      .padding(start = 12.dp, top = 14.dp, end = 12.dp),
+      // Background + hairline bleed to the physical bottom edge; only the tab
+      // items lift above the gesture bar (no-op when there's no inset, e.g. previews).
+      .navigationBarsPadding()
+      .height(72.dp)
+      .padding(start = 12.dp, top = 12.dp, end = 12.dp),
     verticalAlignment = Alignment.Top,
     content = content,
   )

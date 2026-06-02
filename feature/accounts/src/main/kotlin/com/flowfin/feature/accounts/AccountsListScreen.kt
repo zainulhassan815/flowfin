@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -83,6 +84,7 @@ private fun AccountsTopBar(onAddAccount: () -> Unit) {
   Row(
     modifier = Modifier
       .fillMaxWidth()
+      .statusBarsPadding()
       .padding(start = HORIZONTAL, end = 14.dp, top = 12.dp, bottom = 4.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {

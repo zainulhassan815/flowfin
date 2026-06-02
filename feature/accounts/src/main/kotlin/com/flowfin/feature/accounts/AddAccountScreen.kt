@@ -1,5 +1,3 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
-
 package com.flowfin.feature.accounts
 
 import androidx.compose.foundation.background
@@ -19,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -38,6 +35,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.flowfin.core.designsystem.component.FlowFinButton
 import com.flowfin.core.designsystem.component.FlowFinPageHeader
+import com.flowfin.core.designsystem.component.FlowFinScreenScaffold
 import com.flowfin.core.designsystem.component.FlowFinTextField
 import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.resources.R
@@ -58,9 +56,8 @@ fun AddAccountScreen(
   onBalanceChange: (String) -> Unit = {},
   onSave: () -> Unit = {},
 ) {
-  Scaffold(
+  FlowFinScreenScaffold(
     modifier = modifier,
-    containerColor = FlowFinTheme.colors.bg,
     topBar = {
       FlowFinPageHeader(
         title = stringResource(R.string.add_account_title),
@@ -70,11 +67,10 @@ fun AddAccountScreen(
     },
     bottomBar = { BottomActions(state, onSave) },
     snackbarHost = { SnackbarHost(snackbarHostState) },
-  ) { innerPadding ->
+  ) {
     Column(
       modifier = Modifier
         .fillMaxSize()
-        .padding(innerPadding)
         .verticalScroll(rememberScrollState())
         .padding(horizontal = HORIZONTAL),
     ) {
@@ -99,7 +95,7 @@ private fun BottomActions(state: AddAccountUiState, onSave: () -> Unit) {
     modifier = Modifier
       .fillMaxWidth()
       .padding(horizontal = HORIZONTAL)
-      .padding(top = 8.dp, bottom = 20.dp),
+      .padding(top = 8.dp, bottom = 12.dp),
   )
 }
 

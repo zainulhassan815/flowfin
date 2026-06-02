@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -108,6 +109,7 @@ private fun HomeTopBar(onSearch: () -> Unit, onSettings: () -> Unit) {
   Row(
     modifier = Modifier
       .fillMaxWidth()
+      .statusBarsPadding()
       .padding(start = 24.dp, end = 14.dp, top = 8.dp, bottom = 4.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
