@@ -20,6 +20,7 @@ import com.flowfin.core.model.Money
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.model.TransactionDraft
 import com.flowfin.core.model.TransactionId
+import com.flowfin.core.model.TransactionKind
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -133,7 +134,8 @@ internal class FakeTransactionRepository(
   override fun observeExpenseByAccount(): Flow<Map<AccountId, Money>> = flowOf(expenseByAccount)
   override fun observeByAccount(accountId: AccountId, limit: Long, offset: Long): Flow<List<Transaction>> = flowOf(byAccount)
   override fun observeFlow(accountId: AccountId, startAt: Instant, endAt: Instant): Flow<AccountFlow> = flowOf(flow)
-  override fun recentFeed(limit: Long): Flow<List<Transaction>> = throw NotImplementedError()
+  override fun feed(limit: Long): Flow<List<Transaction>> = throw NotImplementedError()
+  override fun feedOfKinds(kinds: Set<TransactionKind>, limit: Long): Flow<List<Transaction>> = throw NotImplementedError()
   override fun observeNetChange(startAt: Instant, endAt: Instant): Flow<Money> = throw NotImplementedError()
   override suspend fun getById(id: TransactionId): Transaction? = throw NotImplementedError()
   override suspend fun record(draft: TransactionDraft): Either<TransactionError, Transaction> = throw NotImplementedError()

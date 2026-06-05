@@ -157,10 +157,20 @@ SELECT *
 FROM transactions
 WHERE id = ?;
 
--- Home feed: newest first, limit at the call site.
-recentFeed:
+-- Newest-first feed, capped at the call site — Home's recent strip and the
+-- Transactions list's All view.
+feed:
 SELECT *
 FROM transactions
+ORDER BY recorded_at DESC, created_at DESC
+LIMIT :limit;
+
+-- Newest-first feed restricted to a set of kinds — the filtered Transactions list.
+-- Served by the (kind, recorded_at) index.
+feedOfKinds:
+SELECT *
+FROM transactions
+WHERE kind IN :kinds
 ORDER BY recorded_at DESC, created_at DESC
 LIMIT :limit;
 
@@ -257,13 +267,6 @@ SELECT *
 FROM transactions
 WHERE recurring_id = ?
 ORDER BY recorded_at DESC, created_at DESC;
-
-byKind:
-SELECT *
-FROM transactions
-WHERE kind = :kind
-ORDER BY recorded_at DESC, created_at DESC
-LIMIT :limit OFFSET :offset;
 
 insert:
 INSERT INTO transactions (

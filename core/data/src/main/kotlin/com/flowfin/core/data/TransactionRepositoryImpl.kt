@@ -14,8 +14,10 @@ import com.flowfin.core.model.Money
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.model.TransactionDraft
 import com.flowfin.core.model.TransactionId
+import com.flowfin.core.model.TransactionKind
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
@@ -28,8 +30,13 @@ internal class TransactionRepositoryImpl(
   private val dispatcher: CoroutineDispatcher,
 ) : TransactionRepository {
 
-  override fun recentFeed(limit: Long): Flow<List<Transaction>> =
-    queries.recentFeed(limit).asFlow().mapToList(dispatcher).map { rows -> rows.map { it.toModel() } }
+  override fun feed(limit: Long): Flow<List<Transaction>> =
+    queries.feed(limit).asFlow().mapToList(dispatcher).map { rows -> rows.map { it.toModel() } }
+
+  override fun feedOfKinds(kinds: Set<TransactionKind>, limit: Long): Flow<List<Transaction>> =
+    // An empty set would generate `IN ()`, which SQLite rejects; no kinds means no rows.
+    if (kinds.isEmpty()) flowOf(emptyList())
+    else queries.feedOfKinds(kinds, limit).asFlow().mapToList(dispatcher).map { rows -> rows.map { it.toModel() } }
 
   override fun observeNetChange(startAt: Instant, endAt: Instant): Flow<Money> =
     queries.netChangeInRange(startAt, endAt).asFlow().mapToOne(dispatcher).map { Money(it) }
