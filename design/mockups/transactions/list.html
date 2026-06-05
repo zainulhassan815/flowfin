@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Transactions / History / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  --cat-bank: #82C5D4;
+  --cat-cash: #C5D982;
+  --cat-food: #E8A87B;
+  --cat-transport: #8AB4E0;
+  --cat-fun: #C98ED4;
+  --cat-salary: #9CD4A2;
+  --cat-subs: #9A8AE0;
+  --cat-rent: #D89A82;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 20px; min-height: 100vh; overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+/* ===== Phone ===== */
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg); border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E, 0 0 0 12px #0A0A0C, 0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28), 0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Header (nav row) ===== */
+.page-header {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.icon-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  color: var(--text); cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.04); border-color: var(--text-faint); }
+.icon-btn.muted { color: var(--text-mute); }
+.icon-btn.muted:hover { color: var(--text); }
+.topbar-title {
+  text-align: center;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ===== Sticky controls block ===== */
+.controls {
+  flex-shrink: 0;
+  padding: 12px 20px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  position: relative; z-index: 4;
+}
+
+/* ===== Filter chips ===== */
+.chips { display: flex; gap: 7px; }
+.chip {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 8px 4px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+}
+.chip:hover { border-color: var(--border-strong); color: var(--text-mute); }
+.chip.active {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+}
+
+/* ===== Scroll ===== */
+.scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 0 20px 40px;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ===== Month group ===== */
+.month-group { margin-top: 0; }
+.month-head {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--bg);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 14px 0 6px;
+  border-bottom: 1px dashed var(--border-strong);
+}
+.month-name {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 500;
+}
+.month-net {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: -0.01em;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+.month-net .cur { font-family: var(--font-serif), serif; font-style: italic; margin-right: 2px; }
+.month-net.pos { color: var(--pos); }
+
+/* ===== Day sub-label ===== */
+.txn-date {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin: 16px 0 2px;
+  display: flex; align-items: center; gap: 7px;
+}
+.txn-date.today::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ===== Transaction row ===== */
+.txn-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.txn-row:hover .txn-name { color: #fff; }
+.txn-group .txn-row:last-child { border-bottom: none; }
+
+.txn-icon {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--icon-color, var(--text-mute));
+  background: var(--icon-bg, transparent);
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+.txn-icon.income       { --icon-color: var(--pos);          --icon-bg: rgba(156,212,162,0.10); }
+.txn-icon.transfer     { --icon-color: var(--transfer);     --icon-bg: rgba(130,197,212,0.10); }
+.txn-icon.cat-food     { --icon-color: var(--cat-food);     --icon-bg: rgba(232,168,123,0.10); }
+.txn-icon.cat-transport{ --icon-color: var(--cat-transport);--icon-bg: rgba(138,180,224,0.10); }
+.txn-icon.cat-fun      { --icon-color: var(--cat-fun);      --icon-bg: rgba(201,142,212,0.10); }
+.txn-icon.cat-rent     { --icon-color: var(--cat-rent);     --icon-bg: rgba(216,154,130,0.10); }
+.txn-icon.cat-subs     { --icon-color: var(--cat-subs);     --icon-bg: rgba(154,138,224,0.10); }
+.txn-icon.cat-salary   { --icon-color: var(--cat-salary);   --icon-bg: rgba(156,212,162,0.10); }
+
+.txn-body { flex: 1; min-width: 0; }
+.txn-name {
+  font-family: var(--font-serif), serif;
+  font-size: 16px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: color .12s;
+}
+.txn-meta {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  color: var(--text-soft);
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+  text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Amount column — expenses muted, income/transfer carry the colour */
+.txn-amount {
+  font-family: var(--font-mono), monospace;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: right;
+  letter-spacing: -0.02em;
+  color: var(--text-mute);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.txn-amount.pos { color: var(--pos); }
+.txn-amount.transfer { color: var(--transfer); }
+.txn-amount .dec { color: var(--text-faint); font-weight: 400; }
+
+/* ===== Filtered-empty (interactive) ===== */
+.filtered-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 70px 30px;
+  gap: 10px;
+}
+.filtered-empty .fe-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--text-faint); font-weight: 500;
+}
+.filtered-empty .fe-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 18px; color: var(--text-mute);
+}
+
+/* ===== End cap ===== */
+.list-end {
+  margin: 26px 0 4px;
+  text-align: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  display: flex; align-items: center; gap: 12px;
+}
+.list-end::before, .list-end::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* Home indicator */
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 6;
+}
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 03<br>
+  <em>Transactions — Full history (v2)</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark · try the chips</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Top bar: back · centered title · action -->
+  <div class="page-header">
+    <button class="icon-btn" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <div class="topbar-title">Transactions</div>
+    <button class="icon-btn muted" aria-label="Search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M21 21l-4.3-4.3"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Filter chips -->
+  <div class="controls">
+    <div class="chips" id="chips">
+      <button class="chip active" data-kind="all">All</button>
+      <button class="chip" data-kind="in">In</button>
+      <button class="chip" data-kind="out">Out</button>
+      <button class="chip" data-kind="transfer">Transfers</button>
+    </div>
+  </div>
+
+  <div class="scroll" id="scroll">
+
+    <!-- ===== DECEMBER ===== -->
+    <div class="month-group">
+      <div class="month-head">
+        <span class="month-name">December 2026</span>
+        <span class="month-net pos"><span class="cur">Rs</span>+37,500</span>
+      </div>
+
+      <div class="txn-group">
+        <div class="txn-date today">Today · 27 Dec</div>
+
+        <div class="txn-row" data-kind="transfer" data-amt="5000">
+          <div class="txn-icon transfer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h14M14 5l3 3-3 3M21 16H7M10 13l-3 3 3 3"/></svg>
+          </div>
+          <div class="txn-body">
+            <div class="txn-name">ATM withdrawal</div>
+            <div class="txn-meta">Bank → Cash</div>
+          </div>
+          <div class="txn-amount transfer">−5,000<span class="dec">.00</span></div>
+        </div>
+
+        <div class="txn-row" data-kind="out" data-amt="-1250">
+          <div class="txn-icon cat-food">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/></svg>
+          </div>
+          <div class="txn-body">
+            <div class="txn-name">Lunch with team</div>
+            <div class="txn-meta">Food · Cash</div>
+          </div>
+          <div class="txn-amount">−1,250<span class="dec">.00</span></div>
+        </div>
+      </div>
+
+      <div class="txn-group">
+        <div class="txn-date">Yesterday · 26 Dec</div>
+
+        <div class="txn-row" data-kind="in" data-amt="150000">
+          <div class="txn-icon income">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          </div>
+          <div class="txn-body">
+            <div class="txn-name">December salary</div>
+            <div class="txn-meta">Salary · Bank</div>
+          </div>
+          <div class="txn-amount pos">+1,50,000<span class="dec">.00</span></div>
+        </div>
+
+        <div class="txn-row" data-kind="transfer" data-amt="15000">
+          <div class="txn-icon transfer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h14M14 5l3 3-3 3M21 16H7M10 13l-3 3 3 3"/></svg>
+          </div>
+          <div class="txn-body">
+            <div class="txn-name">Allocated to Food</div>
+            <div class="txn-meta">Bank → Food</div>
+          </div>
+          <div class="txn-amount transfer">−15,000<span class="dec">.00</span></div>
+        </div>
+
+        <div class="txn-row" data-kind="out" data-amt="-3200">
+          <div class="txn-icon cat-transport">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6 17V9l2-4h8l2 4v8M7 17v2M17 17v2M8 9h8"/><circle cx="8.5" cy="13.5" r="1"/><circle cx="15.5" cy="13.5" r="1"/></svg>
+          </div>
+          <div class="txn-body">
+            <div class="txn-name">Fuel</div>
+            <div class="txn-meta">Transport · Cash</div>
+          </div>
+          <div class="txn-amount">−3,200<span class="dec">.00</span></div>
+        </div>
+      </div>
+
+      <div class="txn-group">
+        <div class="txn-date">25 Dec · Thu</div>
+
+        <div class="txn-row" data-kind="out" data-amt="-12000">
+          <div class="txn-icon cat-rent">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+          </div>
+          <div class="txn-body">
+            <div class="txn-name">December rent</div>
+            <div class="txn-meta">Rent · Bank</div>
+          </div>
+          <div class="txn-amount">−12,000<span class="dec">.00</span></div>
+        </div>
+
+        <div class="txn-row" data-kind="out" data-amt="-1500">
+          <div class="txn-icon cat-subs">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg>
+          </div>
+          <div class="txn-body">
+            <div class="txn-name">Netflix</div>
+            <div class="txn-meta">Subscriptions · Bank</div>
+          </div>
+          <div class="txn-amount">−1,500<span class="dec">.00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== NOVEMBER ===== -->
+    <div class="month-group">
+      <div class="month-head">
+        <span class="month-name">November 2026</span>
+        <span class="month-net"><span class="cur">Rs</span>−8,200</span>
+      </div>
+
+      <div class="txn-group">
+        <div class="txn-date">28 Nov · Fri</div>
+
+        <div class="txn-row" data-kind="out" data-amt="-4500">
+          <div class="txn-icon cat-fun">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>
+          </div>
+          <div class="txn-body">
+            <div class="txn-name">Concert tickets</div>
+            <div class="txn-meta">Fun · Cash</div>
+          </div>
+          <div class="txn-amount">−4,500<span class="dec">.00</span></div>
+        </div>
+
+        <div class="txn-row" data-kind="out" data-amt="-3700">
+          <div class="txn-icon cat-subs">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v16M18 4v16M9 8c1.5 0 2-1.5 4-1.5s2.5 1.5 4 1.5"/></svg>
+          </div>
+          <div class="txn-body">
+            <div class="txn-name">Gym membership</div>
+            <div class="txn-meta">Subscriptions · Bank</div>
+          </div>
+          <div class="txn-amount">−3,700<span class="dec">.00</span></div>
+        </div>
+      </div>
+
+      <div class="txn-group">
+        <div class="txn-date">22 Nov · Sat</div>
+
+        <div class="txn-row" data-kind="in" data-amt="20000">
+          <div class="txn-icon income">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          </div>
+          <div class="txn-body">
+            <div class="txn-name">Freelance project</div>
+            <div class="txn-meta">Side income · Bank</div>
+          </div>
+          <div class="txn-amount pos">+20,000<span class="dec">.00</span></div>
+        </div>
+
+        <div class="txn-row" data-kind="out" data-amt="-6800">
+          <div class="txn-icon cat-food">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/></svg>
+          </div>
+          <div class="txn-body">
+            <div class="txn-name">Groceries</div>
+            <div class="txn-meta">Food · Bank</div>
+          </div>
+          <div class="txn-amount">−6,800<span class="dec">.00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtered-empty (shown by JS when a chip yields nothing) -->
+    <div class="filtered-empty" id="filteredEmpty">
+      <div class="fe-eyebrow" id="feEyebrow">No transfers</div>
+      <div class="fe-title" id="feTitle">Nothing matches this filter.</div>
+    </div>
+
+    <div class="list-end" id="listEnd">Beginning · Mar 2026</div>
+
+  </div>
+
+  <div class="home-indicator"></div>
+</div>
+
+<script>
+(function () {
+  const rows = Array.from(document.querySelectorAll('.txn-row'));
+  const groups = Array.from(document.querySelectorAll('.txn-group'));
+  const months = Array.from(document.querySelectorAll('.month-group'));
+  const chips = Array.from(document.querySelectorAll('.chip'));
+  const fe = document.getElementById('filteredEmpty');
+  const feEyebrow = document.getElementById('feEyebrow');
+  const feTitle = document.getElementById('feTitle');
+  const listEnd = document.getElementById('listEnd');
+
+  function apply(kind) {
+    let count = 0;
+
+    rows.forEach(r => {
+      const show = kind === 'all' || r.dataset.kind === kind;
+      r.style.display = show ? '' : 'none';
+      if (show) count++;
+    });
+
+    // Collapse day-groups and months that have no visible rows.
+    groups.forEach(g => {
+      const any = g.querySelector('.txn-row:not([style*="display: none"])');
+      g.style.display = any ? '' : 'none';
+    });
+    months.forEach(m => {
+      const any = m.querySelector('.txn-group:not([style*="display: none"])');
+      m.style.display = any ? '' : 'none';
+    });
+
+    // Filtered-empty.
+    const empty = count === 0;
+    fe.style.display = empty ? 'flex' : 'none';
+    listEnd.style.display = empty ? 'none' : 'flex';
+    if (empty) {
+      const labels = { in: 'No income', out: 'No spending', transfer: 'No transfers' };
+      feEyebrow.textContent = labels[kind] || 'Nothing here';
+      feTitle.textContent = 'Nothing matches this filter.';
+    }
+  }
+
+  chips.forEach(c => c.addEventListener('click', () => {
+    chips.forEach(x => x.classList.toggle('active', x === c));
+    apply(c.dataset.kind);
+  }));
+
+  apply('all');
+})();
+</script>
+
+</body>
+</html>

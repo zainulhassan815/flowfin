@@ -71,7 +71,7 @@ class RecurringRepositoryTest {
     fire(schedule.id).rightOrFail()
 
     assertEquals(Money(16_000_000), accounts.balanceOf(bank.id))
-    val firing = transactions.recentFeed(10).first().firstOrNull { it.recurringId == schedule.id }
+    val firing = transactions.feed(10).first().firstOrNull { it.recurringId == schedule.id }
     assertNotNull(firing)
     assertEquals(date(2024, 2, 15), recurring.getById(schedule.id)?.nextDueAt)
   }
@@ -85,7 +85,7 @@ class RecurringRepositoryTest {
 
     assertEquals(Money(1_000_000), accounts.balanceOf(bank.id))
     assertEquals(date(2024, 2, 15), recurring.getById(schedule.id)?.nextDueAt)
-    assertTrue(transactions.recentFeed(10).first().none { it.recurringId == schedule.id })
+    assertTrue(transactions.feed(10).first().none { it.recurringId == schedule.id })
   }
 
   @Test

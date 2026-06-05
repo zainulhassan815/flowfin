@@ -9,6 +9,7 @@ import com.flowfin.core.model.Money
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.model.TransactionDraft
 import com.flowfin.core.model.TransactionId
+import com.flowfin.core.model.TransactionKind
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 
@@ -20,8 +21,11 @@ import kotlinx.datetime.Instant
  */
 interface TransactionRepository {
 
-  /** Newest first, for the Home feed. */
-  fun recentFeed(limit: Long): Flow<List<Transaction>>
+  /** Newest first, capped at [limit] — Home's recent strip and the ledger's All view. */
+  fun feed(limit: Long): Flow<List<Transaction>>
+
+  /** Newest first, restricted to [kinds] — the filtered Transactions list. */
+  fun feedOfKinds(kinds: Set<TransactionKind>, limit: Long): Flow<List<Transaction>>
 
   /**
    * Net change to the headline total over `[startAt, endAt)` — the signed sum of

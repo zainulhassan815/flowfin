@@ -29,7 +29,7 @@ fun Transaction.toRowUi(
   // Money enters an account iff it's the destination. Viewed from one account
   // ([perspective]) this flips an internal move's sign — a transfer reads +in on the
   // receiver and −out on the payer; the global feed keeps its by-kind convention.
-  val moneyIn = if (perspective != null) toAccountId == perspective else kind.isExternalInflow()
+  val moneyIn = if (perspective != null) toAccountId == perspective else kind.rowKind() == RowKind.Income
   return TxRowUi(
     id = id,
     name = when (kind) {
@@ -44,11 +44,7 @@ fun Transaction.toRowUi(
     meta = rowMeta(perspective, fromName, toName),
     amount = (if (moneyIn) "+" else "−") + money.whole(amount),
     decimal = money.fraction(amount),
-    kind = when (kind) {
-      TransactionKind.INCOME, TransactionKind.DEBT_BORROW, TransactionKind.DEBT_REPAY_IN -> RowKind.Income
-      TransactionKind.EXPENSE, TransactionKind.DEBT_LEND, TransactionKind.DEBT_REPAY_OUT -> RowKind.Expense
-      TransactionKind.TRANSFER, TransactionKind.ALLOCATION, TransactionKind.REALLOCATION -> RowKind.Transfer
-    },
+    kind = kind.rowKind(),
     iconKey = when (kind) {
       TransactionKind.INCOME, TransactionKind.EXPENSE -> category?.icon
       else -> "sync_alt"
@@ -75,9 +71,18 @@ fun dateLabel(date: LocalDate, today: LocalDate): UiText {
   return UiText.Res(R.string.date_label, listOf(prefix, date.dayOfMonth, date.month.name.titleCase3()))
 }
 
-/** Money entering the system from outside, for the global (perspective-less) feed. */
-private fun TransactionKind.isExternalInflow(): Boolean =
-  this == TransactionKind.INCOME || this == TransactionKind.DEBT_BORROW || this == TransactionKind.DEBT_REPAY_IN
+/**
+ * The 3-way display bucket for a domain [TransactionKind] — the single source of
+ * truth shared by a row's colour/sign (here), the ledger's per-month net, and the
+ * ledger's filter. Income covers external inflows (income, borrowing, repayments
+ * received); Expense the outflows; Transfer the internal moves (transfer,
+ * allocation, reallocation).
+ */
+fun TransactionKind.rowKind(): RowKind = when (this) {
+  TransactionKind.INCOME, TransactionKind.DEBT_BORROW, TransactionKind.DEBT_REPAY_IN -> RowKind.Income
+  TransactionKind.EXPENSE, TransactionKind.DEBT_LEND, TransactionKind.DEBT_REPAY_OUT -> RowKind.Expense
+  TransactionKind.TRANSFER, TransactionKind.ALLOCATION, TransactionKind.REALLOCATION -> RowKind.Transfer
+}
 
 /**
  * A row's secondary line. The global feed names the account(s); from one account's

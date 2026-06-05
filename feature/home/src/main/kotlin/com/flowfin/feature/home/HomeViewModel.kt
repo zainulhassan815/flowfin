@@ -63,7 +63,7 @@ class HomeViewModel(
 
   val uiState: StateFlow<HomeUiState> = combine(
     accounts.observeBalances(),
-    transactions.recentFeed(RECENT_LIMIT),
+    transactions.feed(RECENT_LIMIT),
     categories.observeAll(),
     recurring.observePending(now),
     transactions.observeNetChange(monthStart, monthEnd),
