@@ -41,7 +41,7 @@ fun <T> FlowFinScopeTabs(
   selected: T,
   onSelect: (T) -> Unit,
   modifier: Modifier = Modifier,
-  label: (T) -> String = { it.toString() },
+  label: @Composable (T) -> String = { it.toString() },
   indicatorColor: (T) -> Color? = { null },
 ) {
   val palette = FlowFinTheme.colors

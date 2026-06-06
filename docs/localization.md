@@ -43,4 +43,5 @@ Use `UiText.Raw` for text that's already final and shouldn't be looked up — us
 ## Status
 
 - **Home** — done (VM + screens).
-- **Transactions, nav / `ComingSoonScreen`, the remaining tabs** — pending; extract their copy into `:core:resources` as each is built. `AddTransactionEffect.toMessage()`'s errors become `UiText`; `InvalidAccountForKind.reason` is a domain-supplied string flagged for follow-up.
+- **Accounts, Transactions (list + Add), navigation bar** — done. `AddTransactionEffect.toMessage()`'s errors are `UiText` resolved in the entry; `InvalidAccountForKind.reason` is still a domain-supplied `UiText.Raw`, flagged for follow-up.
+- **`ComingSoonScreen` + the remaining feature tabs** — pending; extract their copy into `:core:resources` as each is built.

@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.flowfin.core.designsystem.component.CalculatorKey
 import com.flowfin.core.designsystem.component.FlowFinButton
@@ -35,6 +36,7 @@ import com.flowfin.core.designsystem.component.FlowFinScopeTabs
 import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.CategoryId
+import com.flowfin.core.resources.R
 import com.flowfin.core.ui.categoryColor
 import com.flowfin.core.ui.categoryIcon
 import kotlinx.datetime.DateTimeUnit
@@ -67,11 +69,11 @@ fun AddTransactionScreen(
 
   FlowFinScreenScaffold(
     modifier = modifier,
-    topBar = { FlowFinPageHeader(title = "Add", onBack = onBack) },
+    topBar = { FlowFinPageHeader(title = stringResource(R.string.add_tx_title), onBack = onBack) },
     bottomBar = {
       FlowFinButton(
         onClick = onSave,
-        text = "Save",
+        text = stringResource(R.string.add_tx_save),
         enabled = state.canSave,
         modifier = Modifier
           .fillMaxWidth()
@@ -90,7 +92,15 @@ fun AddTransactionScreen(
         options = EntryType.entries,
         selected = state.type,
         onSelect = onSelectType,
-        label = { it.name },
+        label = { type ->
+          stringResource(
+            when (type) {
+              EntryType.Expense -> R.string.add_tx_type_expense
+              EntryType.Income -> R.string.add_tx_type_income
+              EntryType.Transfer -> R.string.add_tx_type_transfer
+            },
+          )
+        },
         indicatorColor = { type ->
           when (type) {
             EntryType.Expense -> palette.accent
@@ -112,20 +122,20 @@ fun AddTransactionScreen(
       Column(modifier = Modifier.padding(horizontal = 24.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         when (state.type) {
           EntryType.Expense -> {
-            AccountRow("From", state.selectedFrom()) { onOpenSheet(AddSheet.FromAccount) }
+            AccountRow(stringResource(R.string.add_tx_field_from), state.selectedFrom()) { onOpenSheet(AddSheet.FromAccount) }
             CategoryRow(state.selectedCategory()) { onOpenSheet(AddSheet.Category) }
           }
           EntryType.Income -> {
-            AccountRow("To", state.selectedTo()) { onOpenSheet(AddSheet.ToAccount) }
+            AccountRow(stringResource(R.string.add_tx_field_to), state.selectedTo()) { onOpenSheet(AddSheet.ToAccount) }
             CategoryRow(state.selectedCategory()) { onOpenSheet(AddSheet.Category) }
           }
           EntryType.Transfer -> {
-            AccountRow("From", state.selectedFrom()) { onOpenSheet(AddSheet.FromAccount) }
-            AccountRow("To", state.selectedTo()) { onOpenSheet(AddSheet.ToAccount) }
+            AccountRow(stringResource(R.string.add_tx_field_from), state.selectedFrom()) { onOpenSheet(AddSheet.FromAccount) }
+            AccountRow(stringResource(R.string.add_tx_field_to), state.selectedTo()) { onOpenSheet(AddSheet.ToAccount) }
           }
         }
-        FlowFinFormRow(label = "Date", value = formatDate(state.date), onClick = { onOpenSheet(AddSheet.Date) })
-        FlowFinFormRow(label = "Note", value = state.note.ifBlank { null }, onClick = { onOpenSheet(AddSheet.Note) })
+        FlowFinFormRow(label = stringResource(R.string.add_tx_field_date), value = formatDate(state.date), onClick = { onOpenSheet(AddSheet.Date) })
+        FlowFinFormRow(label = stringResource(R.string.add_tx_field_note), value = state.note.ifBlank { null }, onClick = { onOpenSheet(AddSheet.Note) })
       }
 
       FlowFinCalculatorPad(
@@ -137,8 +147,8 @@ fun AddTransactionScreen(
   }
 
   when (state.openSheet) {
-    AddSheet.FromAccount -> AccountSheet("From account", state.accountOptions.filter { state.type != EntryType.Transfer || !it.isBudget }, state.fromAccount.value, onDismissSheet, onPickFromAccount)
-    AddSheet.ToAccount -> AccountSheet("To account", state.accountOptions.filter { !it.isBudget }, state.toAccount.value, onDismissSheet, onPickToAccount)
+    AddSheet.FromAccount -> AccountSheet(stringResource(R.string.add_tx_sheet_from_account), state.accountOptions.filter { state.type != EntryType.Transfer || !it.isBudget }, state.fromAccount.value, onDismissSheet, onPickFromAccount)
+    AddSheet.ToAccount -> AccountSheet(stringResource(R.string.add_tx_sheet_to_account), state.accountOptions.filter { !it.isBudget }, state.toAccount.value, onDismissSheet, onPickToAccount)
     AddSheet.Category -> CategorySheet(state, onDismissSheet, onPickCategory)
     AddSheet.Date -> DateSheet(state.date, onDismissSheet, onPickDate)
     AddSheet.Note -> NoteSheet(state.note, onDismissSheet, onNoteChange)
@@ -153,7 +163,7 @@ private fun AccountRow(label: String, selected: AccountOption?, onClick: () -> U
 
 @Composable
 private fun CategoryRow(selected: CategoryOption?, onClick: () -> Unit) {
-  FlowFinFormRow(label = "Category", value = selected?.name, onClick = onClick)
+  FlowFinFormRow(label = stringResource(R.string.add_tx_field_category), value = selected?.name, onClick = onClick)
 }
 
 @Composable
@@ -183,7 +193,7 @@ private fun AccountSheet(
 @Composable
 private fun CategorySheet(state: AddTransactionUiState, onDismiss: () -> Unit, onPick: (CategoryId) -> Unit) {
   FlowFinModalBottomSheet(onDismissRequest = onDismiss) {
-    FlowFinSheetHeader(title = "Category", onClose = onDismiss)
+    FlowFinSheetHeader(title = stringResource(R.string.add_tx_field_category), onClose = onDismiss)
     state.categoryOptions.forEach { option ->
       val tint = if (option.colorKey != null) categoryColor(option.colorKey) else null
       FlowFinPickerRow(
@@ -200,7 +210,7 @@ private fun CategorySheet(state: AddTransactionUiState, onDismiss: () -> Unit, o
 @Composable
 private fun DateSheet(date: LocalDate, onDismiss: () -> Unit, onPick: (LocalDate) -> Unit) {
   FlowFinModalBottomSheet(onDismissRequest = onDismiss) {
-    FlowFinSheetHeader(title = "Date", onClose = onDismiss)
+    FlowFinSheetHeader(title = stringResource(R.string.add_tx_field_date), onClose = onDismiss)
     var month by remember { mutableStateOf(date) }
     FlowFinCalendar(
       month = month,
@@ -216,11 +226,11 @@ private fun DateSheet(date: LocalDate, onDismiss: () -> Unit, onPick: (LocalDate
 @Composable
 private fun NoteSheet(note: String, onDismiss: () -> Unit, onChange: (String) -> Unit) {
   FlowFinModalBottomSheet(onDismissRequest = onDismiss) {
-    FlowFinSheetHeader(title = "Note", onClose = onDismiss, actionLabel = "Done", onAction = onDismiss)
+    FlowFinSheetHeader(title = stringResource(R.string.add_tx_field_note), onClose = onDismiss, actionLabel = stringResource(R.string.add_tx_note_done), onAction = onDismiss)
     FlowFinTextField(
       value = note,
       onValueChange = onChange,
-      placeholder = "What was this for?",
+      placeholder = stringResource(R.string.add_tx_note_placeholder),
       modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 24.dp, vertical = 8.dp),
