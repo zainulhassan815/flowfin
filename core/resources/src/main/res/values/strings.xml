@@ -157,6 +157,33 @@
   <string name="account_detail_not_found_title">Account unavailable</string>
   <string name="account_detail_not_found_body">This account is no longer active.</string>
 
+  <!-- Add transaction -->
+  <string name="add_tx_title">Add</string>
+  <string name="add_tx_save">Save</string>
+  <!-- Entry-type tabs -->
+  <string name="add_tx_type_expense">Expense</string>
+  <string name="add_tx_type_income">Income</string>
+  <string name="add_tx_type_transfer">Transfer</string>
+  <!-- Form rows + their picker sheets -->
+  <string name="add_tx_field_from">From</string>
+  <string name="add_tx_field_to">To</string>
+  <string name="add_tx_field_category">Category</string>
+  <string name="add_tx_field_date">Date</string>
+  <string name="add_tx_field_note">Note</string>
+  <string name="add_tx_sheet_from_account">From account</string>
+  <string name="add_tx_sheet_to_account">To account</string>
+  <string name="add_tx_note_done">Done</string>
+  <string name="add_tx_note_placeholder">What was this for?</string>
+  <!-- Save failures, shown as a snackbar -->
+  <string name="add_tx_error_amount">Enter an amount greater than zero.</string>
+  <string name="add_tx_error_account_not_found">That account no longer exists.</string>
+  <string name="add_tx_error_account_archived">That account is archived.</string>
+  <string name="add_tx_error_self_transfer">Pick two different accounts.</string>
+  <string name="add_tx_error_currency_mismatch">Those accounts use different currencies.</string>
+  <string name="add_tx_error_category_not_found">That category no longer exists.</string>
+  <string name="add_tx_error_category_scope">Pick a category for this type.</string>
+  <string name="add_tx_error_generic">Couldn\'t save. Please try again.</string>
+
   <!-- Transactions · full history list (reached from Home's Recent → All / History) -->
   <string name="transactions_title">Transactions</string>
   <!-- A month heading in the ledger: month name + year, e.g. "December 2026". -->
