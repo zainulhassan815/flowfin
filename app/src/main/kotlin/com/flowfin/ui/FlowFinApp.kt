@@ -9,12 +9,14 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.annotation.StringRes
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.NavKey
@@ -35,6 +37,7 @@ import com.flowfin.core.navigation.ReportsRoute
 import com.flowfin.core.navigation.TOP_LEVEL_ROUTES
 import com.flowfin.core.navigation.rememberNavigationState
 import com.flowfin.core.navigation.toEntries
+import com.flowfin.core.resources.R
 import com.flowfin.feature.accounts.navigation.accountDetailEntry
 import com.flowfin.feature.accounts.navigation.accountsEntry
 import com.flowfin.feature.accounts.navigation.addAccountEntry
@@ -46,14 +49,14 @@ import com.flowfin.feature.transactions.navigation.addTransactionEntry
 import com.flowfin.feature.transactions.navigation.transactionsEntry
 import org.koin.compose.viewmodel.koinViewModel
 
-private data class Tab(val route: NavKey, val icon: ImageVector, val label: String)
+private data class Tab(val route: NavKey, val icon: ImageVector, @StringRes val label: Int)
 
 private val TABS = listOf(
-  Tab(HomeRoute, FlowFinIcons.Home, "Home"),
-  Tab(AccountsRoute, FlowFinIcons.Accounts, "Accounts"),
-  Tab(RecurringRoute, FlowFinIcons.Recurring, "Recur"),
-  Tab(DebtsRoute, FlowFinIcons.Debts, "Debts"),
-  Tab(ReportsRoute, FlowFinIcons.Reports, "Reports"),
+  Tab(HomeRoute, FlowFinIcons.Home, R.string.nav_home),
+  Tab(AccountsRoute, FlowFinIcons.Accounts, R.string.nav_accounts),
+  Tab(RecurringRoute, FlowFinIcons.Recurring, R.string.nav_recurring),
+  Tab(DebtsRoute, FlowFinIcons.Debts, R.string.nav_debts),
+  Tab(ReportsRoute, FlowFinIcons.Reports, R.string.nav_reports),
 )
 
 /** The app shell: one Scaffold owning the bottom nav + FAB, hosting the nav back stack. */
@@ -92,7 +95,7 @@ fun FlowFinApp() {
           TABS.forEach { tab ->
             FlowFinNavBarItem(
               icon = tab.icon,
-              label = tab.label,
+              label = stringResource(tab.label),
               selected = navState.currentTopLevelKey == tab.route,
               onClick = { navigator.navigate(tab.route) },
             )
@@ -106,7 +109,7 @@ fun FlowFinApp() {
         FlowFinFab(
           onClick = { navigator.navigate(AddTransactionRoute) },
           icon = FlowFinIcons.Add,
-          contentDescription = "Add transaction",
+          contentDescription = stringResource(R.string.nav_add_transaction),
         )
       }
     },

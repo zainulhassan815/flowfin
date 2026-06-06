@@ -4,6 +4,14 @@
   <!-- Common · shared across screens -->
   <string name="action_back">Back</string>
 
+  <!-- Navigation · bottom-bar tab labels + shell FAB -->
+  <string name="nav_home">Home</string>
+  <string name="nav_accounts">Accounts</string>
+  <string name="nav_recurring">Recur</string>
+  <string name="nav_debts">Debts</string>
+  <string name="nav_reports">Reports</string>
+  <string name="nav_add_transaction">Add transaction</string>
+
   <!-- Home · top bar -->
   <string name="home_action_search">Search</string>
   <string name="home_action_settings">Settings</string>
