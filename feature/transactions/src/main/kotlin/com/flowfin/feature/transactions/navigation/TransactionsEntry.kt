@@ -6,6 +6,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.flowfin.core.navigation.AddTransactionRoute
 import com.flowfin.core.navigation.Navigator
+import com.flowfin.core.navigation.TransactionDetailRoute
 import com.flowfin.core.navigation.TransactionsRoute
 import com.flowfin.feature.transactions.TransactionsListScreen
 import com.flowfin.feature.transactions.TransactionsListViewModel
@@ -21,7 +22,7 @@ fun EntryProviderScope<NavKey>.transactionsEntry(navigator: Navigator) {
       onBack = { navigator.goBack() },
       onFilterChange = viewModel::setFilter,
       onAddTransaction = { navigator.navigate(AddTransactionRoute) },
-      // onTransactionClick is wired once Transaction detail (FLO-23) exists.
+      onTransactionClick = { id -> navigator.navigate(TransactionDetailRoute(id.value.toString())) },
     )
   }
 }

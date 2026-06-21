@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Transaction Detail (delete confirm) / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  --cat-bank: #82C5D4;
+  --cat-cash: #C5D982;
+  --cat-food: #E8A87B;
+  --cat-transport: #8AB4E0;
+  --cat-fun: #C98ED4;
+  --cat-salary: #9CD4A2;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 20px; min-height: 100vh; overflow-x: hidden;
+}
+
+.caption {
+  position: fixed; top: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+.caption em {
+  display: block; margin-top: 6px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-size: 15px; color: var(--text);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; opacity: 0.85;
+}
+.caption-r {
+  position: fixed; bottom: 28px; left: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px; color: var(--text-mute);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  z-index: 10; font-weight: 500;
+}
+
+/* ===== Phone ===== */
+.phone {
+  width: 390px; height: 844px;
+  background: var(--bg); border-radius: 52px;
+  position: relative; overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E, 0 0 0 12px #0A0A0C, 0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28), 0 6px 14px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+}
+.notch {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000; border-radius: 20px; z-index: 30;
+}
+
+.status-bar {
+  height: 50px; padding: 18px 32px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px; font-weight: 500;
+  position: relative; z-index: 5; flex-shrink: 0;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Header (standard FlowFinPageHeader) ===== */
+.page-header {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.icon-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  color: var(--text); cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.04); border-color: var(--text-faint); }
+.topbar-title {
+  text-align: center;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ===== Scroll ===== */
+.scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 8px 24px 132px;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* This screen carries a category tint, set once on the kind wrapper. */
+.kind { --tint: var(--cat-food); --tint-bg: rgba(232,168,123,0.10); --tint-bd: rgba(232,168,123,0.28); }
+
+/* ===== Hero ===== */
+.hero {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+  padding: 18px 0 26px;
+}
+.hero-icon {
+  width: 60px; height: 60px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--tint);
+  background: var(--tint-bg);
+  border: 1px solid var(--tint-bd);
+  margin-bottom: 20px;
+}
+.amount {
+  display: flex; align-items: baseline; justify-content: center;
+  gap: 6px;
+}
+.amount .sign {
+  font-family: var(--font-mono), monospace;
+  font-size: 34px; font-weight: 300;
+  color: var(--text-soft);
+  letter-spacing: -0.04em;
+}
+.amount .cur {
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-weight: 300;
+  font-size: 22px;
+  color: var(--text-mute);
+  letter-spacing: -0.02em;
+}
+.amount .whole {
+  font-family: var(--font-mono), monospace;
+  font-size: 52px; font-weight: 300;
+  letter-spacing: -0.04em; line-height: 1;
+}
+.amount .dec {
+  font-family: var(--font-mono), monospace;
+  font-size: 22px; font-weight: 300;
+  color: var(--text-mute);
+}
+
+.hero-note {
+  margin-top: 14px;
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-weight: 400;
+  font-size: 21px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  max-width: 280px;
+}
+.hero-date {
+  margin-top: 8px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-soft); font-weight: 500;
+}
+
+/* ===== Money path rail ===== */
+.rail {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 8px;
+}
+.node {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px; padding: 4px 8px; min-width: 0;
+}
+.node-role {
+  font-family: var(--font-mono), monospace;
+  font-size: 8.5px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--text-faint); font-weight: 500;
+}
+.node-chip {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--node-color, var(--text-mute));
+  background: var(--node-bg, var(--surface-3));
+  border: 1px solid var(--node-bd, var(--border-strong));
+}
+.node-name {
+  font-family: var(--font-serif), serif;
+  font-size: 14px; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 100%;
+}
+.node.acct .node-chip { --node-color: var(--cat-cash); --node-bg: rgba(197,217,130,0.10); --node-bd: rgba(197,217,130,0.26); }
+.node.cat  .node-chip { --node-color: var(--tint);     --node-bg: var(--tint-bg);        --node-bd: var(--tint-bd); }
+
+.rail-arrow {
+  align-self: center;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--tint);
+  padding: 0 2px;
+}
+
+/* ===== Action bar ===== */
+.action-bar {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 14px 24px 30px;
+  display: flex; gap: 12px;
+  background: linear-gradient(180deg, rgba(8,8,10,0) 0%, var(--bg) 32%);
+  z-index: 8;
+}
+.btn-edit {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  background: var(--accent); color: #0A0A0B;
+  border: none; border-radius: 14px;
+  padding: 15px;
+  font-family: var(--font-mono), monospace;
+  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600;
+  cursor: pointer;
+}
+.btn-delete {
+  width: 56px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; color: var(--neg);
+  border: 1px solid rgba(224,138,138,0.28); border-radius: 14px;
+  cursor: pointer;
+}
+
+/* Home indicator */
+.home-indicator {
+  position: absolute; bottom: 9px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--text); border-radius: 3px;
+  opacity: 0.4; z-index: 9;
+}
+
+/* ===== Delete-confirm (modal bottom sheet) ===== */
+.scrim {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 20;
+}
+.confirm-sheet {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  z-index: 21;
+  background: var(--surface-2);
+  border-radius: 20px 20px 0 0;
+  border-top: 1px solid var(--border);
+  padding: 0 24px 32px;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+.sheet-handle {
+  width: 36px; height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,0.18);
+  margin: 10px 0 20px;
+}
+.confirm-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--neg);
+  background: rgba(224,138,138,0.10);
+  border: 1px solid rgba(224,138,138,0.26);
+  margin-bottom: 16px;
+}
+.confirm-title {
+  font-family: var(--font-serif), serif;
+  font-style: italic; font-weight: 400;
+  font-size: 22px; letter-spacing: -0.01em;
+  color: var(--text);
+}
+.confirm-body {
+  margin-top: 10px;
+  font-family: var(--font-serif), serif;
+  font-size: 14px; line-height: 1.5;
+  color: var(--text-soft);
+  max-width: 290px;
+}
+.confirm-actions {
+  display: flex; gap: 12px; width: 100%;
+  margin-top: 24px;
+}
+.btn-cancel {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  padding: 15px;
+  color: var(--text);
+  font-family: var(--font-mono), monospace;
+  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600;
+  cursor: pointer; transition: background .15s, border-color .15s;
+}
+.btn-cancel:hover { background: rgba(255,255,255,0.04); border-color: var(--text-faint); }
+.btn-confirm {
+  flex: 1;
+  background: var(--neg); color: #0A0A0B;
+  border: none; border-radius: 14px;
+  padding: 15px;
+  font-family: var(--font-mono), monospace;
+  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600;
+  cursor: pointer; transition: filter .15s, transform .15s;
+}
+.btn-confirm:hover { filter: brightness(1.06); transform: translateY(-1px); }
+</style>
+</head>
+<body>
+
+<div class="caption">
+  FlowFin / 04g<br>
+  <em>Transaction detail — Delete confirm</em>
+</div>
+<div class="caption-r">Mobile · 390 × 844 · Dark</div>
+
+<div class="phone">
+  <div class="notch"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="none">
+        <rect x="0.5" y="6.5" width="3" height="4" rx="0.5" fill="currentColor"/>
+        <rect x="5" y="4.5" width="3" height="6" rx="0.5" fill="currentColor"/>
+        <rect x="9.5" y="2.5" width="3" height="8" rx="0.5" fill="currentColor"/>
+        <rect x="14" y="0.5" width="3" height="10" rx="0.5" fill="currentColor"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+        <path d="M7.5 9.5L7.5 9.51" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4.5 7C5.36 6.18 6.4 5.75 7.5 5.75C8.6 5.75 9.64 6.18 10.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+        <path d="M2 4.5C3.5 3 5.4 2.25 7.5 2.25C9.6 2.25 11.5 3 13 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg width="27" height="12" viewBox="0 0 27 12" fill="none">
+        <rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="currentColor" fill="none"/>
+        <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+        <rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <button class="icon-btn" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <div class="topbar-title">Expense</div>
+    <div></div>
+  </div>
+
+  <div class="scroll">
+    <div class="kind expense">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/>
+          </svg>
+        </div>
+        <div class="amount">
+          <span class="sign">−</span>
+          <span class="cur">Rs</span>
+          <span class="whole">1,250</span>
+          <span class="dec">.00</span>
+        </div>
+        <div class="hero-note">Lunch with the team</div>
+        <div class="hero-date">Saturday, 27 Dec 2026</div>
+      </div>
+
+      <!-- MONEY PATH -->
+      <div class="rail">
+        <div class="node acct">
+          <span class="node-role">Paid from</span>
+          <div class="node-chip">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20M6 15h4"/>
+            </svg>
+          </div>
+          <span class="node-name">Cash</span>
+        </div>
+
+        <div class="rail-arrow">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </div>
+
+        <div class="node cat">
+          <span class="node-role">Category</span>
+          <div class="node-chip">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 11h18M5 11a7 7 0 0 1 14 0M2 15h20M6 19h12"/>
+            </svg>
+          </div>
+          <span class="node-name">Food &amp; Dining</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ACTIONS (behind the scrim) -->
+  <div class="action-bar">
+    <button class="btn-edit">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+      </svg>
+      Edit
+    </button>
+    <button class="btn-delete" aria-label="Delete">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- DELETE CONFIRM -->
+  <div class="scrim"></div>
+  <div class="confirm-sheet">
+    <div class="sheet-handle"></div>
+    <div class="confirm-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/>
+      </svg>
+    </div>
+    <div class="confirm-title">Delete this transaction?</div>
+    <div class="confirm-body">This removes the entry and updates your account balances. It can’t be undone.</div>
+    <div class="confirm-actions">
+      <button class="btn-cancel">Cancel</button>
+      <button class="btn-confirm">Delete</button>
+    </div>
+  </div>
+
+  <div class="home-indicator"></div>
+</div>
+
+</body>
+</html>

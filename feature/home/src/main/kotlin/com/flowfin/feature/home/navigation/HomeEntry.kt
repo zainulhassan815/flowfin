@@ -9,6 +9,7 @@ import com.flowfin.core.navigation.AddAccountRoute
 import com.flowfin.core.navigation.HomeRoute
 import com.flowfin.core.navigation.Navigator
 import com.flowfin.core.navigation.RecurringRoute
+import com.flowfin.core.navigation.TransactionDetailRoute
 import com.flowfin.core.navigation.TransactionsRoute
 import com.flowfin.feature.home.HomeScreen
 import com.flowfin.feature.home.HomeViewModel
@@ -24,9 +25,9 @@ fun EntryProviderScope<NavKey>.homeEntry(navigator: Navigator) {
       onAllPending = { navigator.navigate(RecurringRoute) },
       onAllRecent = { navigator.navigate(TransactionsRoute) },
       onAddAccount = { navigator.navigate(AddAccountRoute) },
-      // TODO: wire once their destinations exist — onAccountClick/onTransactionClick
-      //  (detail screens), onPayPending (fire-schedule flow), onSearch, onSettings.
-      //  Until then they intentionally no-op.
+      onTransactionClick = { id -> navigator.navigate(TransactionDetailRoute(id.value.toString())) },
+      // TODO: wire once their destinations exist — onAccountClick (detail screen),
+      //  onPayPending (fire-schedule flow), onSearch, onSettings. They no-op until then.
     )
   }
 }

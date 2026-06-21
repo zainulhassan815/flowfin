@@ -184,6 +184,38 @@
   <string name="add_tx_error_category_scope">Pick a category for this type.</string>
   <string name="add_tx_error_generic">Couldn\'t save. Please try again.</string>
 
+  <!-- Transaction detail -->
+  <!-- Top-bar title, by kind. -->
+  <string name="tx_detail_kind_expense">Expense</string>
+  <string name="tx_detail_kind_income">Income</string>
+  <string name="tx_detail_kind_transfer">Transfer</string>
+  <string name="tx_detail_kind_allocation">Allocation</string>
+  <string name="tx_detail_kind_reallocation">Reallocation</string>
+  <string name="tx_detail_kind_debt">Debt</string>
+  <!-- Money-path rail roles. -->
+  <string name="tx_detail_role_paid_from">Paid from</string>
+  <string name="tx_detail_role_category">Category</string>
+  <string name="tx_detail_role_received_in">Received in</string>
+  <string name="tx_detail_role_from">From</string>
+  <string name="tx_detail_role_to">To</string>
+  <string name="tx_detail_role_from_envelope">From envelope</string>
+  <string name="tx_detail_role_to_envelope">To envelope</string>
+  <string name="tx_detail_role_debt">Debt</string>
+  <!-- Hero date, e.g. "Sat · 27 Dec 2026" (weekday · day month year). -->
+  <string name="tx_detail_date">%1$s · %2$d %3$s %4$d</string>
+  <!-- Shown only when edited after creation, e.g. "Edited · 2 Jan". -->
+  <string name="tx_detail_edited">Edited · %1$d %2$s</string>
+  <!-- Delete action + its confirmation sheet. -->
+  <string name="tx_detail_action_delete">Delete</string>
+  <string name="tx_detail_delete_title">Delete this transaction?</string>
+  <string name="tx_detail_delete_body">This removes the entry and updates your account balances. It can\'t be undone.</string>
+  <string name="tx_detail_delete_confirm">Delete</string>
+  <string name="tx_detail_delete_cancel">Cancel</string>
+  <string name="tx_detail_delete_error">Couldn\'t delete. Please try again.</string>
+  <!-- The transaction is no longer available (already deleted). -->
+  <string name="tx_detail_not_found_title">Transaction unavailable</string>
+  <string name="tx_detail_not_found_body">This entry is no longer available.</string>
+
   <!-- Transactions · full history list (reached from Home's Recent → All / History) -->
   <string name="transactions_title">Transactions</string>
   <!-- A month heading in the ledger: month name + year, e.g. "December 2026". -->

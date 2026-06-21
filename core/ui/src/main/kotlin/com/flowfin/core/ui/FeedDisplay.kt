@@ -101,6 +101,17 @@ private fun Transaction.rowMeta(perspective: AccountId?, fromName: String, toNam
   else -> note.orEmpty()
 }
 
+/**
+ * A transaction's full date for the detail hero — "Sat · 27 Dec 2026". Carries
+ * the year (unlike the feed's day heading) since a detail screen is read out of
+ * the feed's date context. Weekday/month stay English enum short forms.
+ */
+fun detailDateLabel(date: LocalDate): UiText =
+  UiText.Res(
+    R.string.tx_detail_date,
+    listOf(UiText.Raw(date.dayOfWeek.name.titleCase3()), date.dayOfMonth, UiText.Raw(date.month.name.titleCase3()), date.year),
+  )
+
 /** A month's short label — "Dec". Shared by feeds and the Account-detail flow strip. */
 fun monthShortLabel(date: LocalDate): String = date.month.name.titleCase3()
 
