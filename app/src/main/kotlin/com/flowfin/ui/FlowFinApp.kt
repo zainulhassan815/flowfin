@@ -46,6 +46,7 @@ import com.flowfin.feature.home.navigation.homeEntry
 import com.flowfin.feature.recurring.navigation.recurringEntry
 import com.flowfin.feature.reports.navigation.reportsEntry
 import com.flowfin.feature.transactions.navigation.addTransactionEntry
+import com.flowfin.feature.transactions.navigation.transactionDetailEntry
 import com.flowfin.feature.transactions.navigation.transactionsEntry
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -78,6 +79,7 @@ fun FlowFinApp() {
     addTransactionEntry(navigator)
     addAccountEntry(navigator)
     transactionsEntry(navigator)
+    transactionDetailEntry(navigator)
   }
 
   // Nav bar + FAB only on a tab root, not on pushed screens (e.g. Add Transaction).

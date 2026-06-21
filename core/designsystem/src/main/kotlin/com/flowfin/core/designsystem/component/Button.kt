@@ -43,6 +43,7 @@ fun FlowFinButton(
   text: String,
   modifier: Modifier = Modifier,
   enabled: Boolean = true,
+  destructive: Boolean = false,
   leadingIcon: ImageVector? = null,
   trailingIcon: ImageVector? = null,
 ) {
@@ -52,7 +53,7 @@ fun FlowFinButton(
     enabled = enabled,
     shape = ButtonShape,
     colors = ButtonDefaults.buttonColors(
-      containerColor = FlowFinTheme.colors.accent,
+      containerColor = if (destructive) FlowFinTheme.colors.negative else FlowFinTheme.colors.accent,
       contentColor = FlowFinTheme.colors.bg,
       disabledContainerColor = FlowFinTheme.colors.surface2,
       disabledContentColor = FlowFinTheme.colors.textFaint,

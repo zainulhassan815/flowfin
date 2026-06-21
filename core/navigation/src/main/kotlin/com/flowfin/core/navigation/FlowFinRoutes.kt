@@ -32,6 +32,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object TransactionsRoute : NavKey
 
+/**
+ * Transaction detail, pushed from any feed (Home recent, the ledger). Like
+ * [AccountDetailRoute], [transactionId] is the id's plain string form; the
+ * feature reparses it at the entry boundary.
+ */
+@Serializable data class TransactionDetailRoute(val transactionId: String) : NavKey
+
 @Serializable data object SettingsRoute : NavKey
 
 /** The bottom-nav tabs, in order. [HomeRoute] is the start destination. */
