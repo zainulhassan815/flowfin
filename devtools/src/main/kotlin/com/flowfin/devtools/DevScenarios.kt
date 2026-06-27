@@ -12,6 +12,7 @@ import com.flowfin.core.domain.usecase.RecordBorrow
 import com.flowfin.core.domain.usecase.RecordLend
 import com.flowfin.core.domain.usecase.RecordTransaction
 import com.flowfin.core.model.Account
+import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.CategoryId
 import com.flowfin.core.model.CategoryScope
 import com.flowfin.core.model.Money
@@ -26,6 +27,7 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 
 /**
  * A named database state, mapped to the screens it lets you exercise (see
@@ -39,6 +41,7 @@ enum class DevScenario(val title: String, val blurb: String) {
   LOADED_MONTH("Loaded month", "Accounts, budgets, salary + spending this month. Home full, flow strip."),
   QUIET_WEEK("Quiet week", "History, but nothing in the last ~2 weeks. Home 'quiet stretch'."),
   OVERDUE_RECURRING("Overdue recurring", "An active schedule past its due date. Home Pending (late)."),
+  RECURRING("Recurring schedules", "A full mix — pending, overdue, and upcoming across weekly / monthly / yearly. Recurring tab."),
   DEBTS("Debts", "One I-owe + one owed-to-me."),
   NEGATIVE_BALANCE("Negative balance", "Spent more than the account holds. Warning treatment."),
   OVERSPENT_BUDGET("Over-spent budget", "Envelope spend exceeds its funding. Progress clamp."),
@@ -74,6 +77,7 @@ internal class DevScenarios(
         DevScenario.LOADED_MONTH -> loadedMonth()
         DevScenario.QUIET_WEEK -> quietWeek()
         DevScenario.OVERDUE_RECURRING -> overdueRecurring()
+        DevScenario.RECURRING -> recurringMix()
         DevScenario.DEBTS -> debts()
         DevScenario.NEGATIVE_BALANCE -> negativeBalance()
         DevScenario.OVERSPENT_BUDGET -> overspentBudget()
@@ -140,6 +144,37 @@ internal class DevScenarios(
     ).bind()
   }
 
+  /** A full Recurring tab: two pending (one due today, one overdue) and several
+   *  upcoming across weekly / monthly / yearly, plus a salary income schedule.
+   *  `firstDueAt` is stamped directly so each lands in the intended bucket. */
+  private suspend fun recurringMix() {
+    categories.ensureDefaultsSeeded().bind()
+    val bank = bank(Money(8_000_000))
+
+    // Pending — due now / overdue (a past firstDueAt anchors them as pending).
+    expenseSchedule("Gym Membership", Money(500_000), Recurrence.Monthly(25), bank.id, expenseCategory("favorite"), daysAgo(0))
+    expenseSchedule("Netflix", Money(150_000), Recurrence.Monthly(22), bank.id, expenseCategory("movie"), daysAgo(3))
+
+    // Upcoming — future dues across every cadence.
+    expenseSchedule("Bus pass", Money(120_000), Recurrence.Weekly(dayOfWeek = 1), bank.id, expenseCategory("directions_bus"), daysFromNow(3))
+    expenseSchedule("Rent", Money(3_000_000), Recurrence.Monthly(1), bank.id, expenseCategory("home"), daysFromNow(6))
+    expenseSchedule("Internet", Money(250_000), Recurrence.Monthly(10), bank.id, expenseCategory("bolt"), daysFromNow(15))
+    expenseSchedule("Cloud storage", Money(350_000), Recurrence.Yearly(month = 7, dayOfMonth = 1), bank.id, expenseCategory("shopping_bag"), daysFromNow(36))
+
+    recurring.create(
+      RecurringDraft.Income(
+        name = "Salary",
+        amount = Money(15_000_000),
+        recurrence = Recurrence.Monthly(dayOfMonth = 1),
+        toAccount = bank.id,
+        category = incomeCategory(),
+      ),
+      firstDueAt = daysFromNow(4),
+    ).bind()
+
+    backdateAccounts(days = 40)
+  }
+
   private suspend fun debts() {
     val bank = bank(Money(5_000_000))
     val ali = createPerson("Ali").bind()
@@ -167,6 +202,28 @@ internal class DevScenarios(
   private suspend fun bank(opening: Money): Account =
     createRealAccount("Bank", openingBalance = opening, color = "bank", icon = "bank").bind()
 
+  private suspend fun expenseSchedule(
+    name: String,
+    amount: Money,
+    recurrence: Recurrence,
+    from: AccountId,
+    category: CategoryId,
+    firstDueAt: Instant,
+  ) {
+    recurring.create(RecurringDraft.Expense(name, amount, recurrence, from, category), firstDueAt).bind()
+  }
+
+  /** A seeded expense category by its icon key, falling back to the first. */
+  private suspend fun expenseCategory(icon: String): CategoryId = scopedCategory(CategoryScope.EXPENSE, icon)
+
+  private suspend fun incomeCategory(): CategoryId = scopedCategory(CategoryScope.INCOME, icon = null)
+
+  private suspend fun scopedCategory(scope: CategoryScope, icon: String?): CategoryId {
+    val all = categories.observeByScope(scope).first()
+    val match = icon?.let { key -> all.firstOrNull { it.icon == key } }
+    return (match ?: all.firstOrNull() ?: error("no $scope category seeded")).id
+  }
+
   /** Seeds the shipped defaults and returns one income + one expense category id. */
   private suspend fun seedCategories(): Pair<CategoryId, CategoryId> {
     categories.ensureDefaultsSeeded().bind()
@@ -188,6 +245,8 @@ internal class DevScenarios(
   }
 
   private fun daysAgo(n: Int): Instant = clock.now().minus(n, DateTimeUnit.DAY, zone)
+
+  private fun daysFromNow(n: Int): Instant = clock.now().plus(n, DateTimeUnit.DAY, zone)
 }
 
 /** Unwrap a seed step, aborting the scenario with a readable message on failure. */
