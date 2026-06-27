@@ -28,6 +28,7 @@ Each maps to the screens/states it lets you check (see [`empty-states.md`](empty
 | Loaded month | Accounts, budgets, salary + spend — Home full, flow strip |
 | Quiet week | History but nothing in the last ~2 weeks — Home "quiet stretch" |
 | Overdue recurring | Active schedule past due — Home Pending (late) |
+| Recurring schedules | Full mix — pending, overdue, upcoming across weekly/monthly/yearly — the Recurring tab |
 | Debts | One I-owe + one owed-to-me |
 | Negative balance | Spent more than the account holds — warning treatment |
 | Over-spent budget | Envelope spend exceeds funding — progress clamp |
