@@ -7,6 +7,7 @@ android {
 }
 
 dependencies {
+  implementation(libs.arrow.core)
   implementation(libs.kotlinx.datetime)
 
   testImplementation(libs.kotlin.test)
