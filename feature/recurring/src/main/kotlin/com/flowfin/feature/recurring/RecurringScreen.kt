@@ -19,8 +19,11 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +35,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.flowfin.core.designsystem.component.FlowFinPendingPaymentCard
+import com.flowfin.core.designsystem.component.PaymentStatus
+import com.flowfin.core.designsystem.component.PaymentUrgency
 import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.model.RecurringScheduleId
 import com.flowfin.core.resources.R
@@ -46,30 +52,36 @@ private val HORIZONTAL = 24.dp
 @Composable
 fun RecurringScreen(
   state: RecurringUiState,
+  snackbarHostState: SnackbarHostState,
   modifier: Modifier = Modifier,
+  onMarkPaid: (RecurringScheduleId, String) -> Unit = { _, _ -> },
+  onSkip: (RecurringScheduleId) -> Unit = {},
 ) {
-  Column(modifier.fillMaxSize().background(FlowFinTheme.colors.bg)) {
-    Header(state)
-    when (state) {
-      RecurringUiState.Loading -> Box(Modifier.weight(1f).fillMaxWidth())
-      RecurringUiState.Empty -> Notice(
-        eyebrow = stringResource(R.string.recurring_empty_eyebrow),
-        title = stringResource(R.string.recurring_empty_title),
-        body = stringResource(R.string.recurring_empty_body),
-      )
-      is RecurringUiState.AllPaused -> Notice(
-        eyebrow = stringResource(R.string.recurring_all_paused_eyebrow),
-        title = stringResource(R.string.recurring_all_paused_title),
-        body = pluralStringResource(R.plurals.recurring_all_paused_body, state.pausedCount, state.pausedCount),
-      )
-      is RecurringUiState.Content -> LazyColumn(
-        modifier = Modifier.weight(1f),
-        contentPadding = PaddingValues(start = HORIZONTAL, end = HORIZONTAL, bottom = 96.dp),
-      ) {
-        if (state.pending.isNotEmpty()) pendingSection(state.pending)
-        upcomingSection(state.upcoming)
+  Box(modifier.fillMaxSize().background(FlowFinTheme.colors.bg)) {
+    Column(Modifier.fillMaxSize()) {
+      Header(state)
+      when (state) {
+        RecurringUiState.Loading -> Box(Modifier.weight(1f).fillMaxWidth())
+        RecurringUiState.Empty -> Notice(
+          eyebrow = stringResource(R.string.recurring_empty_eyebrow),
+          title = stringResource(R.string.recurring_empty_title),
+          body = stringResource(R.string.recurring_empty_body),
+        )
+        is RecurringUiState.AllPaused -> Notice(
+          eyebrow = stringResource(R.string.recurring_all_paused_eyebrow),
+          title = stringResource(R.string.recurring_all_paused_title),
+          body = pluralStringResource(R.plurals.recurring_all_paused_body, state.pausedCount, state.pausedCount),
+        )
+        is RecurringUiState.Content -> LazyColumn(
+          modifier = Modifier.weight(1f),
+          contentPadding = PaddingValues(start = HORIZONTAL, end = HORIZONTAL, bottom = 96.dp),
+        ) {
+          if (state.pending.isNotEmpty()) pendingSection(state.pending, onMarkPaid, onSkip)
+          upcomingSection(state.upcoming)
+        }
       }
     }
+    SnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter).padding(bottom = 12.dp))
   }
 }
 
@@ -98,7 +110,11 @@ private fun Header(state: RecurringUiState) {
   }
 }
 
-private fun LazyListScope.pendingSection(pending: List<RecurringPendingUi>) {
+private fun LazyListScope.pendingSection(
+  pending: List<RecurringPendingUi>,
+  onMarkPaid: (RecurringScheduleId, String) -> Unit,
+  onSkip: (RecurringScheduleId) -> Unit,
+) {
   item(key = "pending-head") {
     SectionHead(
       title = stringResource(R.string.recurring_section_pending),
@@ -106,7 +122,7 @@ private fun LazyListScope.pendingSection(pending: List<RecurringPendingUi>) {
       aux = stringResource(R.string.recurring_section_pending_aux),
     )
   }
-  items(pending, key = { it.id.value.toString() }) { PendingCard(it) }
+  items(pending, key = { it.id.value.toString() }) { PendingCard(it, onMarkPaid, onSkip) }
 }
 
 private fun LazyListScope.upcomingSection(groups: List<RecurringMonthGroup>) {
@@ -150,37 +166,26 @@ private fun MonthHeading(label: UiText) {
 }
 
 @Composable
-private fun PendingCard(row: RecurringPendingUi) {
-  val palette = FlowFinTheme.colors
-  val statusColor = if (row.urgency == RecurringUrgency.Late) palette.negative else palette.warning
-  Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(vertical = 6.dp)
-      .border(1.dp, palette.border, RoundedCornerShape(14.dp))
-      .background(palette.surface, RoundedCornerShape(14.dp))
-      .padding(14.dp),
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    IconTile(categoryIcon(row.iconKey), categoryColor(row.colorKey))
-    Spacer(Modifier.width(14.dp))
-    Column(Modifier.weight(1f)) {
-      Text(row.name, style = FlowFinTheme.typography.bodyLg, color = palette.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
-      Row(modifier = Modifier.padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(
-          text = row.schedule.asString(),
-          style = FlowFinTheme.typography.caption,
-          color = palette.textSoft,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-          modifier = Modifier.weight(1f, fill = false),
-        )
-        Dot()
-        Text(row.status.asString(), style = FlowFinTheme.typography.caption, color = statusColor, maxLines = 1, softWrap = false)
-      }
-    }
-    Amount(row.amountWhole, row.amountDecimal)
-  }
+private fun PendingCard(
+  row: RecurringPendingUi,
+  onMarkPaid: (RecurringScheduleId, String) -> Unit,
+  onSkip: (RecurringScheduleId) -> Unit,
+) {
+  FlowFinPendingPaymentCard(
+    icon = categoryIcon(row.iconKey),
+    name = row.name,
+    schedule = row.schedule.asString(),
+    amount = row.amountWhole,
+    decimal = row.amountDecimal,
+    tint = categoryColor(row.colorKey),
+    status = PaymentStatus(
+      text = row.status.asString(),
+      urgency = if (row.urgency == RecurringUrgency.Late) PaymentUrgency.Late else PaymentUrgency.Due,
+    ),
+    onSkip = { onSkip(row.id) },
+    onPay = { onMarkPaid(row.id, row.name) },
+    modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+  )
 }
 
 @Composable
@@ -232,16 +237,6 @@ private fun Amount(whole: String, decimal: String) {
 }
 
 @Composable
-private fun Dot() {
-  Box(
-    Modifier
-      .padding(horizontal = 7.dp)
-      .size(3.dp)
-      .background(FlowFinTheme.colors.textFaint, RoundedCornerShape(2.dp)),
-  )
-}
-
-@Composable
 private fun IconTile(image: ImageVector, tint: Color) {
   Box(
     modifier = Modifier
@@ -285,6 +280,7 @@ private fun Notice(eyebrow: String, title: String, body: String) {
 private fun PreviewRecurring() = FlowFinTheme {
   fun id() = RecurringScheduleId(Uuid.random())
   RecurringScreen(
+    snackbarHostState = remember { SnackbarHostState() },
     state = RecurringUiState.Content(
       pendingCount = 2,
       activeCount = 4,

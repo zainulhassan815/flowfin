@@ -191,6 +191,10 @@
   <!-- Section headings. -->
   <string name="recurring_section_pending">Pending</string>
   <string name="recurring_section_pending_aux">Needs action</string>
+  <!-- Confirmation after firing, e.g. "Marked paid · Netflix". -->
+  <string name="recurring_paid_confirm">Marked paid · %1$s</string>
+  <!-- Backstop when a fire / skip fails. -->
+  <string name="recurring_action_error">Couldn\'t update. Please try again.</string>
   <string name="recurring_section_active">All active</string>
   <string name="recurring_section_active_aux">Upcoming</string>
   <!-- Cadence tag on an upcoming row. -->

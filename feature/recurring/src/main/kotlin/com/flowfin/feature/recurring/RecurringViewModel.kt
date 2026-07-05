@@ -2,18 +2,25 @@ package com.flowfin.feature.recurring
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arrow.core.Either
 import com.flowfin.core.domain.repository.CategoryRepository
 import com.flowfin.core.domain.repository.RecurringRepository
+import com.flowfin.core.domain.usecase.FireSchedule
+import com.flowfin.core.domain.usecase.SkipSchedule
 import com.flowfin.core.model.Category
 import com.flowfin.core.model.Recurrence
 import com.flowfin.core.model.RecurringSchedule
+import com.flowfin.core.model.RecurringScheduleId
 import com.flowfin.core.resources.R
 import com.flowfin.core.ui.MoneyFormatter
 import com.flowfin.core.ui.UiText
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -31,11 +38,21 @@ import kotlinx.datetime.toLocalDateTime
 class RecurringViewModel(
   recurring: RecurringRepository,
   categories: CategoryRepository,
+  private val fireSchedule: FireSchedule,
+  private val skipSchedule: SkipSchedule,
   private val money: MoneyFormatter,
 ) : ViewModel() {
 
   private val zone = TimeZone.currentSystemDefault()
   private val today = Clock.System.now().toLocalDateTime(zone).date
+
+  private val effectChannel = Channel<RecurringEffect>(Channel.BUFFERED)
+  val effects = effectChannel.receiveAsFlow()
+
+  // Guards against a double-tap firing/skipping the same schedule twice before the
+  // reactive list drops its card. Touched only on the main thread (Compose callbacks
+  // + viewModelScope.Main), so a plain set is enough.
+  private val inFlight = mutableSetOf<RecurringScheduleId>()
 
   val uiState: StateFlow<RecurringUiState> = combine(
     recurring.observeAll(),
@@ -43,6 +60,37 @@ class RecurringViewModel(
   ) { schedules, categoryList ->
     buildState(schedules, categoryList.associateBy(Category::id))
   }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), RecurringUiState.Loading)
+
+  /** Record the firing and advance the due date — the row then leaves Pending on the
+   *  next emission. [name] is only for the confirmation message. */
+  fun markPaid(id: RecurringScheduleId, name: String) {
+    if (!inFlight.add(id)) return
+    viewModelScope.launch {
+      try {
+        val effect = when (fireSchedule(id)) {
+          is Either.Right -> RecurringEffect.ShowMessage(UiText.Res(R.string.recurring_paid_confirm, listOf(name)))
+          is Either.Left -> RecurringEffect.ShowMessage(UiText.Res(R.string.recurring_action_error))
+        }
+        effectChannel.send(effect)
+      } finally {
+        inFlight.remove(id)
+      }
+    }
+  }
+
+  /** Advance the due date without recording anything. */
+  fun skip(id: RecurringScheduleId) {
+    if (!inFlight.add(id)) return
+    viewModelScope.launch {
+      try {
+        if (skipSchedule(id) is Either.Left) {
+          effectChannel.send(RecurringEffect.ShowMessage(UiText.Res(R.string.recurring_action_error)))
+        }
+      } finally {
+        inFlight.remove(id)
+      }
+    }
+  }
 
   private fun buildState(schedules: List<RecurringSchedule>, categoriesById: Map<*, Category>): RecurringUiState {
     if (schedules.isEmpty()) return RecurringUiState.Empty
