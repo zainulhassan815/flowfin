@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
@@ -169,19 +168,3 @@ class RecurringViewModel(
 }
 
 private const val STOP_TIMEOUT_MS = 5_000L
-
-private fun weekdayShort(isoDayNumber: Int): String = titleCase3(DayOfWeek(isoDayNumber).name)
-private fun monthShort(month: Month): String = titleCase3(month.name)
-private fun monthFull(month: Month): String = month.name.lowercase().replaceFirstChar { it.uppercase() }
-private fun titleCase3(name: String): String = name.take(3).lowercase().replaceFirstChar { it.uppercase() }
-
-/** 1 → "1st", 22 → "22nd", 13 → "13th". */
-private fun ordinal(n: Int): String {
-  val suffix = if (n % 100 in 11..13) "th" else when (n % 10) {
-    1 -> "st"
-    2 -> "nd"
-    3 -> "rd"
-    else -> "th"
-  }
-  return "$n$suffix"
-}

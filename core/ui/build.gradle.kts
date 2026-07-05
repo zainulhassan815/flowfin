@@ -14,4 +14,7 @@ dependencies {
   api(projects.core.resources)
 
   implementation(libs.kotlinx.datetime)
+
+  testImplementation(libs.kotlin.test)
+  testImplementation(libs.kotlin.test.junit)
 }

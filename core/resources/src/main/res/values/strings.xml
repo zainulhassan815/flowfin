@@ -223,6 +223,32 @@
     <item quantity="one">%1$d schedule is paused. Resume it to start tracking it again.</item>
     <item quantity="other">All %1$d schedules are paused. Resume one to start tracking it again.</item>
   </plurals>
+  <!-- The + action in the tab header. -->
+  <string name="recurring_add_action">Add recurring</string>
+
+  <!-- Add recurring (pushed from the Recurring tab) -->
+  <string name="add_recurring_title">New recurring</string>
+  <string name="add_recurring_save">Save recurring</string>
+  <string name="add_recurring_field_name">Name</string>
+  <string name="add_recurring_name_placeholder">Gym Membership</string>
+  <string name="add_recurring_field_frequency">Frequency</string>
+  <string name="add_recurring_field_repeats">Repeats on</string>
+  <!-- The chosen cadence, e.g. "Every Monday", "25th of every month", "25 Jun every year". -->
+  <string name="add_recurring_repeats_weekly">Every %1$s</string>
+  <string name="add_recurring_repeats_monthly">%1$s of every month</string>
+  <string name="add_recurring_repeats_yearly">%1$d %2$s every year</string>
+  <!-- Preview under the cadence, e.g. "Next: 25 Jun 2026 · in 30 days". -->
+  <plurals name="add_recurring_next">
+    <item quantity="one">Next: %1$d %2$s %3$d · in %4$d day</item>
+    <item quantity="other">Next: %1$d %2$s %3$d · in %4$d days</item>
+  </plurals>
+  <string name="add_recurring_sheet_amount">Amount</string>
+  <!-- Month picker heading inside the yearly repeats-on sheet. -->
+  <string name="add_recurring_sheet_month">Month</string>
+  <string name="add_recurring_sheet_day">Day</string>
+  <string name="add_recurring_note_placeholder">Monthly gym fees…</string>
+  <string name="add_recurring_error_name">Give it a name first.</string>
+  <string name="add_recurring_error_income_account">Income must land in a real account.</string>
 
   <!-- Transaction detail -->
   <!-- Top-bar title, by kind. -->

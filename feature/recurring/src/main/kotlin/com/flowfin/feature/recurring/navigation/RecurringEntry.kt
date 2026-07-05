@@ -8,6 +8,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import com.flowfin.core.navigation.AddRecurringRoute
+import com.flowfin.core.navigation.Navigator
 import com.flowfin.core.navigation.RecurringRoute
 import com.flowfin.core.ui.resolve
 import com.flowfin.feature.recurring.RecurringEffect
@@ -15,7 +17,7 @@ import com.flowfin.feature.recurring.RecurringScreen
 import com.flowfin.feature.recurring.RecurringViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
-fun EntryProviderScope<NavKey>.recurringEntry() {
+fun EntryProviderScope<NavKey>.recurringEntry(navigator: Navigator) {
   entry<RecurringRoute> {
     val viewModel = koinViewModel<RecurringViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -35,6 +37,7 @@ fun EntryProviderScope<NavKey>.recurringEntry() {
       snackbarHostState = snackbarHostState,
       onMarkPaid = viewModel::markPaid,
       onSkip = viewModel::skip,
+      onAdd = { navigator.navigate(AddRecurringRoute) },
     )
   }
 }
