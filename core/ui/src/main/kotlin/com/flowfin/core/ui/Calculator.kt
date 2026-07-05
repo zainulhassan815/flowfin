@@ -1,4 +1,4 @@
-package com.flowfin.feature.transactions
+package com.flowfin.core.ui
 
 import com.flowfin.core.designsystem.component.CalculatorKey
 import com.flowfin.core.designsystem.component.CalculatorOperator

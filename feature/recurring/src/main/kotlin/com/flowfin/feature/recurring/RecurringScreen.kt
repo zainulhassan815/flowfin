@@ -35,9 +35,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.flowfin.core.designsystem.component.FlowFinIconButton
 import com.flowfin.core.designsystem.component.FlowFinPendingPaymentCard
 import com.flowfin.core.designsystem.component.PaymentStatus
 import com.flowfin.core.designsystem.component.PaymentUrgency
+import com.flowfin.core.designsystem.icon.FlowFinIcons
 import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.model.RecurringScheduleId
 import com.flowfin.core.resources.R
@@ -56,10 +58,11 @@ fun RecurringScreen(
   modifier: Modifier = Modifier,
   onMarkPaid: (RecurringScheduleId, String) -> Unit = { _, _ -> },
   onSkip: (RecurringScheduleId) -> Unit = {},
+  onAdd: () -> Unit = {},
 ) {
   Box(modifier.fillMaxSize().background(FlowFinTheme.colors.bg)) {
     Column(Modifier.fillMaxSize()) {
-      Header(state)
+      Header(state, onAdd)
       when (state) {
         RecurringUiState.Loading -> Box(Modifier.weight(1f).fillMaxWidth())
         RecurringUiState.Empty -> Notice(
@@ -86,27 +89,35 @@ fun RecurringScreen(
 }
 
 @Composable
-private fun Header(state: RecurringUiState) {
+private fun Header(state: RecurringUiState, onAdd: () -> Unit) {
   val palette = FlowFinTheme.colors
-  Column(
-    Modifier
+  Row(
+    modifier = Modifier
       .fillMaxWidth()
       .statusBarsPadding()
-      .padding(start = HORIZONTAL, end = HORIZONTAL, top = 12.dp, bottom = 8.dp),
+      .padding(start = HORIZONTAL, end = 16.dp, top = 12.dp, bottom = 8.dp),
+    verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text(
-      text = stringResource(R.string.recurring_title),
-      style = FlowFinTheme.typography.h2.copy(fontSize = 26.sp),
-      color = palette.text,
-    )
-    if (state is RecurringUiState.Content) {
+    Column(Modifier.weight(1f)) {
       Text(
-        text = stringResource(R.string.recurring_stats, state.pendingCount, state.activeCount),
-        modifier = Modifier.padding(top = 4.dp),
-        style = FlowFinTheme.typography.caption,
-        color = palette.textSoft,
+        text = stringResource(R.string.recurring_title),
+        style = FlowFinTheme.typography.h2.copy(fontSize = 26.sp),
+        color = palette.text,
       )
+      if (state is RecurringUiState.Content) {
+        Text(
+          text = stringResource(R.string.recurring_stats, state.pendingCount, state.activeCount),
+          modifier = Modifier.padding(top = 4.dp),
+          style = FlowFinTheme.typography.caption,
+          color = palette.textSoft,
+        )
+      }
     }
+    FlowFinIconButton(
+      onClick = onAdd,
+      icon = FlowFinIcons.Add,
+      contentDescription = stringResource(R.string.recurring_add_action),
+    )
   }
 }
 

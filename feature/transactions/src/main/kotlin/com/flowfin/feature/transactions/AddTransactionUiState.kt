@@ -4,6 +4,7 @@ import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.CategoryId
 import com.flowfin.core.model.CategoryScope
 import com.flowfin.core.model.Money
+import com.flowfin.core.ui.CalculatorState
 import kotlinx.datetime.LocalDate
 import org.dreamerslab.formz.Form
 import org.dreamerslab.formz.FormInput
