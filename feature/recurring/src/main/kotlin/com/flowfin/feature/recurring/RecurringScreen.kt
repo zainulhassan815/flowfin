@@ -2,6 +2,7 @@ package com.flowfin.feature.recurring
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,9 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -58,7 +56,9 @@ fun RecurringScreen(
   modifier: Modifier = Modifier,
   onMarkPaid: (RecurringScheduleId, String) -> Unit = { _, _ -> },
   onSkip: (RecurringScheduleId) -> Unit = {},
+  onResume: (RecurringScheduleId) -> Unit = {},
   onAdd: () -> Unit = {},
+  onOpenDetail: (RecurringScheduleId) -> Unit = {},
 ) {
   Box(modifier.fillMaxSize().background(FlowFinTheme.colors.bg)) {
     Column(Modifier.fillMaxSize()) {
@@ -70,17 +70,14 @@ fun RecurringScreen(
           title = stringResource(R.string.recurring_empty_title),
           body = stringResource(R.string.recurring_empty_body),
         )
-        is RecurringUiState.AllPaused -> Notice(
-          eyebrow = stringResource(R.string.recurring_all_paused_eyebrow),
-          title = stringResource(R.string.recurring_all_paused_title),
-          body = pluralStringResource(R.plurals.recurring_all_paused_body, state.pausedCount, state.pausedCount),
-        )
         is RecurringUiState.Content -> LazyColumn(
           modifier = Modifier.weight(1f),
           contentPadding = PaddingValues(start = HORIZONTAL, end = HORIZONTAL, bottom = 96.dp),
         ) {
           if (state.pending.isNotEmpty()) pendingSection(state.pending, onMarkPaid, onSkip)
-          upcomingSection(state.upcoming)
+          val nothingRunning = state.pendingCount == 0 && state.activeCount == 0 && state.paused.isNotEmpty()
+          activeSection(state.activeCount, state.upcoming, nothingRunning, onOpenDetail)
+          if (state.paused.isNotEmpty()) pausedSection(state.paused, onResume, onOpenDetail)
         }
       }
     }
@@ -105,6 +102,18 @@ private fun Header(state: RecurringUiState, onAdd: () -> Unit) {
         color = palette.text,
       )
       if (state is RecurringUiState.Content) {
+        // Nothing running (everything paused, or nothing due/upcoming) — the mockup
+        // swaps the monthly amount for a plain "paused" pill rather than showing Rs 0.
+        val nothingActive = state.pendingCount == 0 && state.activeCount == 0
+        Row(modifier = Modifier.padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+          Text(
+            text = stringResource(R.string.recurring_stats_monthly_label).uppercase(),
+            style = FlowFinTheme.typography.caption.copy(fontSize = 9.5.sp),
+            color = palette.textFaint,
+          )
+          Spacer(Modifier.width(8.dp))
+          if (nothingActive && state.paused.isNotEmpty()) PausePill() else Amount(state.monthlyTotalWhole, state.monthlyTotalDecimal)
+        }
         Text(
           text = stringResource(R.string.recurring_stats, state.pendingCount, state.activeCount),
           modifier = Modifier.padding(top = 4.dp),
@@ -117,6 +126,26 @@ private fun Header(state: RecurringUiState, onAdd: () -> Unit) {
       onClick = onAdd,
       icon = FlowFinIcons.Add,
       contentDescription = stringResource(R.string.recurring_add_action),
+    )
+  }
+}
+
+@Composable
+private fun PausePill() {
+  val palette = FlowFinTheme.colors
+  Row(
+    modifier = Modifier
+      .background(palette.surface2, RoundedCornerShape(6.dp))
+      .border(1.dp, palette.border, RoundedCornerShape(6.dp))
+      .padding(horizontal = 7.dp, vertical = 2.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Icon(imageVector = FlowFinIcons.Pause, contentDescription = null, modifier = Modifier.size(9.dp), tint = palette.textMute)
+    Spacer(Modifier.width(5.dp))
+    Text(
+      text = stringResource(R.string.recurring_all_paused_pill),
+      style = FlowFinTheme.typography.caption.copy(fontSize = 10.sp),
+      color = palette.textMute,
     )
   }
 }
@@ -136,18 +165,78 @@ private fun LazyListScope.pendingSection(
   items(pending, key = { it.id.value.toString() }) { PendingCard(it, onMarkPaid, onSkip) }
 }
 
-private fun LazyListScope.upcomingSection(groups: List<RecurringMonthGroup>) {
-  if (groups.isEmpty()) return
+/**
+ * Truly nothing running — no pending, nothing upcoming, but something's paused —
+ * surface the "active 0" section with an explanatory hint instead of just going
+ * blank. A schedule sitting in Pending still counts as "running" even with
+ * nothing upcoming, so [nothingRunning] must already account for that; in that
+ * case (or when nothing's paused either — a lone due-today schedule, say) the
+ * section is skipped entirely, same as before.
+ */
+private fun LazyListScope.activeSection(
+  activeCount: Int,
+  groups: List<RecurringMonthGroup>,
+  nothingRunning: Boolean,
+  onOpenDetail: (RecurringScheduleId) -> Unit,
+) {
+  if (groups.isEmpty() && !nothingRunning) return
   item(key = "active-head") {
     SectionHead(
       title = stringResource(R.string.recurring_section_active),
-      count = groups.sumOf { it.rows.size },
+      count = activeCount,
       aux = stringResource(R.string.recurring_section_active_aux),
     )
   }
+  if (groups.isEmpty()) {
+    item(key = "active-empty-hint") { EmptyActiveHint() }
+    return
+  }
   groups.forEachIndexed { index, group ->
     item(key = "month-$index") { MonthHeading(group.label) }
-    items(group.rows, key = { it.id.value.toString() }) { UpcomingRow(it) }
+    items(group.rows, key = { it.id.value.toString() }) { UpcomingRow(it, onOpenDetail) }
+  }
+}
+
+private fun LazyListScope.pausedSection(
+  paused: List<RecurringPausedUi>,
+  onResume: (RecurringScheduleId) -> Unit,
+  onOpenDetail: (RecurringScheduleId) -> Unit,
+) {
+  item(key = "paused-head") {
+    SectionHead(stringResource(R.string.recurring_paused_title), paused.size, stringResource(R.string.recurring_paused_aux))
+  }
+  items(paused, key = { it.id.value.toString() }) { PausedRow(it, onResume, onClick = onOpenDetail) }
+}
+
+@Composable
+private fun EmptyActiveHint() {
+  val palette = FlowFinTheme.colors
+  Column(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(top = 6.dp, bottom = 8.dp)
+      .border(1.dp, palette.borderStrong, RoundedCornerShape(14.dp))
+      .padding(vertical = 28.dp, horizontal = 20.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    Text(
+      text = stringResource(R.string.recurring_all_paused_eyebrow).uppercase(),
+      style = FlowFinTheme.typography.caption.copy(fontSize = 9.sp),
+      color = palette.textFaint,
+    )
+    Text(
+      text = stringResource(R.string.recurring_all_paused_title),
+      modifier = Modifier.padding(top = 6.dp),
+      style = FlowFinTheme.typography.h2.copy(fontSize = 19.sp),
+      color = palette.text,
+    )
+    Text(
+      text = stringResource(R.string.recurring_all_paused_body),
+      modifier = Modifier.padding(top = 6.dp),
+      style = FlowFinTheme.typography.body.copy(fontSize = 13.sp),
+      color = palette.textMute,
+      textAlign = TextAlign.Center,
+    )
   }
 }
 
@@ -200,10 +289,10 @@ private fun PendingCard(
 }
 
 @Composable
-private fun UpcomingRow(row: RecurringUpcomingUi) {
+private fun UpcomingRow(row: RecurringUpcomingUi, onClick: (RecurringScheduleId) -> Unit) {
   val palette = FlowFinTheme.colors
   Row(
-    modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+    modifier = Modifier.fillMaxWidth().clickable { onClick(row.id) }.padding(vertical = 12.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
     IconTile(categoryIcon(row.iconKey), categoryColor(row.colorKey))
@@ -225,42 +314,7 @@ private fun UpcomingRow(row: RecurringUpcomingUi) {
   }
 }
 
-@Composable
-private fun FreqTag(freq: UiText) {
-  val palette = FlowFinTheme.colors
-  Text(
-    text = freq.asString().uppercase(),
-    modifier = Modifier
-      .border(1.dp, palette.border, RoundedCornerShape(6.dp))
-      .padding(horizontal = 6.dp, vertical = 2.dp),
-    style = FlowFinTheme.typography.caption.copy(fontSize = 8.5.sp),
-    color = palette.textSoft,
-  )
-}
-
-@Composable
-private fun Amount(whole: String, decimal: String) {
-  val palette = FlowFinTheme.colors
-  Row(verticalAlignment = Alignment.Bottom) {
-    Text(whole, style = FlowFinTheme.typography.monoNum.copy(fontSize = 15.sp), color = palette.textMute)
-    Text(decimal, style = FlowFinTheme.typography.monoNum.copy(fontSize = 12.sp), color = palette.textFaint)
-  }
-}
-
-@Composable
-private fun IconTile(image: ImageVector, tint: Color) {
-  Box(
-    modifier = Modifier
-      .size(38.dp)
-      .background(tint.copy(alpha = 0.10f), RoundedCornerShape(10.dp))
-      .border(1.dp, tint.copy(alpha = 0.26f), RoundedCornerShape(10.dp)),
-    contentAlignment = Alignment.Center,
-  ) {
-    Icon(imageVector = image, contentDescription = null, modifier = Modifier.size(18.dp), tint = tint)
-  }
-}
-
-/** Centered, CTA-less informational state — shared by the empty and all-paused screens. */
+/** Centered, CTA-less informational state — used by the whole-screen empty state. */
 @Composable
 private fun Notice(eyebrow: String, title: String, body: String) {
   val palette = FlowFinTheme.colors
@@ -295,6 +349,8 @@ private fun PreviewRecurring() = FlowFinTheme {
     state = RecurringUiState.Content(
       pendingCount = 2,
       activeCount = 4,
+      monthlyTotalWhole = "39,500",
+      monthlyTotalDecimal = ".00",
       pending = listOf(
         RecurringPendingUi(id(), "Gym Membership", UiText.Raw("Monthly · 25th"), UiText.Raw("Due today"), RecurringUrgency.Due, "5,000", ".00", "favorite", "health"),
         RecurringPendingUi(id(), "Netflix", UiText.Raw("Monthly · 22nd"), UiText.Raw("3 days late"), RecurringUrgency.Late, "1,500", ".00", "subscriptions", "subs"),
@@ -307,6 +363,30 @@ private fun PreviewRecurring() = FlowFinTheme {
             RecurringUpcomingUi(id(), "Spotify", UiText.Raw("Monthly"), UiText.Raw("Due 5 Jun · in 10 days"), "500", ".00", "subscriptions", "subs"),
           ),
         ),
+      ),
+      paused = listOf(
+        RecurringPausedUi(id(), "Gym", UiText.Raw("Monthly"), UiText.Raw("Paused since 1 Apr"), "5,000", ".00", "health_and_wellness", "health"),
+      ),
+    ),
+  )
+}
+
+@Preview(name = "Recurring · all paused", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
+@Composable
+private fun PreviewRecurringAllPaused() = FlowFinTheme {
+  fun id() = RecurringScheduleId(Uuid.random())
+  RecurringScreen(
+    snackbarHostState = remember { SnackbarHostState() },
+    state = RecurringUiState.Content(
+      pendingCount = 0,
+      activeCount = 0,
+      monthlyTotalWhole = "0",
+      monthlyTotalDecimal = ".00",
+      pending = emptyList(),
+      upcoming = emptyList(),
+      paused = listOf(
+        RecurringPausedUi(id(), "Rent", UiText.Raw("Monthly"), UiText.Raw("Paused since 12 May"), "30,000", ".00", "home", "rent"),
+        RecurringPausedUi(id(), "Netflix", UiText.Raw("Monthly"), UiText.Raw("Paused since 4 May"), "1,500", ".00", "subscriptions", "subs"),
       ),
     ),
   )
