@@ -15,6 +15,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object RecurringRoute : NavKey
 
+/**
+ * Recurring schedule detail, pushed from an upcoming/paused row. Like
+ * [AccountDetailRoute], [scheduleId] is the id's plain string form; the feature
+ * reparses it at the entry boundary.
+ */
+@Serializable data class RecurringDetailRoute(val scheduleId: String) : NavKey
+
 @Serializable data object DebtsRoute : NavKey
 
 @Serializable data object ReportsRoute : NavKey

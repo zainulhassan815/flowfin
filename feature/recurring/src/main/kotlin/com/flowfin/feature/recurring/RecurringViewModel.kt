@@ -8,6 +8,7 @@ import com.flowfin.core.domain.repository.RecurringRepository
 import com.flowfin.core.domain.usecase.FireSchedule
 import com.flowfin.core.domain.usecase.SkipSchedule
 import com.flowfin.core.model.Category
+import com.flowfin.core.model.Money
 import com.flowfin.core.model.Recurrence
 import com.flowfin.core.model.RecurringSchedule
 import com.flowfin.core.model.RecurringScheduleId
@@ -31,11 +32,9 @@ import kotlinx.datetime.toLocalDateTime
  * Drives the Recurring tab. Active schedules split into pending (due now /
  * overdue) and upcoming (future, grouped by month); "now" is sampled once at
  * construction so the due/late labels stay stable for the screen's life.
- *
- * Read-only: firing / skipping / pausing / adding land in a follow-up slice.
  */
 class RecurringViewModel(
-  recurring: RecurringRepository,
+  private val recurring: RecurringRepository,
   categories: CategoryRepository,
   private val fireSchedule: FireSchedule,
   private val skipSchedule: SkipSchedule,
@@ -91,24 +90,54 @@ class RecurringViewModel(
     }
   }
 
+  /** Resumes a paused schedule — it reappears in Pending/Upcoming on the next emission. */
+  fun resume(id: RecurringScheduleId) {
+    if (!inFlight.add(id)) return
+    viewModelScope.launch {
+      try {
+        if (recurring.resume(id) is Either.Left) {
+          effectChannel.send(RecurringEffect.ShowMessage(UiText.Res(R.string.recurring_action_error)))
+        }
+      } finally {
+        inFlight.remove(id)
+      }
+    }
+  }
+
   private fun buildState(schedules: List<RecurringSchedule>, categoriesById: Map<*, Category>): RecurringUiState {
     if (schedules.isEmpty()) return RecurringUiState.Empty
 
-    val active = schedules.filter { it.isActive }.sortedBy { it.nextDueAt }
-    if (active.isEmpty()) return RecurringUiState.AllPaused(pausedCount = schedules.size)
-    val (pending, upcoming) = active.partition { it.dueDate() <= today }
+    val (active, paused) = schedules.partition { it.isActive }
+    val sortedActive = active.sortedBy { it.nextDueAt }
+    val (pending, upcoming) = sortedActive.partition { it.dueDate() <= today }
+    val monthlyTotal = monthlyEquivalentTotal(active)
 
     return RecurringUiState.Content(
       pendingCount = pending.size,
       activeCount = upcoming.size,
+      monthlyTotalWhole = money.whole(monthlyTotal),
+      monthlyTotalDecimal = money.fraction(monthlyTotal),
       pending = pending.map { it.toPendingUi(categoriesById) },
       upcoming = upcoming
         .groupBy { LocalDate(it.dueDate().year, it.dueDate().month, 1) }
         .map { (monthStart, rows) ->
           RecurringMonthGroup(monthLabel(monthStart), rows.map { it.toUpcomingUi(categoriesById) })
         },
+      paused = paused.map { it.toPausedUi(categoriesById) },
     )
   }
+
+  /** Each active schedule's amount, normalized to its monthly-equivalent load and
+   *  summed — weekly ×52÷12 (average weeks/month), monthly ×1, yearly ÷12. */
+  private fun monthlyEquivalentTotal(active: List<RecurringSchedule>): Money = Money(
+    active.sumOf { schedule ->
+      when (schedule.recurrence) {
+        is Recurrence.Weekly -> schedule.amount.minorUnits * 52 / 12
+        is Recurrence.Monthly -> schedule.amount.minorUnits
+        is Recurrence.Yearly -> schedule.amount.minorUnits / 12
+      }
+    },
+  )
 
   private fun RecurringSchedule.dueDate(): LocalDate = nextDueAt.toLocalDateTime(zone).date
 
@@ -142,6 +171,25 @@ class RecurringViewModel(
       name = name,
       freq = recurrence.freqLabel(),
       due = UiText.Plural(R.plurals.recurring_due_in, inDays, listOf(due.dayOfMonth, UiText.Raw(monthShort(due.month)), inDays)),
+      amountWhole = money.whole(amount),
+      amountDecimal = money.fraction(amount),
+      iconKey = category?.icon,
+      colorKey = category?.color,
+    )
+  }
+
+  private fun RecurringSchedule.toPausedUi(categoriesById: Map<*, Category>): RecurringPausedUi {
+    val category = categoriesById[categoryId]
+    val since = pausedAt?.toLocalDateTime(zone)?.date
+    return RecurringPausedUi(
+      id = id,
+      name = name,
+      freq = recurrence.freqLabel(),
+      pausedSince = if (since != null) {
+        UiText.Res(R.string.recurring_paused_since, listOf(since.dayOfMonth, UiText.Raw(monthShort(since.month))))
+      } else {
+        UiText.Res(R.string.recurring_paused_since_unknown)
+      },
       amountWhole = money.whole(amount),
       amountDecimal = money.fraction(amount),
       iconKey = category?.icon,

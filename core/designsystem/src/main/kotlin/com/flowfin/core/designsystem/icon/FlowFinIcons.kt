@@ -57,6 +57,7 @@ object FlowFinIcons {
   val History: ImageVector by lazy { lineIcon("M 3 12 a 9 9 0 1 0 18 0 a 9 9 0 1 0 -18 0 M12 7v5l3 2") }
   val Archive: ImageVector by lazy { lineIcon("M 4 4 L 20 4 A 1 1 0 0 1 21 5 L 21 7 A 1 1 0 0 1 20 8 L 4 8 A 1 1 0 0 1 3 7 L 3 5 A 1 1 0 0 1 4 4 Z M5 8v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4") }
   val Pause: ImageVector by lazy { lineIcon("M 7 4 L 9 4 A 1 1 0 0 1 10 5 L 10 19 A 1 1 0 0 1 9 20 L 7 20 A 1 1 0 0 1 6 19 L 6 5 A 1 1 0 0 1 7 4 Z M 15 4 L 17 4 A 1 1 0 0 1 18 5 L 18 19 A 1 1 0 0 1 17 20 L 15 20 A 1 1 0 0 1 14 19 L 14 5 A 1 1 0 0 1 15 4 Z") }
+  val Play: ImageVector by lazy { lineIcon("M5 3l14 9-14 9V3z") }
   val Sparkle: ImageVector by lazy { lineIcon("M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z") }
   val Export: ImageVector by lazy { lineIcon("M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3") }
   val Upload: ImageVector by lazy { lineIcon("M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12") }
@@ -142,6 +143,7 @@ private fun PreviewFlowFinIcons() = FlowFinTheme {
     "History" to FlowFinIcons.History,
     "Archive" to FlowFinIcons.Archive,
     "Pause" to FlowFinIcons.Pause,
+    "Play" to FlowFinIcons.Play,
     "Sparkle" to FlowFinIcons.Sparkle,
     "Export" to FlowFinIcons.Export,
     "Upload" to FlowFinIcons.Upload,

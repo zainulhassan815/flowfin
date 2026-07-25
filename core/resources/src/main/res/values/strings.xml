@@ -186,6 +186,8 @@
 
   <!-- Recurring schedules (tab) -->
   <string name="recurring_title">Recurring</string>
+  <!-- Stats line: monthly-equivalent load headline (label, currency prefixed by the amount itself). -->
+  <string name="recurring_stats_monthly_label">Monthly</string>
   <!-- Stats line under the title: pending + active counts. -->
   <string name="recurring_stats">%1$d pending · %2$d active</string>
   <!-- Section headings. -->
@@ -193,7 +195,7 @@
   <string name="recurring_section_pending_aux">Needs action</string>
   <!-- Confirmation after firing, e.g. "Marked paid · Netflix". -->
   <string name="recurring_paid_confirm">Marked paid · %1$s</string>
-  <!-- Backstop when a fire / skip fails. -->
+  <!-- Backstop when a fire / skip / pause / resume / delete fails. -->
   <string name="recurring_action_error">Couldn\'t update. Please try again.</string>
   <string name="recurring_section_active">All active</string>
   <string name="recurring_section_active_aux">Upcoming</string>
@@ -216,15 +218,22 @@
   <string name="recurring_empty_eyebrow">Set &amp; forget</string>
   <string name="recurring_empty_title">Nothing on repeat yet.</string>
   <string name="recurring_empty_body">Bills and income that repeat — rent, salary, subscriptions — gather here, each with a nudge when it\'s due.</string>
-  <!-- Schedules exist but all are paused. -->
-  <string name="recurring_all_paused_eyebrow">Paused</string>
-  <string name="recurring_all_paused_title">Everything\'s on hold.</string>
-  <plurals name="recurring_all_paused_body">
-    <item quantity="one">%1$d schedule is paused. Resume it to start tracking it again.</item>
-    <item quantity="other">All %1$d schedules are paused. Resume one to start tracking it again.</item>
-  </plurals>
+  <!-- Schedules exist but all are paused — the empty-hint card in the "All active" section. -->
+  <string name="recurring_all_paused_eyebrow">All paused</string>
+  <string name="recurring_all_paused_title">Nothing running.</string>
+  <string name="recurring_all_paused_body">Every schedule is paused. Resume one to start surfacing it before its next due date.</string>
+  <!-- Stats-line pill when nothing's currently running. -->
+  <string name="recurring_all_paused_pill">All paused</string>
   <!-- The + action in the tab header. -->
   <string name="recurring_add_action">Add recurring</string>
+
+  <!-- Paused schedules — a section in the tab's own flow, like Pending / Active -->
+  <string name="recurring_paused_title">Paused</string>
+  <string name="recurring_paused_aux">Tap ▶ to resume</string>
+  <string name="recurring_resume_action">Resume %1$s</string>
+  <!-- A paused row's meta, e.g. "Paused since 12 May". -->
+  <string name="recurring_paused_since">Paused since %1$d %2$s</string>
+  <string name="recurring_paused_since_unknown">Paused</string>
 
   <!-- Add recurring (pushed from the Recurring tab) -->
   <string name="add_recurring_title">New recurring</string>
@@ -249,6 +258,24 @@
   <string name="add_recurring_note_placeholder">Monthly gym fees…</string>
   <string name="add_recurring_error_name">Give it a name first.</string>
   <string name="add_recurring_error_income_account">Income must land in a real account.</string>
+
+  <!-- Recurring schedule detail (pushed from an upcoming/paused row) -->
+  <string name="recurring_detail_status_active">Active</string>
+  <!-- Fact-rail row labels. -->
+  <string name="recurring_detail_fact_status">Status</string>
+  <string name="recurring_detail_fact_schedule">Schedule</string>
+  <string name="recurring_detail_fact_next_due">Next due</string>
+  <!-- Next firing fact value, e.g. "1 Jun 2026". -->
+  <string name="recurring_detail_next_due">%1$d %2$s %3$d</string>
+  <string name="recurring_detail_action_pause">Pause</string>
+  <string name="recurring_detail_action_resume">Resume</string>
+  <string name="recurring_detail_action_delete">Delete</string>
+  <string name="recurring_detail_delete_title">Delete this schedule?</string>
+  <string name="recurring_detail_delete_body">This stops future firings. Transactions it already recorded aren\'t affected. It can\'t be undone.</string>
+  <string name="recurring_detail_delete_confirm">Delete</string>
+  <string name="recurring_detail_delete_cancel">Cancel</string>
+  <string name="recurring_detail_not_found_title">Schedule unavailable</string>
+  <string name="recurring_detail_not_found_body">This schedule is no longer available.</string>
 
   <!-- Transaction detail -->
   <!-- Top-bar title, by kind. -->

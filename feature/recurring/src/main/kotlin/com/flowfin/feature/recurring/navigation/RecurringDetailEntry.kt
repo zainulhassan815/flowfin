@@ -8,19 +8,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import com.flowfin.core.navigation.AddRecurringRoute
+import com.flowfin.core.model.RecurringScheduleId
 import com.flowfin.core.navigation.Navigator
 import com.flowfin.core.navigation.RecurringDetailRoute
-import com.flowfin.core.navigation.RecurringRoute
 import com.flowfin.core.ui.resolve
-import com.flowfin.feature.recurring.RecurringEffect
-import com.flowfin.feature.recurring.RecurringScreen
-import com.flowfin.feature.recurring.RecurringViewModel
+import com.flowfin.feature.recurring.RecurringDetailEffect
+import com.flowfin.feature.recurring.RecurringDetailScreen
+import com.flowfin.feature.recurring.RecurringDetailViewModel
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
+import kotlin.uuid.Uuid
 
-fun EntryProviderScope<NavKey>.recurringEntry(navigator: Navigator) {
-  entry<RecurringRoute> {
-    val viewModel = koinViewModel<RecurringViewModel>()
+fun EntryProviderScope<NavKey>.recurringDetailEntry(navigator: Navigator) {
+  entry<RecurringDetailRoute> { route ->
+    val scheduleId = RecurringScheduleId(Uuid.parse(route.scheduleId))
+    val viewModel = koinViewModel<RecurringDetailViewModel> { parametersOf(scheduleId) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -28,19 +30,18 @@ fun EntryProviderScope<NavKey>.recurringEntry(navigator: Navigator) {
     LaunchedEffect(viewModel) {
       viewModel.effects.collect { effect ->
         when (effect) {
-          is RecurringEffect.ShowMessage -> snackbarHostState.showSnackbar(effect.text.resolve(context))
+          RecurringDetailEffect.Dismiss -> navigator.goBack()
+          is RecurringDetailEffect.ShowMessage -> snackbarHostState.showSnackbar(effect.text.resolve(context))
         }
       }
     }
 
-    RecurringScreen(
+    RecurringDetailScreen(
       state = state,
       snackbarHostState = snackbarHostState,
-      onMarkPaid = viewModel::markPaid,
-      onSkip = viewModel::skip,
-      onResume = viewModel::resume,
-      onAdd = { navigator.navigate(AddRecurringRoute) },
-      onOpenDetail = { navigator.navigate(RecurringDetailRoute(it.value.toString())) },
+      onBack = { navigator.goBack() },
+      onTogglePause = viewModel::togglePause,
+      onConfirmDelete = viewModel::delete,
     )
   }
 }
