@@ -2,6 +2,7 @@ package com.flowfin.core.data
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOneOrNull
 import arrow.core.Either
 import com.flowfin.core.database.FlowFinDatabase
 import com.flowfin.core.domain.error.DebtError
@@ -39,6 +40,9 @@ internal class DebtRepositoryImpl(
   override fun observeByDirection(direction: DebtDirection): Flow<List<DebtWithRemaining>> =
     debts.selectByDirectionWithRemaining(direction).asFlow().mapToList(dispatcher).map { rows -> rows.map { it.toDebtWithRemaining() } }
 
+  override fun observeWithRemaining(id: DebtId): Flow<DebtWithRemaining?> =
+    debts.selectByIdWithRemaining(id).asFlow().mapToOneOrNull(dispatcher).map { it?.toDebtWithRemaining() }
+
   override suspend fun getById(id: DebtId): Debt? = withContext(dispatcher) {
     debts.selectById(id).executeAsOneOrNull()?.toModel()
   }
@@ -46,7 +50,7 @@ internal class DebtRepositoryImpl(
   override suspend fun open(
     direction: DebtDirection,
     personId: PersonId,
-    accountId: AccountId,
+    accountId: AccountId?,
     amount: Money,
     currency: String,
     reason: String?,
@@ -106,8 +110,9 @@ internal class DebtRepositoryImpl(
 
   override suspend fun recordRepayment(
     debt: Debt,
-    accountId: AccountId,
+    accountId: AccountId?,
     amount: Money,
+    note: String?,
     recordedAt: Instant,
   ): Either<DebtError, Unit> = withContext(dispatcher) {
     val now = clock.now()
@@ -120,7 +125,7 @@ internal class DebtRepositoryImpl(
         to_account_id = if (repayingOut) null else accountId,
         amount_minor = amount.minorUnits,
         category_id = null,
-        note = null,
+        note = note,
         recorded_at = recordedAt,
         recurring_id = null,
         debt_id = debt.id,
@@ -142,6 +147,18 @@ internal class DebtRepositoryImpl(
   override suspend fun reopen(id: DebtId): Either<DebtError, Unit> = withContext(dispatcher) {
     Either.catch {
       debts.reopen(updatedAt = clock.now(), id = id).value
+      Unit
+    }.mapLeft { DebtError.Unexpected(it) }
+  }
+
+  override suspend fun delete(id: DebtId): Either<DebtError, Unit> = withContext(dispatcher) {
+    Either.catch {
+      // Transactions first — `transactions.debt_id` has no cascade, and the debt
+      // row can't go while they still reference it.
+      db.transaction {
+        transactions.deleteByDebt(id)
+        debts.delete(id)
+      }
       Unit
     }.mapLeft { DebtError.Unexpected(it) }
   }

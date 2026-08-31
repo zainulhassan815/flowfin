@@ -24,31 +24,43 @@ interface DebtRepository {
 
   fun observeByDirection(direction: DebtDirection): Flow<List<DebtWithRemaining>>
 
+  /** One debt and its computed position, re-emitting as repayments land. Null once deleted. */
+  fun observeWithRemaining(id: DebtId): Flow<DebtWithRemaining?>
+
   suspend fun getById(id: DebtId): Debt?
 
   /**
    * Opens a debt: inserts the origin transaction (DEBT_BORROW for I_OWE into the
    * account, DEBT_LEND for OWED_TO_ME out of it) and the debt row atomically.
+   * [accountId] is optional — a debt can be tracked off-book, with no linked
+   * account movement (the user borrowed/lent outside any tracked account).
    */
   suspend fun open(
     direction: DebtDirection,
     personId: PersonId,
-    accountId: AccountId,
+    accountId: AccountId?,
     amount: Money,
     currency: String,
     reason: String?,
     recordedAt: Instant,
   ): Either<DebtError, Debt>
 
-  /** Records a repayment against [debt] (DEBT_REPAY_OUT for I_OWE, DEBT_REPAY_IN for OWED_TO_ME). */
+  /**
+   * Records a repayment against [debt] (DEBT_REPAY_OUT for I_OWE, DEBT_REPAY_IN
+   * for OWED_TO_ME). [accountId] is optional, same as [open].
+   */
   suspend fun recordRepayment(
     debt: Debt,
-    accountId: AccountId,
+    accountId: AccountId?,
     amount: Money,
+    note: String?,
     recordedAt: Instant,
   ): Either<DebtError, Unit>
 
   suspend fun markSettled(id: DebtId): Either<DebtError, Unit>
 
   suspend fun reopen(id: DebtId): Either<DebtError, Unit>
+
+  /** Deletes a debt and its entire transaction history (origin + repayments). */
+  suspend fun delete(id: DebtId): Either<DebtError, Unit>
 }

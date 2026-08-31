@@ -4,17 +4,20 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import com.flowfin.core.database.FlowFinDatabase
 import com.flowfin.core.domain.repository.CategoryRepository
+import com.flowfin.core.domain.repository.DebtRepository
 import com.flowfin.core.domain.repository.RecurringRepository
 import com.flowfin.core.domain.usecase.CreateBudget
 import com.flowfin.core.domain.usecase.CreatePerson
 import com.flowfin.core.domain.usecase.CreateRealAccount
 import com.flowfin.core.domain.usecase.RecordBorrow
 import com.flowfin.core.domain.usecase.RecordLend
+import com.flowfin.core.domain.usecase.RecordRepayment
 import com.flowfin.core.domain.usecase.RecordTransaction
 import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.CategoryId
 import com.flowfin.core.model.CategoryScope
+import com.flowfin.core.model.DebtId
 import com.flowfin.core.model.Money
 import com.flowfin.core.model.Recurrence
 import com.flowfin.core.model.RecurringDraft
@@ -42,7 +45,9 @@ enum class DevScenario(val title: String, val blurb: String) {
   QUIET_WEEK("Quiet week", "History, but nothing in the last ~2 weeks. Home 'quiet stretch'."),
   OVERDUE_RECURRING("Overdue recurring", "An active schedule past its due date. Home Pending (late)."),
   RECURRING("Recurring schedules", "A full mix — pending, overdue, and upcoming across weekly / monthly / yearly. Recurring tab."),
-  DEBTS("Debts", "One I-owe + one owed-to-me."),
+  RECURRING_PAUSED("Recurring — all paused", "Every schedule paused. Active section empty, paused list inline, nothing pending."),
+  DEBTS("Debts", "Both directions: part-paid, untouched, off-book, overpaid, and one settled. Detail timeline + settled disclosure."),
+  DEBTS_SETTLED("Debts — all clear", "Every debt settled. Hero reads \"All clear.\", both tabs empty above the settled lists."),
   NEGATIVE_BALANCE("Negative balance", "Spent more than the account holds. Warning treatment."),
   OVERSPENT_BUDGET("Over-spent budget", "Envelope spend exceeds its funding. Progress clamp."),
 }
@@ -63,6 +68,8 @@ internal class DevScenarios(
   private val createPerson: CreatePerson,
   private val recordBorrow: RecordBorrow,
   private val recordLend: RecordLend,
+  private val recordRepayment: RecordRepayment,
+  private val debtRepository: DebtRepository,
   private val clock: Clock,
   private val zone: TimeZone,
   private val dispatcher: CoroutineDispatcher,
@@ -78,7 +85,9 @@ internal class DevScenarios(
         DevScenario.QUIET_WEEK -> quietWeek()
         DevScenario.OVERDUE_RECURRING -> overdueRecurring()
         DevScenario.RECURRING -> recurringMix()
+        DevScenario.RECURRING_PAUSED -> recurringAllPaused()
         DevScenario.DEBTS -> debts()
+        DevScenario.DEBTS_SETTLED -> debtsAllSettled()
         DevScenario.NEGATIVE_BALANCE -> negativeBalance()
         DevScenario.OVERSPENT_BUDGET -> overspentBudget()
       }
@@ -175,12 +184,83 @@ internal class DevScenarios(
     backdateAccounts(days = 40)
   }
 
+  /**
+   * Every schedule paused: the Active section goes empty (with its "Resume one"
+   * hint), the paused list surfaces inline, and nothing is pending — one seed
+   * covers both designed states.
+   */
+  private suspend fun recurringAllPaused() {
+    categories.ensureDefaultsSeeded().bind()
+    val bank = bank(Money(8_000_000))
+
+    expenseSchedule("Gym Membership", Money(500_000), Recurrence.Monthly(25), bank.id, expenseCategory("favorite"), daysFromNow(9))
+    expenseSchedule("Netflix", Money(150_000), Recurrence.Monthly(22), bank.id, expenseCategory("movie"), daysFromNow(5))
+    expenseSchedule("Rent", Money(3_000_000), Recurrence.Monthly(1), bank.id, expenseCategory("home"), daysFromNow(6))
+    expenseSchedule("Internet", Money(250_000), Recurrence.Monthly(10), bank.id, expenseCategory("bolt"), daysFromNow(15))
+
+    recurring.observeAll().first().forEach { recurring.pause(it.id).bind() }
+    backdateAccounts(days = 40)
+  }
+
+  /**
+   * Both directions, dense enough that one seed reaches every Debts state the
+   * app can render: a part-paid debt (progress bar + multi-entry timeline), an
+   * untouched one (0%, origin-only timeline), an off-book one (no account
+   * movement), an overpaid one (negative remaining), and a settled one behind
+   * the tab's disclosure.
+   */
   private suspend fun debts() {
     val bank = bank(Money(5_000_000))
-    val ali = createPerson("Ali").bind()
-    val sara = createPerson("Sara").bind()
-    recordBorrow(ali.id, intoAccount = bank.id, amount = Money(2_000_000), reason = "Short-term loan", recordedAt = daysAgo(7)).bind()
-    recordLend(sara.id, fromAccount = bank.id, amount = Money(1_000_000), reason = "Covered lunch tab", recordedAt = daysAgo(4)).bind()
+    val ali = createPerson("Ali", avatarTintIndex = 1).bind()
+    val sara = createPerson("Sara", avatarTintIndex = 3).bind()
+    val imran = createPerson("Imran", avatarTintIndex = 2).bind()
+    val hina = createPerson("Hina", avatarTintIndex = 4).bind()
+    val bilal = createPerson("Bilal", avatarTintIndex = 5).bind()
+
+    // I owe · part-paid — three timeline entries, progress just past half.
+    val rent = recordBorrow(ali.id, bank.id, Money(8_000_000), "Borrowed for rent", daysAgo(21)).bind()
+    repay(rent.id, bank.id, Money(2_000_000), daysAgo(14))
+    repay(rent.id, bank.id, Money(2_500_000), daysAgo(8), note = "rent share")
+    repay(rent.id, bank.id, Money(1_000_000), daysAgo(2))
+
+    // I owe · untouched — origin-only timeline, 0% progress, "Full amount".
+    recordBorrow(imran.id, bank.id, Money(2_500_000), reason = null, recordedAt = daysAgo(5)).bind()
+
+    // I owe · off-book — no account movement at all, so no balance shifts.
+    val offBook = recordBorrow(hina.id, intoAccount = null, amount = Money(1_200_000), reason = "Cash from mum", recordedAt = daysAgo(11)).bind()
+    repay(offBook.id, account = null, amount = Money(400_000), at = daysAgo(3))
+
+    // Owed to me · part-paid.
+    val lunch = recordLend(sara.id, bank.id, Money(3_000_000), "Covered the lunch tab", daysAgo(16)).bind()
+    repay(lunch.id, bank.id, Money(1_000_000), daysAgo(6))
+
+    // Owed to me · overpaid — remaining goes negative, which is allowed.
+    val tickets = recordLend(bilal.id, bank.id, Money(600_000), "Concert tickets", daysAgo(9)).bind()
+    repay(tickets.id, bank.id, Money(750_000), daysAgo(1), note = "rounded up")
+
+    // Settled — sits behind the "1 settled debt" disclosure on the I-owe tab.
+    val phone = recordBorrow(sara.id, bank.id, Money(1_500_000), "Phone repair", daysAgo(40)).bind()
+    repay(phone.id, bank.id, Money(1_500_000), daysAgo(30))
+    debtRepository.markSettled(phone.id).bind()
+
+    backdateAccounts(days = 60)
+  }
+
+  /** Every debt settled — the hero reads "All clear." and both active lists are empty. */
+  private suspend fun debtsAllSettled() {
+    val bank = bank(Money(5_000_000))
+    val ali = createPerson("Ali", avatarTintIndex = 1).bind()
+    val sara = createPerson("Sara", avatarTintIndex = 3).bind()
+
+    val borrowed = recordBorrow(ali.id, bank.id, Money(2_000_000), "Short-term loan", daysAgo(30)).bind()
+    repay(borrowed.id, bank.id, Money(2_000_000), daysAgo(9))
+    debtRepository.markSettled(borrowed.id).bind()
+
+    val lent = recordLend(sara.id, bank.id, Money(1_000_000), "Covered lunch tab", daysAgo(25)).bind()
+    repay(lent.id, bank.id, Money(1_000_000), daysAgo(4))
+    debtRepository.markSettled(lent.id).bind()
+
+    backdateAccounts(days = 60)
   }
 
   private suspend fun negativeBalance() {
@@ -236,6 +316,11 @@ internal class DevScenarios(
 
   private suspend fun record(draft: TransactionDraft) {
     recordTransaction(draft).bind()
+  }
+
+  /** A repayment against a seeded debt. A null [account] keeps it off-book. */
+  private suspend fun repay(debt: DebtId, account: AccountId?, amount: Money, at: Instant, note: String? = null) {
+    recordRepayment(debt, account, amount, at, note).bind()
   }
 
   /** Backdate every seeded account's creation, so Home reads an established user

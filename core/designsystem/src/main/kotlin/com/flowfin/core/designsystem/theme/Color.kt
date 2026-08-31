@@ -8,9 +8,14 @@ import androidx.compose.ui.graphics.Color
  * FlowFin's color tokens. One source of truth — every component reads from
  * [FlowFinTheme.colors] rather than hardcoding hex values.
  *
- * Mirrors the CSS custom properties in `design/system/styles.css`. The dark
- * palette is the default and currently the only one; a `lightColors` will
- * arrive when the design system covers light mode.
+ * Mirrors the CSS custom properties in `design/system/styles.css`. Two palettes
+ * ship: [flowFinDarkColors] (the reference palette the design system was drawn
+ * in) and [flowFinLightColors] (the same structure re-tuned for light surfaces).
+ *
+ * Note the [accent] departs from `styles.css` and `design/system/brand.html`,
+ * which are still on the brand's sand/cream `#E8DCC0`. The app's accent is now
+ * deliberately near-neutral so that hue is free to mean something — see the
+ * property's own note.
  */
 @Immutable
 data class FlowFinColors(
@@ -30,11 +35,21 @@ data class FlowFinColors(
   val textFaint: Color,
 
   // Semantic
+  /**
+   * Deliberately near-neutral — near-black on light, near-white on dark. The
+   * accent carries emphasis (buttons, the FAB, progress fills), not meaning:
+   * colour in FlowFin is reserved for semantic state ([positive], [negative],
+   * [warning], [transfer]) and category identity, so a hued accent would
+   * compete with the only signals that are supposed to mean something.
+   */
   val accent: Color,
   val positive: Color,
   val warning: Color,
   val negative: Color,
   val transfer: Color,
+
+  /** Content color for text/icons sitting on an [accent] or [negative] fill. */
+  val onAccent: Color,
 
   // Category palette — keyed by category role.
   val categories: CategoryColors,
@@ -98,11 +113,12 @@ val flowFinDarkColors = FlowFinColors(
   textSoft      = Color(0xFF8A8A92),
   textFaint     = Color(0xFF565660),
 
-  accent        = Color(0xFFE8DCC0),
+  accent        = Color(0xFFE8E8EA),
   positive      = Color(0xFF9CD4A2),
   warning       = Color(0xFFE8B66E),
   negative      = Color(0xFFE08A8A),
   transfer      = Color(0xFF82C5D4),
+  onAccent      = Color(0xFF0A0A0B),
 
   categories = CategoryColors(
     bank      = Color(0xFF82C5D4),
@@ -130,6 +146,63 @@ val flowFinDarkColors = FlowFinColors(
     tint3 = Color(0xFFE8A87B),
     tint4 = Color(0xFF9CD4A2),
     tint5 = Color(0xFFE89AB8),
+  ),
+)
+
+/**
+ * The light palette. Same structure as [flowFinDarkColors], re-tuned for light
+ * surfaces: the surface ramp steps *away* from a white page (each level a touch
+ * warmer/darker, so cards read as tiles), and every semantic/category hue is
+ * darkened to keep ≥4.5:1 against the surfaces it labels — the dark palette's
+ * pastels wash out on white.
+ */
+val flowFinLightColors = FlowFinColors(
+  bg            = Color(0xFFFFFFFF),
+  surface       = Color(0xFFF8F7F4),
+  surface2      = Color(0xFFF1F0EB),
+  surface3      = Color(0xFFE9E8E2),
+  border        = Color(0xFFE5E4DE),
+  borderStrong  = Color(0xFFD4D3CC),
+  pageBg        = Color(0xFFE9E8E2),
+
+  text          = Color(0xFF16161A),
+  textMute      = Color(0xFF4A4A52),
+  textSoft      = Color(0xFF74747E),
+  textFaint     = Color(0xFF9E9EA8),
+
+  accent        = Color(0xFF22262B),
+  positive      = Color(0xFF2E7D48),
+  warning       = Color(0xFF9A6A17),
+  negative      = Color(0xFFB3413C),
+  transfer      = Color(0xFF2A7A8C),
+  onAccent      = Color(0xFFFFFFFF),
+
+  categories = CategoryColors(
+    bank      = Color(0xFF2F7C8E),
+    cash      = Color(0xFF6B8A2E),
+    mobile    = Color(0xFF8B4E97),
+    food      = Color(0xFFB4653A),
+    grocery   = Color(0xFF5C8B32),
+    transport = Color(0xFF3D6FA5),
+    fun_      = Color(0xFF8B4E97),
+    salary    = Color(0xFF2E7D48),
+    subs      = Color(0xFF5B4CB0),
+    rent      = Color(0xFFA0563C),
+    utilities = Color(0xFF8A6F1E),
+    shop      = Color(0xFFB0466C),
+    health    = Color(0xFFA8443F),
+    edu       = Color(0xFF2C7B87),
+    care      = Color(0xFF7E5A8E),
+    debt      = Color(0xFFB3413C),
+    other     = Color(0xFF6C6C76),
+  ),
+
+  avatars = AvatarColors(
+    tint1 = Color(0xFF2F7C8E),
+    tint2 = Color(0xFF8B4E97),
+    tint3 = Color(0xFFB4653A),
+    tint4 = Color(0xFF2E7D48),
+    tint5 = Color(0xFFB0466C),
   ),
 )
 

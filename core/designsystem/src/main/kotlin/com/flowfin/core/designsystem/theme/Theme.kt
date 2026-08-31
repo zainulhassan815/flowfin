@@ -1,8 +1,10 @@
 package com.flowfin.core.designsystem.theme
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
@@ -19,10 +21,17 @@ import androidx.compose.runtime.ReadOnlyComposable
  *   color = FlowFinTheme.colors.textSoft,
  * )
  * ```
+ *
+ * Light is the default palette; pass [darkTheme] explicitly to pin the dark one
+ * (previews, screenshots, a future in-app appearance setting). It does not follow
+ * the system setting — FlowFin picks its own look until Settings offers a choice.
  */
 @Composable
-fun FlowFinTheme(content: @Composable () -> Unit) {
-  val colors = flowFinDarkColors
+fun FlowFinTheme(
+  darkTheme: Boolean = false,
+  content: @Composable () -> Unit,
+) {
+  val colors = if (darkTheme) flowFinDarkColors else flowFinLightColors
   val typography = flowFinTypography
 
   CompositionLocalProvider(
@@ -30,7 +39,7 @@ fun FlowFinTheme(content: @Composable () -> Unit) {
     LocalFlowFinTypography provides typography,
   ) {
     MaterialTheme(
-      colorScheme = colors.toMaterialColorScheme(),
+      colorScheme = colors.toMaterialColorScheme(darkTheme),
       typography = typography.toMaterialTypography(),
       content = content,
     )
@@ -55,27 +64,30 @@ object FlowFinTheme {
  * (Button, Card, TextField, …) inherit FlowFin colors when used as building
  * blocks. Custom FlowFin components should read [FlowFinTheme.colors] directly.
  */
-private fun FlowFinColors.toMaterialColorScheme() = darkColorScheme(
-  background       = bg,
-  surface          = surface,
-  surfaceVariant   = surface2,
-  surfaceContainer = surface3,
-  outline          = border,
-  outlineVariant   = borderStrong,
+private fun FlowFinColors.toMaterialColorScheme(darkTheme: Boolean): ColorScheme {
+  val base = if (darkTheme) darkColorScheme() else lightColorScheme()
+  return base.copy(
+    background       = bg,
+    surface          = surface,
+    surfaceVariant   = surface2,
+    surfaceContainer = surface3,
+    outline          = border,
+    outlineVariant   = borderStrong,
 
-  onBackground       = text,
-  onSurface          = text,
-  onSurfaceVariant   = textMute,
+    onBackground       = text,
+    onSurface          = text,
+    onSurfaceVariant   = textMute,
 
-  primary            = accent,
-  onPrimary          = bg,
-  secondary          = transfer,
-  onSecondary        = bg,
-  tertiary           = positive,
-  onTertiary         = bg,
-  error              = negative,
-  onError            = bg,
-)
+    primary            = accent,
+    onPrimary          = onAccent,
+    secondary          = transfer,
+    onSecondary        = onAccent,
+    tertiary           = positive,
+    onTertiary         = onAccent,
+    error              = negative,
+    onError            = onAccent,
+  )
+}
 
 /**
  * Maps FlowFin's type scale onto M3's `Typography` slots. The fit is

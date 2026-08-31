@@ -54,7 +54,7 @@ fun FlowFinButton(
     shape = ButtonShape,
     colors = ButtonDefaults.buttonColors(
       containerColor = if (destructive) FlowFinTheme.colors.negative else FlowFinTheme.colors.accent,
-      contentColor = FlowFinTheme.colors.bg,
+      contentColor = FlowFinTheme.colors.onAccent,
       disabledContainerColor = FlowFinTheme.colors.surface2,
       disabledContentColor = FlowFinTheme.colors.textFaint,
     ),

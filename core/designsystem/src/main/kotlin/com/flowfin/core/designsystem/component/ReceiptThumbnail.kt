@@ -41,10 +41,12 @@ fun FlowFinReceiptThumbnail(modifier: Modifier = Modifier) {
     Canvas(modifier = Modifier.fillMaxSize()) {
       val inset = 8.dp.toPx()
       val lineHeight = 1.dp.toPx()
-      listOf(0.10f, 0.08f, 0.06f).forEachIndexed { index, alpha ->
+      // Faux receipt lines. Tinted off the palette's faintest text so they read
+      // on a light ground as well as a dark one.
+      listOf(0.55f, 0.42f, 0.30f).forEachIndexed { index, alpha ->
         val y = (8 + index * 6).dp.toPx()
         drawRect(
-          color = Color.White.copy(alpha = alpha),
+          color = palette.textFaint.copy(alpha = alpha),
           topLeft = Offset(inset, y),
           size = Size(size.width - inset * 2, lineHeight),
         )

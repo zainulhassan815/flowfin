@@ -45,7 +45,7 @@ fun FlowFinNotificationPreview(
     modifier = modifier
       .fillMaxWidth()
       .clip(RoundedCornerShape(14.dp))
-      .background(Color.White.copy(alpha = 0.06f))
+      .background(palette.surface3)
       .padding(horizontal = 14.dp, vertical = 12.dp),
     horizontalArrangement = Arrangement.spacedBy(12.dp),
     verticalAlignment = Alignment.Top,

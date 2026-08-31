@@ -14,7 +14,9 @@ import kotlinx.datetime.Instant
 /**
  * Records a repayment against a debt. Overpayment is allowed (settling up or
  * forgiveness), so there's no check against the remaining; the direction of the
- * debt decides whether money leaves or enters the account.
+ * debt decides whether money leaves or enters the account. [account] is
+ * optional — an off-book debt (or an off-book repayment on a linked one) has no
+ * account to move money through, and so nothing to currency-check either.
  */
 class RecordRepayment(
   private val accounts: AccountRepository,
@@ -22,14 +24,17 @@ class RecordRepayment(
 ) {
   suspend operator fun invoke(
     debtId: DebtId,
-    account: AccountId,
+    account: AccountId?,
     amount: Money,
     recordedAt: Instant,
+    note: String? = null,
   ): Either<DebtError, Unit> = either {
     ensure(amount.isPositive) { DebtError.AmountNotPositive }
     val debt = debts.getById(debtId) ?: raise(DebtError.DebtNotFound(debtId))
-    val real = requireRealActiveAccount(accounts, account)
-    ensure(real.currency == debt.currency) { DebtError.CurrencyMismatch }
-    debts.recordRepayment(debt, account, amount, recordedAt).bind()
+    if (account != null) {
+      val real = requireRealActiveAccount(accounts, account)
+      ensure(real.currency == debt.currency) { DebtError.CurrencyMismatch }
+    }
+    debts.recordRepayment(debt, account, amount, note, recordedAt).bind()
   }
 }

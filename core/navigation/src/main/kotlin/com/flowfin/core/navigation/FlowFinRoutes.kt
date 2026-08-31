@@ -24,6 +24,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object DebtsRoute : NavKey
 
+/**
+ * Debt detail, pushed from a debt card. Like [AccountDetailRoute], [debtId] is
+ * the id's plain string form; the feature reparses it at the entry boundary.
+ */
+@Serializable data class DebtDetailRoute(val debtId: String) : NavKey
+
 @Serializable data object ReportsRoute : NavKey
 
 @Serializable data object AddTransactionRoute : NavKey
@@ -31,6 +37,8 @@ import kotlinx.serialization.Serializable
 @Serializable data object AddAccountRoute : NavKey
 
 @Serializable data object AddRecurringRoute : NavKey
+
+@Serializable data object AddDebtRoute : NavKey
 
 /**
  * Account detail, pushed within the Accounts tab. [accountId] is the account's

@@ -5,6 +5,7 @@ import com.flowfin.core.domain.error.TransactionError
 import com.flowfin.core.model.AccountFlow
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.CategoryId
+import com.flowfin.core.model.DebtId
 import com.flowfin.core.model.Money
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.model.TransactionDraft
@@ -33,6 +34,9 @@ interface TransactionRepository {
    * negative). Powers Home's "this month" trend.
    */
   fun observeNetChange(startAt: Instant, endAt: Instant): Flow<Money>
+
+  /** A debt's movements — origin then repayments, oldest first, for its timeline. */
+  fun observeByDebt(debtId: DebtId): Flow<List<Transaction>>
 
   /** Every row touching one account, for Account detail. */
   fun observeByAccount(accountId: AccountId, limit: Long, offset: Long): Flow<List<Transaction>>

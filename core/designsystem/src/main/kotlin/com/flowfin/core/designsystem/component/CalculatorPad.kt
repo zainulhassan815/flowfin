@@ -280,7 +280,7 @@ private fun EqualsKey(tint: Color, onClick: () -> Unit) {
     Text(
       text = "=",
       style = FlowFinTheme.typography.monoNum.copy(fontWeight = FontWeight.SemiBold),
-      color = FlowFinTheme.colors.bg,
+      color = FlowFinTheme.colors.onAccent,
     )
   }
 }
