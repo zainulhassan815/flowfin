@@ -6,6 +6,8 @@ import com.flowfin.core.data.DebtRepositoryImpl
 import com.flowfin.core.data.IdGenerator
 import com.flowfin.core.data.PersonRepositoryImpl
 import com.flowfin.core.data.RecurringRepositoryImpl
+import com.flowfin.core.data.SettingsRepositoryImpl
+import com.flowfin.core.data.UserSettingsSerializer
 import com.flowfin.core.data.TransactionRepositoryImpl
 import com.flowfin.core.data.UuidV7Generator
 import com.flowfin.core.domain.repository.AccountRepository
@@ -13,6 +15,7 @@ import com.flowfin.core.domain.repository.CategoryRepository
 import com.flowfin.core.domain.repository.DebtRepository
 import com.flowfin.core.domain.repository.PersonRepository
 import com.flowfin.core.domain.repository.RecurringRepository
+import com.flowfin.core.domain.repository.SettingsRepository
 import com.flowfin.core.domain.repository.TransactionRepository
 import com.flowfin.core.domain.usecase.CreateBudget
 import com.flowfin.core.domain.usecase.CreateCategory
@@ -25,10 +28,15 @@ import com.flowfin.core.domain.usecase.RecordLend
 import com.flowfin.core.domain.usecase.RecordRepayment
 import com.flowfin.core.domain.usecase.RecordTransaction
 import com.flowfin.core.domain.usecase.SkipSchedule
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.dataStoreFile
+import com.flowfin.core.model.UserSettings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 /**
@@ -46,6 +54,13 @@ val dataModule = module {
   single<PersonRepository> { PersonRepositoryImpl(get(), get(), get(), get()) }
   single<DebtRepository> { DebtRepositoryImpl(get(), get(), get(), get()) }
   single<CategoryRepository> { CategoryRepositoryImpl(get(), get(), get(), get()) }
+  // Preferences live in their own file, not the database — see SettingsRepository.
+  single<DataStore<UserSettings>> {
+    DataStoreFactory.create(serializer = UserSettingsSerializer) {
+      androidContext().dataStoreFile("user_settings.json")
+    }
+  }
+  single<SettingsRepository> { SettingsRepositoryImpl(get()) }
   single<RecurringRepository> { RecurringRepositoryImpl(get(), get(), get(), get()) }
 
   factory { RecordTransaction(get(), get(), get()) }

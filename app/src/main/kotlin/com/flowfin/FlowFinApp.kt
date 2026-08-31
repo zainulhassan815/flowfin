@@ -10,6 +10,7 @@ import com.flowfin.feature.accounts.di.accountsModule
 import com.flowfin.feature.debts.di.debtsModule
 import com.flowfin.feature.home.di.homeModule
 import com.flowfin.feature.recurring.di.recurringModule
+import com.flowfin.feature.settings.di.settingsModule
 import com.flowfin.feature.transactions.di.transactionsModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +27,7 @@ class FlowFinApp : Application() {
     val koin = startKoin {
       androidLogger(Level.INFO)
       androidContext(this@FlowFinApp)
-      modules(databaseModule, dataModule, uiModule, appModule, homeModule, transactionsModule, accountsModule, recurringModule, debtsModule)
+      modules(databaseModule, dataModule, uiModule, appModule, homeModule, transactionsModule, accountsModule, recurringModule, debtsModule, settingsModule)
     }.koin
 
     CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {

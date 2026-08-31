@@ -14,7 +14,9 @@ dependencies {
   implementation(projects.core.common)
   implementation(projects.core.database)
 
+  implementation(libs.androidx.datastore)
   implementation(libs.kotlinx.coroutines.core)
+  implementation(libs.kotlinx.serialization.json)
   implementation(libs.kotlinx.datetime)
   implementation(libs.sqldelight.coroutines)
   implementation(libs.arrow.core)

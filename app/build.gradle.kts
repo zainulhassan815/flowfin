@@ -29,6 +29,11 @@ android {
     }
   }
 
+  // Settings shows the running build's version; BuildConfig is where it comes from.
+  buildFeatures {
+    buildConfig = true
+  }
+
   packaging {
     resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
   }
