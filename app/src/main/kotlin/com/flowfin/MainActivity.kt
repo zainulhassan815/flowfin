@@ -19,11 +19,12 @@ import org.koin.compose.KoinContext
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     installSplashScreen()
-    // Draw under the system bars; both stay transparent with light icons since the
-    // app is always dark-themed. Screens own their own insets from here on.
+    // Draw under the system bars; both stay transparent with dark icons since
+    // FlowFinTheme defaults to the light palette. Screens own their own insets
+    // from here on.
     enableEdgeToEdge(
-      statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
-      navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+      statusBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
+      navigationBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
     )
     super.onCreate(savedInstanceState)
     setContent { FlowFinRoot() }

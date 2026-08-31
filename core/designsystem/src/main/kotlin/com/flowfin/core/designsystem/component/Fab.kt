@@ -33,7 +33,7 @@ fun FlowFinFab(
     modifier = modifier.size(56.dp),
     shape = CircleShape,
     containerColor = FlowFinTheme.colors.accent,
-    contentColor = FlowFinTheme.colors.bg,
+    contentColor = FlowFinTheme.colors.onAccent,
     elevation = FloatingActionButtonDefaults.elevation(
       defaultElevation = 12.dp,
       pressedElevation = 6.dp,
