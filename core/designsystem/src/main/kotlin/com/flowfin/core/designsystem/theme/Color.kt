@@ -151,19 +151,24 @@ val flowFinDarkColors = FlowFinColors(
 
 /**
  * The light palette. Same structure as [flowFinDarkColors], re-tuned for light
- * surfaces: the surface ramp steps *away* from a white page (each level a touch
- * warmer/darker, so cards read as tiles), and every semantic/category hue is
- * darkened to keep ≥4.5:1 against the surfaces it labels — the dark palette's
- * pastels wash out on white.
+ * surfaces: the surface ramp steps *down* from a white page (each level a touch
+ * darker, so cards read as tiles), and every semantic/category hue is darkened
+ * to keep ≥4.5:1 against the surfaces it labels — the dark palette's pastels
+ * wash out on white.
+ *
+ * The neutrals carry the same faint cool bias as the text ramp and as the dark
+ * palette. They were originally cream, inherited from the sand brand accent,
+ * which left warm cards sitting under cool grey type and kept a gold cast on
+ * every surface after the accent itself went neutral.
  */
 val flowFinLightColors = FlowFinColors(
   bg            = Color(0xFFFFFFFF),
-  surface       = Color(0xFFF8F7F4),
-  surface2      = Color(0xFFF1F0EB),
-  surface3      = Color(0xFFE9E8E2),
-  border        = Color(0xFFE5E4DE),
-  borderStrong  = Color(0xFFD4D3CC),
-  pageBg        = Color(0xFFE9E8E2),
+  surface       = Color(0xFFFAFAFB),
+  surface2      = Color(0xFFF3F3F6),
+  surface3      = Color(0xFFEBEBEF),
+  border        = Color(0xFFE3E3E8),
+  borderStrong  = Color(0xFFD1D1D8),
+  pageBg        = Color(0xFFEBEBEF),
 
   text          = Color(0xFF16161A),
   textMute      = Color(0xFF4A4A52),

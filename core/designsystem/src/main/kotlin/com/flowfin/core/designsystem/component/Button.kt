@@ -20,6 +20,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -134,7 +135,12 @@ fun FlowFinTextButton(
   ) {
     Text(
       text = text.uppercase(),
-      style = FlowFinTheme.typography.label.copy(letterSpacing = 0.18.em),
+      // Underlined, not tinted: the accent is near-neutral, so colour alone no
+      // longer separates a bare text action from an uppercase section label.
+      style = FlowFinTheme.typography.label.copy(
+        letterSpacing = 0.18.em,
+        textDecoration = TextDecoration.Underline,
+      ),
     )
   }
 }
