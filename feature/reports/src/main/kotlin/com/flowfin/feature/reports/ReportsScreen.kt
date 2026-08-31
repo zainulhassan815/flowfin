@@ -426,7 +426,7 @@ private fun PreviewReports() = FlowFinTheme {
         BreakdownRowUi("Food & Dining", "food", "9,000", ".00", 20, 14, 900_000f),
         BreakdownRowUi("Transport", "transport", "5,000", ".00", 11, 22, 500_000f),
       ),
-      breakdownTotal = "45,000",
+      breakdownTotal = "45K",
       breakdownCount = 37,
     ),
   )

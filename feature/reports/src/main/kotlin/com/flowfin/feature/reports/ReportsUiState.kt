@@ -25,7 +25,7 @@ sealed interface ReportsUiState {
     /** Null when the selected month has no rows in the current scope. */
     val trend: TrendUi?,
     val breakdown: List<BreakdownRowUi>,
-    /** Whole units, unsymbolled: the donut hole is narrower than a full display form. */
+    /** Compact and unsymbolled: the donut's hole is narrower than a full form. */
     val breakdownTotal: String,
     val breakdownCount: Int,
   ) : ReportsUiState

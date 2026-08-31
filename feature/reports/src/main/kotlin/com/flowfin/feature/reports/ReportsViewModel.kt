@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.datetime.Clock
@@ -48,6 +49,10 @@ class ReportsViewModel(
 
   private val selection = MutableStateFlow(Selection(thisMonth, ReportScope.EXPENSE))
 
+  /** Whether anything has ever been recorded, which is a different question
+   *  from whether the selected month has anything in it. */
+  private val hasHistory = transactions.feed(limit = 1).map { it.isNotEmpty() }
+
   val uiState: StateFlow<ReportsUiState> = selection
     .flatMapLatest { current ->
       val start = current.month.atStartOfDayIn(zone)
@@ -59,9 +64,10 @@ class ReportsViewModel(
         transactions.observeAmountsOfKind(TransactionKind.EXPENSE, start, end),
         categories.observeAll(),
       ) { scoped, totals, incomes, expenses, allCategories ->
-        build(current, scoped, totals, incomes, expenses, allCategories)
+        Month(current, scoped, totals, incomes, expenses, allCategories)
       }
     }
+    .combine(hasHistory) { month, everRecorded -> build(month, everRecorded) }
     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), ReportsUiState.Loading)
 
   fun onPreviousMonth() = selection.update { it.copy(month = it.month.minus(DatePeriod(months = 1))) }
@@ -73,20 +79,15 @@ class ReportsViewModel(
 
   fun onSelectScope(scope: ReportScope) = selection.update { it.copy(scope = scope) }
 
-  private fun build(
-    current: Selection,
-    scoped: List<DatedAmount>,
-    totals: List<CategoryTotal>,
-    incomes: List<DatedAmount>,
-    expenses: List<DatedAmount>,
-    allCategories: List<Category>,
-  ): ReportsUiState {
+  private fun build(month: Month, everRecorded: Boolean): ReportsUiState {
+    val (current, scoped, totals, incomes, expenses, allCategories) = month
     val income = incomes.fold(Money.ZERO) { acc, it -> acc + it.amount }
     val expense = expenses.fold(Money.ZERO) { acc, it -> acc + it.amount }
-    // Nothing this month and nothing to compare it against — the screen has no
-    // period worth picking, so it reads as a first-run empty rather than a
-    // month that happens to be quiet.
-    if (income.isZero && expense.isZero && current.month == thisMonth) return ReportsUiState.Empty
+    // The takeover is only right when there is nothing at all to report on.
+    // A quiet month with history behind it keeps its chrome — otherwise the
+    // month strip disappears and there is no way back to the months that do
+    // have data, which is every user's view on the first of the month.
+    if (!everRecorded) return ReportsUiState.Empty
 
     val net = income - expense
     val byId = allCategories.associateBy { it.id }
@@ -119,7 +120,7 @@ class ReportsViewModel(
           value = total.total.minorUnits.toFloat(),
         )
       },
-      breakdownTotal = money.whole(scopeTotal),
+      breakdownTotal = money.compact(scopeTotal),
       breakdownCount = totals.sumOf { it.transactionCount },
     )
   }
@@ -151,7 +152,7 @@ class ReportsViewModel(
       title = UiText.Res(
         if (current.scope == ReportScope.EXPENSE) R.string.reports_trend_expense else R.string.reports_trend_income,
       ),
-      paceLabel = UiText.Res(R.string.reports_pace, listOf(money.display(Money(pace.toLong())))),
+      paceLabel = UiText.Res(R.string.reports_pace, listOf(money.compact(Money(pace.toLong())))),
       paceFraction = pace / peak,
       todayAmount = if (isCurrentMonth) money.display(Money(perDay[today.dayOfMonth - 1])) else null,
     )
@@ -161,6 +162,16 @@ class ReportsViewModel(
     if (scope == ReportScope.EXPENSE) TransactionKind.EXPENSE else TransactionKind.INCOME
 
   private data class Selection(val month: LocalDate, val scope: ReportScope)
+
+  /** One month's raw reads, before they become UI. */
+  private data class Month(
+    val selection: Selection,
+    val scoped: List<DatedAmount>,
+    val totals: List<CategoryTotal>,
+    val incomes: List<DatedAmount>,
+    val expenses: List<DatedAmount>,
+    val categories: List<Category>,
+  )
 }
 
 private fun LocalDate.firstOfMonth() = LocalDate(year, monthNumber, 1)
