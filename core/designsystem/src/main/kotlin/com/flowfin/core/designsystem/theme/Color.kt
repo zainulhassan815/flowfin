@@ -98,20 +98,24 @@ data class AvatarColors(
   }
 }
 
-/** The shipped dark palette. */
+/**
+ * The shipped dark palette. The surface ramp steps ~5 L* per level: at these
+ * luminances a smaller step is invisible — the original ramp separated a card
+ * from the page by 1.05:1, which read as one flat black field.
+ */
 val flowFinDarkColors = FlowFinColors(
   bg            = Color(0xFF08080A),
-  surface       = Color(0xFF101013),
-  surface2      = Color(0xFF16161A),
-  surface3      = Color(0xFF1C1C20),
-  border        = Color(0xFF1E1E22),
-  borderStrong  = Color(0xFF2A2A2F),
-  pageBg        = Color(0xFF1C1C20),
+  surface       = Color(0xFF17171C),
+  surface2      = Color(0xFF202027),
+  surface3      = Color(0xFF2A2A32),
+  border        = Color(0xFF34343E),
+  borderStrong  = Color(0xFF46464F),
+  pageBg        = Color(0xFF2A2A32),
 
   text          = Color(0xFFF2F2F4),
   textMute      = Color(0xFFB4B4BC),
-  textSoft      = Color(0xFF8A8A92),
-  textFaint     = Color(0xFF565660),
+  textSoft      = Color(0xFF9A9AA4),
+  textFaint     = Color(0xFF7C7C88),
 
   accent        = Color(0xFFE8E8EA),
   positive      = Color(0xFF9CD4A2),
@@ -172,8 +176,8 @@ val flowFinLightColors = FlowFinColors(
 
   text          = Color(0xFF16161A),
   textMute      = Color(0xFF4A4A52),
-  textSoft      = Color(0xFF74747E),
-  textFaint     = Color(0xFF9E9EA8),
+  textSoft      = Color(0xFF6C6C76),
+  textFaint     = Color(0xFF83838E),
 
   accent        = Color(0xFF22262B),
   positive      = Color(0xFF2E7D48),
