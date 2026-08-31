@@ -22,6 +22,12 @@ data class Transaction(
   val updatedAt: Instant,
 )
 
+/** An amount with the date it was recorded — the raw input to a trend chart. */
+data class DatedAmount(
+  val recordedAt: Instant,
+  val amount: Money,
+)
+
 /**
  * The intent to record a transaction, one variant per non-debt [TransactionKind].
  * Each variant carries exactly the fields its kind allows, so illegal shapes

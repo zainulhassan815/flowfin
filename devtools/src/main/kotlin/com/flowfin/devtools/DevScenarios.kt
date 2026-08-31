@@ -109,7 +109,7 @@ internal class DevScenarios(
   }
 
   private suspend fun loadedMonth() {
-    val (income, expense) = seedCategories()
+    val (income, _) = seedCategories()
     val bank = bank(Money(5_000_000))
     val cash = createRealAccount("Cash", openingBalance = Money(700_000), color = "cash", icon = "wallet").bind()
     val food = createBudget("Food", bank.id, color = "food", icon = "restaurant").bind()
@@ -119,10 +119,16 @@ internal class DevScenarios(
     record(TransactionDraft.Allocation(bank.id, food.id, Money(1_600_000), daysAgo(6)))
     record(TransactionDraft.Allocation(bank.id, transport.id, Money(600_000), daysAgo(6)))
     record(TransactionDraft.Transfer(bank.id, cash.id, Money(500_000), "ATM withdrawal", daysAgo(4)))
-    record(TransactionDraft.Expense(bank.id, Money(1_200_000), expense, "Rent", daysAgo(5)))
-    record(TransactionDraft.Expense(food.id, Money(650_000), expense, "Groceries", daysAgo(3)))
-    record(TransactionDraft.Expense(transport.id, Money(300_000), expense, "Fuel", daysAgo(2)))
-    record(TransactionDraft.Expense(cash.id, Money(150_000), expense, "Coffee", daysAgo(1)))
+    // Each expense under its own category, and spread across the month — a
+    // single category files every row into one donut segment, and same-week
+    // dates leave the Reports trend a cluster of bars against empty axis.
+    record(TransactionDraft.Expense(bank.id, Money(1_200_000), expenseCategory("home"), "Rent", daysAgo(24)))
+    record(TransactionDraft.Expense(food.id, Money(650_000), expenseCategory("shopping_cart"), "Groceries", daysAgo(18)))
+    record(TransactionDraft.Expense(transport.id, Money(300_000), expenseCategory("directions_bus"), "Fuel", daysAgo(12)))
+    record(TransactionDraft.Expense(bank.id, Money(420_000), expenseCategory("bolt"), "Electricity", daysAgo(9)))
+    record(TransactionDraft.Expense(cash.id, Money(150_000), expenseCategory("restaurant"), "Coffee", daysAgo(5)))
+    record(TransactionDraft.Expense(bank.id, Money(260_000), expenseCategory("movie"), "Cinema", daysAgo(3)))
+    record(TransactionDraft.Expense(food.id, Money(180_000), expenseCategory("restaurant"), "Lunch", daysAgo(1)))
     // An established user, so Home shows the month trend rather than "Day 1".
     backdateAccounts(days = 40)
   }

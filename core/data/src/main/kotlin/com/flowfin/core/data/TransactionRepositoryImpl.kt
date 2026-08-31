@@ -10,7 +10,9 @@ import com.flowfin.core.domain.repository.TransactionRepository
 import com.flowfin.core.model.AccountFlow
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.CategoryId
+import com.flowfin.core.model.CategoryTotal
 import com.flowfin.core.model.CategoryUsage
+import com.flowfin.core.model.DatedAmount
 import com.flowfin.core.model.DebtId
 import com.flowfin.core.model.Money
 import com.flowfin.core.model.Transaction
@@ -42,6 +44,26 @@ internal class TransactionRepositoryImpl(
 
   override fun observeNetChange(startAt: Instant, endAt: Instant): Flow<Money> =
     queries.netChangeInRange(startAt, endAt).asFlow().mapToOne(dispatcher).map { Money(it) }
+
+  override fun observeAmountsOfKind(kind: TransactionKind, startAt: Instant, endAt: Instant): Flow<List<DatedAmount>> =
+    queries.amountsOfKindInRange(kind, startAt, endAt).asFlow().mapToList(dispatcher).map { rows ->
+      rows.map { DatedAmount(it.recorded_at, Money(it.amount_minor)) }
+    }
+
+  override fun observeCategoryTotals(kind: TransactionKind, startAt: Instant, endAt: Instant): Flow<List<CategoryTotal>> {
+    // Two queries rather than one parameterised by kind: the per-kind CHECKs
+    // mean expense and income rows carry different shapes, and SQLDelight types
+    // each result separately.
+    val rows = when (kind) {
+      TransactionKind.INCOME -> queries.incomesByCategoryInRange(startAt, endAt) {
+        categoryId, total, count -> CategoryTotal(categoryId!!, Money(total), count.toInt())
+      }
+      else -> queries.expensesByCategoryInRange(startAt, endAt) {
+        categoryId, total, count -> CategoryTotal(categoryId!!, Money(total), count.toInt())
+      }
+    }
+    return rows.asFlow().mapToList(dispatcher)
+  }
 
   override fun observeCategoryUsage(): Flow<Map<CategoryId, CategoryUsage>> =
     queries.usageByCategory().asFlow().mapToList(dispatcher).map { rows ->

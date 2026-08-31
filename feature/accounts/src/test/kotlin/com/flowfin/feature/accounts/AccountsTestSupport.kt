@@ -16,6 +16,8 @@ import com.flowfin.core.model.AccountType
 import com.flowfin.core.model.Category
 import com.flowfin.core.model.CategoryId
 import com.flowfin.core.model.CategoryScope
+import com.flowfin.core.model.CategoryTotal
+import com.flowfin.core.model.DatedAmount
 import com.flowfin.core.model.CategoryUsage
 import com.flowfin.core.model.DebtId
 import com.flowfin.core.model.Money
@@ -141,6 +143,8 @@ internal class FakeTransactionRepository(
   override fun observeNetChange(startAt: Instant, endAt: Instant): Flow<Money> = throw NotImplementedError()
   override fun observeByDebt(debtId: DebtId): Flow<List<Transaction>> = throw NotImplementedError()
   override fun observeCategoryUsage(): Flow<Map<CategoryId, CategoryUsage>> = throw NotImplementedError()
+  override fun observeAmountsOfKind(kind: TransactionKind, startAt: Instant, endAt: Instant): Flow<List<DatedAmount>> = throw NotImplementedError()
+  override fun observeCategoryTotals(kind: TransactionKind, startAt: Instant, endAt: Instant): Flow<List<CategoryTotal>> = throw NotImplementedError()
   override suspend fun getById(id: TransactionId): Transaction? = throw NotImplementedError()
   override suspend fun record(draft: TransactionDraft): Either<TransactionError, Transaction> = throw NotImplementedError()
   override suspend fun updateContent(id: TransactionId, amount: Money, categoryId: CategoryId?, note: String?, recordedAt: Instant): Either<TransactionError, Unit> = throw NotImplementedError()

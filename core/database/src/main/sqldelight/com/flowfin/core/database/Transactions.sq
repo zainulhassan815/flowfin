@@ -260,6 +260,18 @@ WHERE kind = 'INCOME'
 GROUP BY category_id
 ORDER BY total_minor DESC;
 
+-- Dated amounts for one kind over a range — the Reports trend chart buckets
+-- these into days. Bucketing happens in Kotlin rather than SQL because a day
+-- boundary depends on the user's zone, and SQLite would need the offset baked
+-- into the query to get it right.
+amountsOfKindInRange:
+SELECT recorded_at, amount_minor
+FROM transactions
+WHERE kind = :kind
+  AND recorded_at >= :startAt
+  AND recorded_at <  :endAt
+ORDER BY recorded_at;
+
 -- Row count and most recent use per category — the count pill and the
 -- "last used" meta on the Categories screen, in one pass.
 usageByCategory:

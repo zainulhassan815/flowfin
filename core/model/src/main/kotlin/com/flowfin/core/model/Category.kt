@@ -32,3 +32,10 @@ data class CategoryUsage(
   val transactionCount: Int,
   val lastUsedAt: Instant?,
 )
+
+/** One category's share of a period — the Reports breakdown row. */
+data class CategoryTotal(
+  val categoryId: CategoryId,
+  val total: Money,
+  val transactionCount: Int,
+)
