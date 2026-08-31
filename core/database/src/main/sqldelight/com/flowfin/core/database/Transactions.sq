@@ -260,6 +260,17 @@ WHERE kind = 'INCOME'
 GROUP BY category_id
 ORDER BY total_minor DESC;
 
+-- Row count and most recent use per category — the count pill and the
+-- "last used" meta on the Categories screen, in one pass.
+usageByCategory:
+SELECT
+  category_id AS category_id,
+  COUNT(*) AS txn_count,
+  MAX(recorded_at) AS last_used_at
+FROM transactions
+WHERE category_id IS NOT NULL
+GROUP BY category_id;
+
 -- Payments toward a debt, chronological.
 byDebt:
 SELECT *

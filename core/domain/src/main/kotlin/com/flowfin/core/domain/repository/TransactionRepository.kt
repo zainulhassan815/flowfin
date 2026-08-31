@@ -5,6 +5,7 @@ import com.flowfin.core.domain.error.TransactionError
 import com.flowfin.core.model.AccountFlow
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.CategoryId
+import com.flowfin.core.model.CategoryUsage
 import com.flowfin.core.model.DebtId
 import com.flowfin.core.model.Money
 import com.flowfin.core.model.Transaction
@@ -34,6 +35,9 @@ interface TransactionRepository {
    * negative). Powers Home's "this month" trend.
    */
   fun observeNetChange(startAt: Instant, endAt: Instant): Flow<Money>
+
+  /** Usage per category, keyed by id — categories never used are absent. */
+  fun observeCategoryUsage(): Flow<Map<CategoryId, CategoryUsage>>
 
   /** A debt's movements — origin then repayments, oldest first, for its timeline. */
   fun observeByDebt(debtId: DebtId): Flow<List<Transaction>>

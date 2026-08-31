@@ -49,6 +49,7 @@ import com.flowfin.feature.recurring.navigation.addRecurringEntry
 import com.flowfin.feature.recurring.navigation.recurringDetailEntry
 import com.flowfin.feature.recurring.navigation.recurringEntry
 import com.flowfin.feature.reports.navigation.reportsEntry
+import com.flowfin.feature.settings.navigation.categoriesEntry
 import com.flowfin.feature.settings.navigation.settingsEntry
 import com.flowfin.feature.transactions.navigation.addTransactionEntry
 import com.flowfin.feature.transactions.navigation.transactionDetailEntry
@@ -85,6 +86,7 @@ fun FlowFinApp() {
     addDebtEntry(navigator)
     reportsEntry()
     settingsEntry(navigator)
+    categoriesEntry(navigator)
     addTransactionEntry(navigator)
     addAccountEntry(navigator)
     addRecurringEntry(navigator)

@@ -457,6 +457,41 @@
   <!-- The brand wordmark, lowercase with its period per design/system/brand.html.
        Not the launcher label, which is the plain name "FlowFin". -->
   <string name="settings_wordmark" translatable="false">flowfin.</string>
+  <string name="settings_section_organize">Organize</string>
+  <string name="settings_categories">Categories</string>
+  <string name="settings_categories_sub">Income &amp; expense tags</string>
+  <!-- Categories row badge, e.g. "14 active". -->
+  <string name="settings_categories_badge">%1$d active</string>
+
+  <!-- Categories -->
+  <string name="categories_title">Categories</string>
+  <string name="categories_add">Add category</string>
+  <string name="categories_edit">Edit category</string>
+  <string name="categories_default">Default</string>
+  <string name="categories_custom">Custom</string>
+  <!-- Shown on a default row instead of provenance: defaults ship and can\'t be changed. -->
+  <string name="categories_locked">Default · locked</string>
+  <string name="categories_custom_empty">No custom categories yet.</string>
+  <!-- Summary above the lists, e.g. "13 default · 2 custom · 47 transactions". -->
+  <string name="categories_summary">%1$d default · %2$d custom · %3$d transactions</string>
+  <!-- A custom category\'s provenance, e.g. "Created 12 Dec · last used 3 days ago". -->
+  <string name="categories_meta_used">Created %1$s · last used %2$s</string>
+  <string name="categories_meta_unused">Created %1$s · never used</string>
+  <!-- Day and short month, e.g. "12 Dec". -->
+  <string name="categories_day">%1$d %2$s</string>
+  <string name="categories_field_name">Name</string>
+  <string name="categories_name_placeholder">e.g. Coffee</string>
+  <string name="categories_field_icon">Icon</string>
+  <string name="categories_field_color">Colour</string>
+  <string name="categories_save">Save category</string>
+  <string name="categories_archive">Archive category</string>
+  <string name="categories_restore">Restore</string>
+  <plurals name="categories_archived_toggle">
+    <item quantity="one">%1$d archived category</item>
+    <item quantity="other">%1$d archived categories</item>
+  </plurals>
+  <string name="categories_error">That didn\'t save. Try again.</string>
+
   <!-- Footer build line, e.g. "Version 1.0.0 · Build 27". -->
   <string name="settings_version">Version %1$s · Build %2$s</string>
 

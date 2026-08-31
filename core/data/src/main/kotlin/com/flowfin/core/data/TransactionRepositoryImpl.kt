@@ -10,6 +10,7 @@ import com.flowfin.core.domain.repository.TransactionRepository
 import com.flowfin.core.model.AccountFlow
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.CategoryId
+import com.flowfin.core.model.CategoryUsage
 import com.flowfin.core.model.DebtId
 import com.flowfin.core.model.Money
 import com.flowfin.core.model.Transaction
@@ -41,6 +42,13 @@ internal class TransactionRepositoryImpl(
 
   override fun observeNetChange(startAt: Instant, endAt: Instant): Flow<Money> =
     queries.netChangeInRange(startAt, endAt).asFlow().mapToOne(dispatcher).map { Money(it) }
+
+  override fun observeCategoryUsage(): Flow<Map<CategoryId, CategoryUsage>> =
+    queries.usageByCategory().asFlow().mapToList(dispatcher).map { rows ->
+      rows.mapNotNull { row ->
+        row.category_id?.let { it to CategoryUsage(row.txn_count.toInt(), row.last_used_at) }
+      }.toMap()
+    }
 
   override fun observeByDebt(debtId: DebtId): Flow<List<Transaction>> =
     queries.byDebt(debtId).asFlow().mapToList(dispatcher).map { rows -> rows.map { it.toModel() } }

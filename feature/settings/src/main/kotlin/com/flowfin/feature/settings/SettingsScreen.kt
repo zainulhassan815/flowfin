@@ -50,6 +50,7 @@ fun SettingsScreen(
   modifier: Modifier = Modifier,
   onBack: () -> Unit = {},
   onThemeChange: (ThemePreference) -> Unit = {},
+  onCategories: () -> Unit = {},
 ) {
   var themeSheet by remember { mutableStateOf(false) }
 
@@ -79,6 +80,21 @@ fun SettingsScreen(
           sub = stringResource(R.string.settings_appearance_sub),
           accessory = SettingsAccessory.Value(stringResource(state.theme.labelRes())),
           onClick = { themeSheet = true },
+        )
+      }
+
+      SectionLabel(
+        text = stringResource(R.string.settings_section_organize),
+        modifier = Modifier.padding(top = 26.dp, bottom = 10.dp),
+      )
+      FlowFinSettingsCard {
+        FlowFinSettingsRow(
+          name = stringResource(R.string.settings_categories),
+          sub = stringResource(R.string.settings_categories_sub),
+          accessory = SettingsAccessory.Badge(
+            stringResource(R.string.settings_categories_badge, state.activeCategoryCount),
+          ),
+          onClick = onCategories,
         )
       }
 

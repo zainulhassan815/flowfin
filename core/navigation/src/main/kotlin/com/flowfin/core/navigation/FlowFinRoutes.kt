@@ -58,6 +58,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object SettingsRoute : NavKey
 
+@Serializable data object CategoriesRoute : NavKey
+
 /** The bottom-nav tabs, in order. [HomeRoute] is the start destination. */
 val TOP_LEVEL_ROUTES: List<NavKey> = listOf(
   HomeRoute,

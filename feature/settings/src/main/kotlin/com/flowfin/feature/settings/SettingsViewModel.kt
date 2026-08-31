@@ -2,21 +2,33 @@ package com.flowfin.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.flowfin.core.domain.repository.CategoryRepository
 import com.flowfin.core.domain.repository.SettingsRepository
 import com.flowfin.core.model.ThemePreference
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
-  private val settings: SettingsRepository,
+  settings: SettingsRepository,
+  categories: CategoryRepository,
+  private val settingsRepository: SettingsRepository,
   private val appVersion: AppVersion,
 ) : ViewModel() {
 
-  val uiState: StateFlow<SettingsUiState> = settings.observe()
-    .map { SettingsUiState(theme = it.theme, versionName = appVersion.name, versionCode = appVersion.code) }
+  val uiState: StateFlow<SettingsUiState> = combine(
+    settings.observe(),
+    categories.observeAll(),
+  ) { prefs, all ->
+    SettingsUiState(
+      theme = prefs.theme,
+      activeCategoryCount = all.count { !it.isArchived },
+      versionName = appVersion.name,
+      versionCode = appVersion.code,
+    )
+  }
     .stateIn(
       viewModelScope,
       SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
@@ -24,7 +36,7 @@ class SettingsViewModel(
     )
 
   fun onThemeChange(theme: ThemePreference) {
-    viewModelScope.launch { settings.setTheme(theme) }
+    viewModelScope.launch { settingsRepository.setTheme(theme) }
   }
 }
 

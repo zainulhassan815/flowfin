@@ -22,3 +22,13 @@ data class Category(
   val isCustom: Boolean get() = !isDefault
   val isArchived: Boolean get() = archivedAt != null
 }
+
+/**
+ * How much a category is actually used — the count shown on its row, and when it
+ * last carried a transaction. Absent from the map entirely when a category has
+ * never been used, rather than present with a zero.
+ */
+data class CategoryUsage(
+  val transactionCount: Int,
+  val lastUsedAt: Instant?,
+)

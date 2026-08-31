@@ -9,6 +9,7 @@ import com.flowfin.core.model.ThemePreference
  */
 data class SettingsUiState(
   val theme: ThemePreference = ThemePreference.LIGHT,
+  val activeCategoryCount: Int = 0,
   val versionName: String = "",
   val versionCode: String = "",
 )
