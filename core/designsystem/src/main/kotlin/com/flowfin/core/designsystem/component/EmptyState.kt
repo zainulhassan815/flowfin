@@ -204,7 +204,9 @@ fun FlowFinSectionEmptyHint(
       }
     }
 
-    // Accent connector straddling the top edge.
+    // Decorative connector straddling the top edge. Tied to the border token,
+    // not the accent — the accent is near-neutral now, and at this weight it
+    // read as a hard dark mark rather than a faint tie.
     Box(
       modifier = Modifier
         .align(Alignment.TopCenter)
@@ -212,7 +214,7 @@ fun FlowFinSectionEmptyHint(
         .height(1.5.dp)
         .background(
           Brush.horizontalGradient(
-            listOf(Color.Transparent, palette.accent, Color.Transparent),
+            listOf(Color.Transparent, palette.borderStrong, Color.Transparent),
           ),
         ),
     )

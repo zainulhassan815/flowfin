@@ -29,6 +29,9 @@ sealed interface DebtDetailUiState {
     val remainingDecimal: String,
     val originalAmount: String,
     val paidAmount: String,
+    /** Remaining in full display form — the hero renders its own currency mark,
+     *  the stat row beside Original and Paid does not. */
+    val remainingAmount: String,
     val paidPercent: Int,
     val progress: Float,
     /** True once repayments cover the original — the hero reads as cleared. */

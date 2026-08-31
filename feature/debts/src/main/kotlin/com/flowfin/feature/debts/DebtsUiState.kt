@@ -41,8 +41,14 @@ data class DebtCardUi(
   val amountDecimal: String,
   val paidWhole: String,
   val paidDecimal: String,
-  /** The debt's original amount — the denominator of "X paid of Y". */
-  val originalAmount: String,
+  /**
+   * The original amount, whole part only — the denominator of "X paid of Y".
+   * Unsymbolled and undecimalled: the meta line sits beside the date and only
+   * fits if both stay short.
+   */
+  val originalWhole: String,
   val progress: Float,
+  /** Whole-percent paid, shown opposite the "X paid of Y" line. */
+  val paidPercent: Int,
   val dateLabel: UiText,
 )

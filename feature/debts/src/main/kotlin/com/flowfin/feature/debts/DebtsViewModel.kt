@@ -88,8 +88,9 @@ class DebtsViewModel(
       amountDecimal = money.fraction(remaining),
       paidWhole = money.whole(paid),
       paidDecimal = money.fraction(paid),
-      originalAmount = money.display(debt.originalAmount),
+      originalWhole = money.whole(debt.originalAmount),
       progress = if (original > 0f) (paid.minorUnits.toFloat() / original).coerceIn(0f, 1f) else 0f,
+      paidPercent = if (original > 0f) ((paid.minorUnits * 100) / debt.originalAmount.minorUnits).toInt().coerceIn(0, 100) else 0,
       dateLabel = dateLabel(date),
     )
   }

@@ -254,6 +254,7 @@ class DebtDetailViewModel(
       remainingDecimal = money.fraction(remaining),
       originalAmount = money.display(debt.originalAmount),
       paidAmount = money.display(paid),
+      remainingAmount = money.display(remaining),
       paidPercent = percent,
       progress = if (original > 0) (paid.minorUnits.toFloat() / original).coerceIn(0f, 1f) else 0f,
       isFullyPaid = !remaining.isPositive,

@@ -233,7 +233,7 @@ private fun AmountBlock(state: DebtDetailUiState.Content) {
     ) {
       Stat(stringResource(R.string.debt_detail_stat_original), state.originalAmount, palette.text)
       Stat(stringResource(R.string.debt_detail_stat_paid, state.paidPercent), state.paidAmount, palette.positive, TextAlign.Center)
-      Stat(stringResource(R.string.debt_detail_stat_remaining), "${state.remainingWhole}${state.remainingDecimal}", palette.warning, TextAlign.End)
+      Stat(stringResource(R.string.debt_detail_stat_remaining), state.remainingAmount, palette.warning, TextAlign.End)
     }
   }
 }
@@ -375,6 +375,7 @@ private fun PreviewDebtDetail() = FlowFinTheme {
       remainingDecimal = ".00",
       originalAmount = "Rs 8,000.00",
       paidAmount = "Rs 6,000.00",
+      remainingAmount = "Rs 2,000.00",
       paidPercent = 75,
       progress = 0.75f,
       isFullyPaid = false,
