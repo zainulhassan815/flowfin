@@ -16,6 +16,7 @@ import com.flowfin.core.model.AccountType
 import com.flowfin.core.model.Category
 import com.flowfin.core.model.CategoryId
 import com.flowfin.core.model.CategoryScope
+import com.flowfin.core.model.DebtId
 import com.flowfin.core.model.Money
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.model.TransactionDraft
@@ -95,6 +96,7 @@ internal class FakeTransactionRepository(
   override fun feedOfKinds(kinds: Set<TransactionKind>, limit: Long): Flow<List<Transaction>> =
     flowOf(rows.filter { it.kind in kinds }.take(limit.toInt()))
   override fun observeNetChange(startAt: Instant, endAt: Instant): Flow<Money> = throw NotImplementedError()
+  override fun observeByDebt(debtId: DebtId): Flow<List<Transaction>> = throw NotImplementedError()
   override fun observeByAccount(accountId: AccountId, limit: Long, offset: Long): Flow<List<Transaction>> = throw NotImplementedError()
   override fun observeFlow(accountId: AccountId, startAt: Instant, endAt: Instant): Flow<AccountFlow> = throw NotImplementedError()
   override fun observeExpenseByAccount(): Flow<Map<AccountId, Money>> = throw NotImplementedError()

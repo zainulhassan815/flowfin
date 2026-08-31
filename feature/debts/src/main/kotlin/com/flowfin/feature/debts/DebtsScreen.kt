@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -53,6 +54,7 @@ private val HORIZONTAL = 24.dp
 fun DebtsScreen(
   state: DebtsUiState,
   modifier: Modifier = Modifier,
+  onDebtClick: (DebtId) -> Unit = {},
 ) {
   Column(modifier.fillMaxSize().background(FlowFinTheme.colors.bg)) {
     Header(state)
@@ -63,7 +65,7 @@ fun DebtsScreen(
         title = stringResource(R.string.debts_empty_title),
         body = stringResource(R.string.debts_empty_body),
       )
-      is DebtsUiState.Content -> DebtsTabs(state, Modifier.weight(1f))
+      is DebtsUiState.Content -> DebtsTabs(state, onDebtClick, Modifier.weight(1f))
     }
   }
 }
@@ -120,7 +122,11 @@ private fun HeroNetPosition(state: DebtsUiState.Content) {
 }
 
 @Composable
-private fun DebtsTabs(state: DebtsUiState.Content, modifier: Modifier = Modifier) {
+private fun DebtsTabs(
+  state: DebtsUiState.Content,
+  onDebtClick: (DebtId) -> Unit,
+  modifier: Modifier = Modifier,
+) {
   var direction by remember { mutableStateOf(DebtDirection.I_OWE) }
   val iOweLabel = "${stringResource(R.string.debts_tab_i_owe)} (${state.iOwe.active.size})"
   val oweMeLabel = "${stringResource(R.string.debts_tab_owe_me)} (${state.oweMe.active.size})"
@@ -139,11 +145,11 @@ private fun DebtsTabs(state: DebtsUiState.Content, modifier: Modifier = Modifier
     var showSettled by remember(direction) { mutableStateOf(false) }
 
     LazyColumn(contentPadding = PaddingValues(start = HORIZONTAL, end = HORIZONTAL, bottom = 96.dp)) {
-      items(tab.active, key = { it.id.value.toString() }) { DebtCard(it, stringResource(amountLabelRes)) }
+      items(tab.active, key = { it.id.value.toString() }) { DebtCard(it, stringResource(amountLabelRes), onDebtClick) }
       if (tab.settled.isNotEmpty()) {
         item(key = "settled-toggle") { SettledToggle(tab.settled.size) { showSettled = !showSettled } }
         if (showSettled) {
-          items(tab.settled, key = { it.id.value.toString() }) { DebtCard(it, stringResource(amountLabelRes)) }
+          items(tab.settled, key = { it.id.value.toString() }) { DebtCard(it, stringResource(amountLabelRes), onDebtClick) }
         }
       }
     }
@@ -178,13 +184,15 @@ private fun SettledToggle(count: Int, onClick: () -> Unit) {
 }
 
 @Composable
-private fun DebtCard(row: DebtCardUi, amountLabel: String) {
+private fun DebtCard(row: DebtCardUi, amountLabel: String, onClick: (DebtId) -> Unit) {
   val palette = FlowFinTheme.colors
   Column(
     modifier = Modifier
       .fillMaxWidth()
       .padding(vertical = 6.dp)
-      .background(palette.surface, RoundedCornerShape(14.dp))
+      .clip(RoundedCornerShape(14.dp))
+      .background(palette.surface)
+      .clickable { onClick(row.id) }
       .padding(14.dp),
   ) {
     Row(verticalAlignment = Alignment.CenterVertically) {

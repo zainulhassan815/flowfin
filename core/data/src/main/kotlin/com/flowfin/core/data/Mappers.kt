@@ -8,6 +8,7 @@ import com.flowfin.core.database.Persons
 import com.flowfin.core.database.Recurring_schedules
 import com.flowfin.core.database.SelectAllWithRemaining
 import com.flowfin.core.database.SelectByDirectionWithRemaining
+import com.flowfin.core.database.SelectByIdWithRemaining
 import com.flowfin.core.database.Transactions
 import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountBalance
@@ -163,8 +164,8 @@ internal fun Debts.toModel(): Debt = Debt(
   settledAt = settled_at,
 )
 
-// The two `*WithRemaining` queries are distinct generated types with identical
-// columns, so both map through one builder.
+// The three `*WithRemaining` queries are distinct generated types with identical
+// columns, so all map through one builder.
 internal fun SelectAllWithRemaining.toDebtWithRemaining(): DebtWithRemaining =
   debtWithRemaining(
     id, person_id, direction, original_amount_minor, currency, reason, status,
@@ -172,6 +173,12 @@ internal fun SelectAllWithRemaining.toDebtWithRemaining(): DebtWithRemaining =
   )
 
 internal fun SelectByDirectionWithRemaining.toDebtWithRemaining(): DebtWithRemaining =
+  debtWithRemaining(
+    id, person_id, direction, original_amount_minor, currency, reason, status,
+    origin_transaction_id, created_at, updated_at, settled_at, origin_recorded_at, paid_minor, remaining_minor,
+  )
+
+internal fun SelectByIdWithRemaining.toDebtWithRemaining(): DebtWithRemaining =
   debtWithRemaining(
     id, person_id, direction, original_amount_minor, currency, reason, status,
     origin_transaction_id, created_at, updated_at, settled_at, origin_recorded_at, paid_minor, remaining_minor,

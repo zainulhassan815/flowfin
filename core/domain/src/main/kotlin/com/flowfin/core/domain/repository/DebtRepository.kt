@@ -24,6 +24,9 @@ interface DebtRepository {
 
   fun observeByDirection(direction: DebtDirection): Flow<List<DebtWithRemaining>>
 
+  /** One debt and its computed position, re-emitting as repayments land. Null once deleted. */
+  fun observeWithRemaining(id: DebtId): Flow<DebtWithRemaining?>
+
   suspend fun getById(id: DebtId): Debt?
 
   /**
@@ -50,6 +53,7 @@ interface DebtRepository {
     debt: Debt,
     accountId: AccountId?,
     amount: Money,
+    note: String?,
     recordedAt: Instant,
   ): Either<DebtError, Unit>
 

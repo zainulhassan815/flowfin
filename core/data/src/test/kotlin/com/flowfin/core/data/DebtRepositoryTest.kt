@@ -12,6 +12,7 @@ import com.flowfin.core.model.DebtDirection
 import com.flowfin.core.model.DebtStatus
 import com.flowfin.core.model.Money
 import com.flowfin.core.model.PersonId
+import com.flowfin.core.model.TransactionKind
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -188,6 +189,50 @@ class DebtRepositoryTest {
     val netChange = transactions.observeNetChange(at, endAt).first()
 
     assertEquals(Money.ZERO, netChange)
+  }
+
+  @Test
+  fun `observing one debt re-emits as repayments land`() = runTest {
+    val bank = createReal("Bank", openingBalance = Money(1_000_000)).rightOrFail()
+    val ahmed = createPerson("Ahmed").rightOrFail()
+    val debt = borrow(ahmed.id, bank.id, Money(800_000), recordedAt = at).rightOrFail()
+
+    assertEquals(Money(800_000), debts.observeWithRemaining(debt.id).first()?.remaining)
+
+    repay(debt.id, bank.id, Money(300_000), recordedAt = at).rightOrFail()
+
+    val after = debts.observeWithRemaining(debt.id).first()
+    assertEquals(Money(500_000), after?.remaining)
+    assertEquals(Money(300_000), after?.paid)
+  }
+
+  @Test
+  fun `observing a deleted debt yields null`() = runTest {
+    val bank = createReal("Bank", openingBalance = Money(1_000_000)).rightOrFail()
+    val ahmed = createPerson("Ahmed").rightOrFail()
+    val debt = borrow(ahmed.id, bank.id, Money(800_000), recordedAt = at).rightOrFail()
+
+    debts.delete(debt.id).rightOrFail()
+
+    assertEquals(null, debts.observeWithRemaining(debt.id).first())
+  }
+
+  @Test
+  fun `a debt's timeline is its origin plus every repayment, oldest first`() = runTest {
+    val bank = createReal("Bank", openingBalance = Money(1_000_000)).rightOrFail()
+    val ahmed = createPerson("Ahmed").rightOrFail()
+    val debt = borrow(ahmed.id, bank.id, Money(800_000), recordedAt = at).rightOrFail()
+    val later = Instant.fromEpochMilliseconds(at.toEpochMilliseconds() + 86_400_000L)
+    repay(debt.id, bank.id, Money(200_000), recordedAt = at, note = "rent share").rightOrFail()
+    repay(debt.id, bank.id, Money(100_000), recordedAt = later).rightOrFail()
+
+    val timeline = transactions.observeByDebt(debt.id).first()
+
+    assertEquals(3, timeline.size)
+    assertEquals(TransactionKind.DEBT_BORROW, timeline.first().kind)
+    assertEquals(listOf(Money(800_000), Money(200_000), Money(100_000)), timeline.map { it.amount })
+    // The note reaches the row so the timeline can show it.
+    assertEquals("rent share", timeline[1].note)
   }
 
   @Test

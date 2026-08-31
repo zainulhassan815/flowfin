@@ -353,4 +353,67 @@
   <string name="debts_empty_title">Money moves between people. Keep score.</string>
   <string name="debts_empty_body">Borrowed for rent, fronted lunch for a friend — record either direction. FlowFin reconciles each repayment until it settles.</string>
 
+  <!-- Debt detail -->
+  <!-- Amount label above the hero, by direction. -->
+  <string name="debt_detail_remaining_i_owe">You still owe</string>
+  <string name="debt_detail_remaining_owe_me">Still owed to you</string>
+  <string name="debt_detail_settled">Settled</string>
+  <string name="debt_detail_stat_original">Original</string>
+  <!-- Paid stat with its share of the original, e.g. "Paid · 75%". -->
+  <string name="debt_detail_stat_paid">Paid · %1$d%%</string>
+  <string name="debt_detail_stat_remaining">Remaining</string>
+  <string name="debt_detail_record_payment">Record a payment</string>
+  <string name="debt_detail_record_receipt">Record a receipt</string>
+  <string name="debt_detail_timeline_title">Timeline</string>
+  <!-- Timeline subtitle, e.g. "3 payments · 1 origin". -->
+  <plurals name="debt_detail_timeline_count">
+    <item quantity="one">%1$d payment · 1 origin</item>
+    <item quantity="other">%1$d payments · 1 origin</item>
+  </plurals>
+  <!-- Timeline row titles; %1$s is the person. -->
+  <string name="debt_detail_timeline_borrowed">Borrowed from %1$s</string>
+  <string name="debt_detail_timeline_lent">Lent to %1$s</string>
+  <string name="debt_detail_timeline_payment_to">Payment to %1$s</string>
+  <string name="debt_detail_timeline_receipt_from">Received from %1$s</string>
+  <string name="debt_detail_timeline_original">Original amount</string>
+  <!-- Timeline empty: the debt is open but nothing has been repaid yet. -->
+  <string name="debt_detail_timeline_empty_eyebrow">No payments yet</string>
+  <string name="debt_detail_timeline_empty_title">Nothing repaid so far.</string>
+  <string name="debt_detail_action_settle">Mark as settled</string>
+  <string name="debt_detail_action_reopen">Reopen debt</string>
+  <string name="debt_detail_action_delete">Delete debt</string>
+  <!-- Delete confirmation: removes the debt and every transaction under it. -->
+  <string name="debt_detail_delete_title">Delete this debt?</string>
+  <string name="debt_detail_delete_body">The origin and every payment recorded against it go too. This can\'t be undone.</string>
+  <string name="debt_detail_delete_confirm">Delete</string>
+  <string name="debt_detail_not_found">This debt is no longer here.</string>
+
+  <!-- Record payment / receipt sheet -->
+  <string name="debt_detail_sheet_title">Record payment</string>
+  <string name="debt_detail_sheet_title_receipt">Record receipt</string>
+  <string name="debt_detail_sheet_amount_label">Payment amount</string>
+  <string name="debt_detail_sheet_amount_label_receipt">Receipt amount</string>
+  <string name="debt_detail_sheet_context_i_owe">Paying back</string>
+  <string name="debt_detail_sheet_context_owe_me">Receiving from</string>
+  <!-- Live preview under the amount; %1$s is the formatted balance left after this payment. -->
+  <string name="debt_detail_sheet_after_i_owe">After this · %1$s remaining</string>
+  <string name="debt_detail_sheet_after_owe_me">After this · %1$s still owed</string>
+  <!-- Overpayment is allowed (forgiveness / settling up) — stated, not blocked. -->
+  <string name="debt_detail_sheet_after_overpaid">After this · %1$s overpaid</string>
+  <string name="debt_detail_sheet_link_label">Create expense from account</string>
+  <string name="debt_detail_sheet_link_label_receipt">Add as income to account</string>
+  <string name="debt_detail_sheet_link_desc">Records this in your expense history</string>
+  <string name="debt_detail_sheet_link_desc_receipt">Records this in your income history</string>
+  <!-- Shown when linking is off: the debt updates but no account moves. -->
+  <string name="debt_detail_sheet_link_off">Tracked off-book — no account balance changes.</string>
+  <string name="debt_detail_sheet_no_accounts">No real account in this currency to move money through.</string>
+  <string name="debt_detail_sheet_date">Date</string>
+  <string name="debt_detail_sheet_note">Note</string>
+  <string name="debt_detail_sheet_note_hint">Add a note…</string>
+  <string name="debt_detail_sheet_save">Save payment</string>
+  <string name="debt_detail_sheet_save_receipt">Save receipt</string>
+
+  <!-- Any debt write that fails; the detail screen surfaces it as a snackbar. -->
+  <string name="debt_action_error">That didn\'t save. Try again.</string>
+
 </resources>

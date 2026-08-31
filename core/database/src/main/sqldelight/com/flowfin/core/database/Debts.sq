@@ -89,6 +89,20 @@ FROM debts d
 JOIN transactions origin ON origin.id = d.origin_transaction_id
 ORDER BY d.status, d.created_at DESC;
 
+-- One debt with its computed remaining — the detail screen's headline, which
+-- has to re-read after every repayment.
+selectByIdWithRemaining:
+SELECT
+  d.*,
+  origin.recorded_at AS origin_recorded_at,
+  COALESCE((SELECT SUM(amount_minor) FROM transactions
+            WHERE debt_id = d.id AND kind IN ('DEBT_REPAY_OUT','DEBT_REPAY_IN')), 0) AS paid_minor,
+  d.original_amount_minor - COALESCE((SELECT SUM(amount_minor) FROM transactions
+            WHERE debt_id = d.id AND kind IN ('DEBT_REPAY_OUT','DEBT_REPAY_IN')), 0) AS remaining_minor
+FROM debts d
+JOIN transactions origin ON origin.id = d.origin_transaction_id
+WHERE d.id = ?;
+
 selectByDirectionWithRemaining:
 SELECT
   d.*,
