@@ -38,6 +38,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object AddRecurringRoute : NavKey
 
+@Serializable data object AddDebtRoute : NavKey
+
 /**
  * Account detail, pushed within the Accounts tab. [accountId] is the account's
  * id in its plain string form — navigation stays free of the `core:model` typed

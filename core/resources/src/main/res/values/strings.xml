@@ -416,4 +416,26 @@
   <!-- Any debt write that fails; the detail screen surfaces it as a snackbar. -->
   <string name="debt_action_error">That didn\'t save. Try again.</string>
 
+  <!-- Add debt -->
+  <string name="add_debt_title">New debt</string>
+  <string name="add_debt_action">Add debt</string>
+  <!-- Stamp above the amount, naming the direction in plain words. -->
+  <string name="add_debt_stamp_borrowed">Borrowed from</string>
+  <string name="add_debt_stamp_lent">Lent to</string>
+  <string name="add_debt_field_person">Person</string>
+  <string name="add_debt_person_placeholder">Who?</string>
+  <string name="add_debt_person_search">Search or type a name</string>
+  <!-- Offer to record the debt against a name that isn\'t a contact yet. -->
+  <string name="add_debt_person_create">Use “%1$s”</string>
+  <string name="add_debt_field_reason">Reason</string>
+  <string name="add_debt_reason_placeholder">What was it for?</string>
+  <string name="add_debt_link_label_borrow">Add to an account</string>
+  <string name="add_debt_link_label_lend">Take from an account</string>
+  <string name="add_debt_link_desc_borrow">Logs the money landing in your balance</string>
+  <string name="add_debt_link_desc_lend">Logs the money leaving your balance</string>
+  <!-- Shown when linking is off: the debt is recorded but no balance moves. -->
+  <string name="add_debt_link_off">Tracked off-book — the debt is recorded, but no account balance changes.</string>
+  <string name="add_debt_save">Save debt</string>
+  <string name="add_debt_error">Couldn\'t save the debt. Please try again.</string>
+
 </resources>

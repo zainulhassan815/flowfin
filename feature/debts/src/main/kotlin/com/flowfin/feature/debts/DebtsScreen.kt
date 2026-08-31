@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.flowfin.core.designsystem.component.FlowFinHeroAmount
+import com.flowfin.core.designsystem.component.FlowFinIconButton
 import com.flowfin.core.designsystem.component.FlowFinPersonAvatar
 import com.flowfin.core.designsystem.component.FlowFinProgressBar
 import com.flowfin.core.designsystem.component.FlowFinSegmentedControl
@@ -55,9 +56,10 @@ fun DebtsScreen(
   state: DebtsUiState,
   modifier: Modifier = Modifier,
   onDebtClick: (DebtId) -> Unit = {},
+  onAddDebt: () -> Unit = {},
 ) {
   Column(modifier.fillMaxSize().background(FlowFinTheme.colors.bg)) {
-    Header(state)
+    Header(state, onAddDebt)
     when (state) {
       DebtsUiState.Loading -> Box(Modifier.weight(1f).fillMaxWidth())
       DebtsUiState.Empty -> Notice(
@@ -71,7 +73,7 @@ fun DebtsScreen(
 }
 
 @Composable
-private fun Header(state: DebtsUiState) {
+private fun Header(state: DebtsUiState, onAddDebt: () -> Unit) {
   val palette = FlowFinTheme.colors
   Column(
     Modifier
@@ -79,12 +81,22 @@ private fun Header(state: DebtsUiState) {
       .statusBarsPadding()
       .padding(top = 12.dp),
   ) {
-    Text(
-      text = stringResource(R.string.debts_title),
-      modifier = Modifier.padding(horizontal = HORIZONTAL),
-      style = FlowFinTheme.typography.h2.copy(fontSize = 26.sp),
-      color = palette.text,
-    )
+    Row(
+      modifier = Modifier.fillMaxWidth().padding(horizontal = HORIZONTAL),
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Text(
+        text = stringResource(R.string.debts_title),
+        style = FlowFinTheme.typography.h2.copy(fontSize = 26.sp),
+        color = palette.text,
+      )
+      Spacer(Modifier.weight(1f))
+      FlowFinIconButton(
+        onClick = onAddDebt,
+        icon = FlowFinIcons.Add,
+        contentDescription = stringResource(R.string.add_debt_action),
+      )
+    }
     if (state is DebtsUiState.Content) HeroNetPosition(state)
   }
 }

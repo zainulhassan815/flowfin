@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import com.flowfin.core.navigation.AddDebtRoute
 import com.flowfin.core.navigation.DebtDetailRoute
 import com.flowfin.core.navigation.DebtsRoute
 import com.flowfin.core.navigation.Navigator
@@ -18,6 +19,7 @@ fun EntryProviderScope<NavKey>.debtsEntry(navigator: Navigator) {
     DebtsScreen(
       state = state,
       onDebtClick = { navigator.navigate(DebtDetailRoute(it.value.toString())) },
+      onAddDebt = { navigator.navigate(AddDebtRoute) },
     )
   }
 }
