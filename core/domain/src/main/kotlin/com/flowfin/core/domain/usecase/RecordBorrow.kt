@@ -15,7 +15,11 @@ import com.flowfin.core.model.Money
 import com.flowfin.core.model.PersonId
 import kotlinx.datetime.Instant
 
-/** Borrowing money from a person: it lands in a real account, creating an I_OWE debt. */
+/**
+ * Borrowing money from a person: normally it lands in a real account, creating
+ * an I_OWE debt; [intoAccount] is optional — the debt can also be tracked
+ * off-book, with no account movement at all.
+ */
 class RecordBorrow(
   private val accounts: AccountRepository,
   private val persons: PersonRepository,
@@ -23,20 +27,22 @@ class RecordBorrow(
 ) {
   suspend operator fun invoke(
     personId: PersonId,
-    intoAccount: AccountId,
+    intoAccount: AccountId?,
     amount: Money,
     reason: String? = null,
     recordedAt: Instant,
   ): Either<DebtError, Debt> = either {
     ensure(amount.isPositive) { DebtError.AmountNotPositive }
     ensureNotNull(persons.getById(personId)) { DebtError.PersonNotFound(personId) }
-    val account = requireRealActiveAccount(accounts, intoAccount)
+    // Off-book has no account to anchor a currency to — same default as a
+    // freshly created account (CreateRealAccount.kt).
+    val currency = intoAccount?.let { requireRealActiveAccount(accounts, it).currency } ?: "PKR"
     debts.open(
       direction = DebtDirection.I_OWE,
       personId = personId,
       accountId = intoAccount,
       amount = amount,
-      currency = account.currency,
+      currency = currency,
       reason = reason,
       recordedAt = recordedAt,
     ).bind()

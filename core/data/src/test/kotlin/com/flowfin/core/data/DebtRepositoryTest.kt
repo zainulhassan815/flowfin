@@ -28,6 +28,7 @@ class DebtRepositoryTest {
   private val accounts = AccountRepositoryImpl(db.accountsQueries, UuidV7Generator(), FixedClock(at), Dispatchers.Unconfined)
   private val persons: PersonRepository = PersonRepositoryImpl(db.personsQueries, UuidV7Generator(), FixedClock(at), Dispatchers.Unconfined)
   private val debts = DebtRepositoryImpl(db, UuidV7Generator(), FixedClock(at), Dispatchers.Unconfined)
+  private val transactions = TransactionRepositoryImpl(db.transactionsQueries, UuidV7Generator(), FixedClock(at), Dispatchers.Unconfined)
 
   private val createReal = CreateRealAccount(accounts)
   private val createBudget = CreateBudget(accounts)
@@ -151,5 +152,56 @@ class DebtRepositoryTest {
 
     debts.reopen(debt.id).rightOrFail()
     assertEquals(DebtStatus.ACTIVE, debts.getById(debt.id)?.status)
+  }
+
+  @Test
+  fun `an off-book borrow tracks remaining without touching any account`() = runTest {
+    val ahmed = createPerson("Ahmed").rightOrFail()
+
+    val debt = borrow(ahmed.id, intoAccount = null, Money(800_000), recordedAt = at).rightOrFail()
+
+    assertEquals(Money(800_000), debts.observeByDirection(DebtDirection.I_OWE).first().single().remaining)
+  }
+
+  @Test
+  fun `an off-book repayment on a linked debt still reduces remaining`() = runTest {
+    val bank = createReal("Bank", openingBalance = Money(1_000_000)).rightOrFail()
+    val ahmed = createPerson("Ahmed").rightOrFail()
+    val debt = borrow(ahmed.id, bank.id, Money(800_000), recordedAt = at).rightOrFail()
+
+    repay(debt.id, account = null, Money(200_000), recordedAt = at).rightOrFail()
+
+    // Remaining drops, but the off-book repayment never touched the account.
+    assertEquals(Money(600_000), debts.observeByDirection(DebtDirection.I_OWE).first().single().remaining)
+    assertEquals(Money(1_800_000), accounts.balanceOf(bank.id))
+  }
+
+  @Test
+  fun `off-book debt activity never moves the net-change headline`() = runTest {
+    // No account touched at any point, so Home's monthly net-change figure —
+    // which is meant to equal the change in totalBalance — must stay at zero.
+    val ahmed = createPerson("Ahmed").rightOrFail()
+    val debt = borrow(ahmed.id, intoAccount = null, Money(800_000), recordedAt = at).rightOrFail()
+    repay(debt.id, account = null, Money(200_000), recordedAt = at).rightOrFail()
+
+    val endAt = Instant.fromEpochMilliseconds(at.toEpochMilliseconds() + 86_400_000L)
+    val netChange = transactions.observeNetChange(at, endAt).first()
+
+    assertEquals(Money.ZERO, netChange)
+  }
+
+  @Test
+  fun `deleting a debt removes it and its entire transaction history`() = runTest {
+    val bank = createReal("Bank", openingBalance = Money(1_000_000)).rightOrFail()
+    val ahmed = createPerson("Ahmed").rightOrFail()
+    val debt = borrow(ahmed.id, bank.id, Money(800_000), recordedAt = at).rightOrFail()
+    repay(debt.id, bank.id, Money(200_000), recordedAt = at).rightOrFail()
+
+    debts.delete(debt.id).rightOrFail()
+
+    assertEquals(null, debts.getById(debt.id))
+    // The origin + repayment transactions are gone too — the account balance
+    // reverts as if the debt never happened.
+    assertEquals(Money(1_000_000), accounts.balanceOf(bank.id))
   }
 }

@@ -43,10 +43,13 @@ CREATE TABLE transactions (
     OR (kind = 'TRANSFER'        AND from_account_id IS NOT NULL AND to_account_id IS NOT NULL AND category_id IS NULL     AND debt_id IS NULL)
     OR (kind = 'ALLOCATION'      AND from_account_id IS NOT NULL AND to_account_id IS NOT NULL AND category_id IS NULL     AND debt_id IS NULL)
     OR (kind = 'REALLOCATION'    AND from_account_id IS NOT NULL AND to_account_id IS NOT NULL AND category_id IS NULL     AND debt_id IS NULL)
-    OR (kind = 'DEBT_BORROW'     AND from_account_id IS NULL     AND to_account_id IS NOT NULL AND category_id IS NULL     AND debt_id IS NOT NULL)
-    OR (kind = 'DEBT_LEND'       AND from_account_id IS NOT NULL AND to_account_id IS NULL     AND category_id IS NULL     AND debt_id IS NOT NULL)
-    OR (kind = 'DEBT_REPAY_OUT'  AND from_account_id IS NOT NULL AND to_account_id IS NULL     AND category_id IS NULL     AND debt_id IS NOT NULL)
-    OR (kind = 'DEBT_REPAY_IN'   AND from_account_id IS NULL     AND to_account_id IS NOT NULL AND category_id IS NULL     AND debt_id IS NOT NULL)
+    -- Debt kinds: the structurally-impossible side is always NULL (a borrow can
+    -- never move money out of your own account, etc.); the other side is
+    -- optional — off-book debts/repayments (no linked account) leave it NULL too.
+    OR (kind = 'DEBT_BORROW'     AND from_account_id IS NULL                                    AND category_id IS NULL     AND debt_id IS NOT NULL)
+    OR (kind = 'DEBT_LEND'       AND to_account_id IS NULL                                       AND category_id IS NULL     AND debt_id IS NOT NULL)
+    OR (kind = 'DEBT_REPAY_OUT'  AND to_account_id IS NULL                                       AND category_id IS NULL     AND debt_id IS NOT NULL)
+    OR (kind = 'DEBT_REPAY_IN'   AND from_account_id IS NULL                                    AND category_id IS NULL     AND debt_id IS NOT NULL)
   ),
 
   -- Recurring schedules don't fire debt payments in v0.
@@ -197,16 +200,19 @@ GROUP BY kind;
 -- Net change to the headline total over a range. Internal moves (transfers,
 -- allocations, reallocations) net to zero across REAL + BUDGET, so only the
 -- external flows count: money entering the system is +, money leaving is −.
--- This equals the change in `totalBalance` across the same window.
+-- This equals the change in `totalBalance` across the same window. Off-book
+-- debt rows (no linked account — see the per-kind CHECK above) contribute 0:
+-- they never touched an account, so counting them here would move this figure
+-- without moving any actual balance.
 netChangeInRange:
 SELECT COALESCE(SUM(
   CASE kind
     WHEN 'INCOME'         THEN  amount_minor
-    WHEN 'DEBT_BORROW'    THEN  amount_minor
-    WHEN 'DEBT_REPAY_IN'  THEN  amount_minor
+    WHEN 'DEBT_BORROW'    THEN CASE WHEN to_account_id   IS NOT NULL THEN  amount_minor ELSE 0 END
+    WHEN 'DEBT_REPAY_IN'  THEN CASE WHEN to_account_id   IS NOT NULL THEN  amount_minor ELSE 0 END
     WHEN 'EXPENSE'        THEN -amount_minor
-    WHEN 'DEBT_LEND'      THEN -amount_minor
-    WHEN 'DEBT_REPAY_OUT' THEN -amount_minor
+    WHEN 'DEBT_LEND'      THEN CASE WHEN from_account_id IS NOT NULL THEN -amount_minor ELSE 0 END
+    WHEN 'DEBT_REPAY_OUT' THEN CASE WHEN from_account_id IS NOT NULL THEN -amount_minor ELSE 0 END
     ELSE 0
   END
 ), 0) AS net_minor
@@ -293,3 +299,9 @@ WHERE id = :id;
 
 delete:
 DELETE FROM transactions WHERE id = ?;
+
+-- Deleting a debt cascades here first — `transactions.debt_id` has no ON DELETE
+-- CASCADE (a debt's own history shouldn't vanish by accident elsewhere), so the
+-- debt-screen delete flow clears these explicitly before deleting the debt row.
+deleteByDebt:
+DELETE FROM transactions WHERE debt_id = ?;

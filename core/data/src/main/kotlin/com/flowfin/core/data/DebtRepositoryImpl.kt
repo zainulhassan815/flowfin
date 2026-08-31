@@ -46,7 +46,7 @@ internal class DebtRepositoryImpl(
   override suspend fun open(
     direction: DebtDirection,
     personId: PersonId,
-    accountId: AccountId,
+    accountId: AccountId?,
     amount: Money,
     currency: String,
     reason: String?,
@@ -106,7 +106,7 @@ internal class DebtRepositoryImpl(
 
   override suspend fun recordRepayment(
     debt: Debt,
-    accountId: AccountId,
+    accountId: AccountId?,
     amount: Money,
     recordedAt: Instant,
   ): Either<DebtError, Unit> = withContext(dispatcher) {
@@ -142,6 +142,18 @@ internal class DebtRepositoryImpl(
   override suspend fun reopen(id: DebtId): Either<DebtError, Unit> = withContext(dispatcher) {
     Either.catch {
       debts.reopen(updatedAt = clock.now(), id = id).value
+      Unit
+    }.mapLeft { DebtError.Unexpected(it) }
+  }
+
+  override suspend fun delete(id: DebtId): Either<DebtError, Unit> = withContext(dispatcher) {
+    Either.catch {
+      // Transactions first — `transactions.debt_id` has no cascade, and the debt
+      // row can't go while they still reference it.
+      db.transaction {
+        transactions.deleteByDebt(id)
+        debts.delete(id)
+      }
       Unit
     }.mapLeft { DebtError.Unexpected(it) }
   }

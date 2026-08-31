@@ -27,9 +27,13 @@ data class Debt(
 /**
  * A [Debt] with its computed money position: [paid] is the sum of repayments,
  * [remaining] is original − paid (can go negative when overpaid — allowed).
+ * [originRecordedAt] is the origin transaction's user-declared date (when the
+ * debt was actually incurred) — distinct from `debt.createdAt`, the row's audit
+ * timestamp, which can differ when a debt is backdated.
  */
 data class DebtWithRemaining(
   val debt: Debt,
   val paid: Money,
   val remaining: Money,
+  val originRecordedAt: Instant,
 )

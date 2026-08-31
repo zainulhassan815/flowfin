@@ -15,7 +15,11 @@ import com.flowfin.core.model.Money
 import com.flowfin.core.model.PersonId
 import kotlinx.datetime.Instant
 
-/** Lending money to a person: it leaves a real account, creating an OWED_TO_ME debt. */
+/**
+ * Lending money to a person: normally it leaves a real account, creating an
+ * OWED_TO_ME debt; [fromAccount] is optional — the debt can also be tracked
+ * off-book, with no account movement at all.
+ */
 class RecordLend(
   private val accounts: AccountRepository,
   private val persons: PersonRepository,
@@ -23,20 +27,22 @@ class RecordLend(
 ) {
   suspend operator fun invoke(
     personId: PersonId,
-    fromAccount: AccountId,
+    fromAccount: AccountId?,
     amount: Money,
     reason: String? = null,
     recordedAt: Instant,
   ): Either<DebtError, Debt> = either {
     ensure(amount.isPositive) { DebtError.AmountNotPositive }
     ensureNotNull(persons.getById(personId)) { DebtError.PersonNotFound(personId) }
-    val account = requireRealActiveAccount(accounts, fromAccount)
+    // Off-book has no account to anchor a currency to — same default as a
+    // freshly created account (CreateRealAccount.kt).
+    val currency = fromAccount?.let { requireRealActiveAccount(accounts, it).currency } ?: "PKR"
     debts.open(
       direction = DebtDirection.OWED_TO_ME,
       personId = personId,
       accountId = fromAccount,
       amount = amount,
-      currency = account.currency,
+      currency = currency,
       reason = reason,
       recordedAt = recordedAt,
     ).bind()

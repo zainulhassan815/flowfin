@@ -48,3 +48,4 @@ SDK path comes from `local.properties` (gitignored).
 - [`docs/localization.md`](docs/localization.md) — where strings live (`:core:resources`) and how `UiText` carries copy out of ViewModels.
 - [`docs/feature-anatomy.md`](docs/feature-anatomy.md) — how a `:feature:*` is built end to end (state, ViewModel, screen, navigation); the base shape for a new feature.
 - [`docs/devtools.md`](docs/devtools.md) — the debug-only `:devtools` module: seed named DB scenarios, wipe, reseed.
+- [`docs/launch.md`](docs/launch.md) — Play Store launch prep: brand research, technical blockers, store listing, sequenced plan.

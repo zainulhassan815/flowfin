@@ -5,3 +5,7 @@ plugins {
 android {
   namespace = "com.flowfin.feature.debts"
 }
+
+dependencies {
+  implementation(libs.kotlinx.datetime)
+}

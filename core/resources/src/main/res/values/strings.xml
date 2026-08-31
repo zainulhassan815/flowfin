@@ -329,4 +329,28 @@
   <string name="transactions_filter_empty_transfers">No transfers</string>
   <string name="transactions_filter_empty_title">Nothing matches this filter.</string>
 
+  <!-- Debts (tab) -->
+  <string name="debts_title">Debts</string>
+  <string name="debts_net_position_label">Net position</string>
+  <!-- Hero copy when every debt in the app is settled (distinct from never having any). -->
+  <string name="debts_all_clear">All clear.</string>
+  <string name="debts_tab_i_owe">I Owe</string>
+  <string name="debts_tab_owe_me">Owe Me</string>
+  <!-- Active-card amount label, by direction. -->
+  <string name="debts_amount_label_i_owe">Remaining</string>
+  <string name="debts_amount_label_owe_me">Owed</string>
+  <!-- A card's progress meta, e.g. "2,000 paid of 5,000". -->
+  <string name="debts_card_paid">%1$s paid of %2$s</string>
+  <!-- A card's date meta, e.g. "20 May · 6 days ago". -->
+  <string name="debts_card_date">%1$d %2$s · %3$s</string>
+  <!-- The settled-list disclosure toggle. -->
+  <plurals name="debts_settled_toggle">
+    <item quantity="one">%1$d settled debt</item>
+    <item quantity="other">%1$d settled debts</item>
+  </plurals>
+  <!-- Whole-screen empty: no debts or receivables at all, ever. -->
+  <string name="debts_empty_eyebrow">Owed &amp; owed to</string>
+  <string name="debts_empty_title">Money moves between people. Keep score.</string>
+  <string name="debts_empty_body">Borrowed for rent, fronted lunch for a friend — record either direction. FlowFin reconciles each repayment until it settles.</string>
+
 </resources>
