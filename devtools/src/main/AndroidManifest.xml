@@ -7,7 +7,7 @@
       android:name=".DevToolsActivity"
       android:exported="true"
       android:label="@string/dev_tools_label"
-      android:theme="@android:style/Theme.Material.NoActionBar">
+      android:theme="@android:style/Theme.Material.Light.NoActionBar">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
