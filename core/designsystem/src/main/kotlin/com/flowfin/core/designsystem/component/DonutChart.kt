@@ -43,7 +43,7 @@ data class DonutSegment(val value: Float, val color: Color)
 fun FlowFinDonutChart(
   segments: List<DonutSegment>,
   modifier: Modifier = Modifier,
-  trackColor: Color = Color.White.copy(alpha = 0.04f),
+  trackColor: Color = FlowFinTheme.colors.surface3,
   content: @Composable BoxScope.() -> Unit = {},
 ) {
   val total = segments.sumOf { it.value.toDouble() }.toFloat().coerceAtLeast(0.0001f)

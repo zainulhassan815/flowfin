@@ -65,7 +65,7 @@ fun FrequencyTag(
   Pill(
     text = text.uppercase(),
     foreground = FlowFinTheme.colors.textSoft,
-    background = Color.White.copy(alpha = 0.05f),
+    background = FlowFinTheme.colors.surface3,
     shape = RoundedCornerShape(5.dp),
     horizontalPadding = 7.dp,
     verticalPadding = 3.dp,
@@ -89,7 +89,7 @@ fun CountBadge(
   Pill(
     text = count.toString(),
     foreground = FlowFinTheme.colors.text,
-    background = Color.White.copy(alpha = 0.06f),
+    background = FlowFinTheme.colors.surface3,
     shape = RoundedCornerShape(8.dp),
     horizontalPadding = 7.dp,
     verticalPadding = 2.dp,
@@ -106,7 +106,7 @@ private fun StatusTone.colors(): Pair<Color, Color> {
     StatusTone.Critical -> palette.negative to palette.negative.copy(alpha = 0.08f)
     StatusTone.Positive -> palette.positive to palette.positive.copy(alpha = 0.08f)
     StatusTone.Info     -> palette.transfer to palette.transfer.copy(alpha = 0.08f)
-    StatusTone.Neutral  -> palette.textSoft to Color.White.copy(alpha = 0.05f)
+    StatusTone.Neutral  -> palette.textSoft to palette.surface3
   }
 }
 

@@ -38,7 +38,7 @@ fun FlowFinProgressDots(
       val color = when {
         index == current -> palette.accent
         index < current -> palette.accent.copy(alpha = 0.3f)
-        else -> Color.White.copy(alpha = 0.10f)
+        else -> palette.borderStrong
       }
       Box(
         modifier = Modifier

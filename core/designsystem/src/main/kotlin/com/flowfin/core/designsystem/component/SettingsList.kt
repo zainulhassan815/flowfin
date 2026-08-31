@@ -260,7 +260,7 @@ private fun Accessory(accessory: SettingsAccessory) {
         .clip(RoundedCornerShape(7.dp))
         .background(
           if (accessory.warn) palette.warning.copy(alpha = 0.10f)
-          else Color.White.copy(alpha = 0.06f),
+          else palette.surface3,
         )
         .padding(horizontal = 8.dp, vertical = 3.dp),
       style = FlowFinTheme.typography.caption.copy(letterSpacing = 0.06.em),

@@ -153,7 +153,7 @@ private fun OpeningTag() {
     text = stringResource(R.string.account_detail_balance_opening).uppercase(),
     modifier = Modifier
       .clip(RoundedCornerShape(6.dp))
-      .background(Color.White.copy(alpha = 0.04f))
+      .background(palette.surface3)
       .padding(horizontal = 7.dp, vertical = 2.dp),
     style = FlowFinTheme.typography.caption.copy(fontSize = 9.sp, letterSpacing = 0.2.em),
     color = palette.textSoft,

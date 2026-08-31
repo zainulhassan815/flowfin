@@ -239,7 +239,7 @@ private fun GradientRule() {
       .height(1.dp)
       .background(
         Brush.horizontalGradient(
-          listOf(Color.Transparent, Color.White.copy(alpha = 0.10f), Color.Transparent),
+          listOf(Color.Transparent, FlowFinTheme.colors.borderStrong, Color.Transparent),
         ),
       ),
   )

@@ -32,7 +32,7 @@ fun FlowFinProgressBar(
   progress: Float,
   modifier: Modifier = Modifier,
   color: Color = FlowFinTheme.colors.accent,
-  trackColor: Color = Color.White.copy(alpha = 0.06f),
+  trackColor: Color = FlowFinTheme.colors.surface3,
   height: Dp = 5.dp,
 ) {
   val shape = RoundedCornerShape(3.dp)

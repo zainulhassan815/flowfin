@@ -131,7 +131,7 @@ private fun FlowFinDragHandle() {
       modifier = Modifier
         .size(width = 36.dp, height = 4.dp)
         .clip(RoundedCornerShape(2.dp))
-        .background(Color.White.copy(alpha = 0.18f)),
+        .background(FlowFinTheme.colors.borderStrong),
     )
   }
 }

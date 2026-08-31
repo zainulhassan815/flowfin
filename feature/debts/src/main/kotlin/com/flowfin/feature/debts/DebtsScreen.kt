@@ -238,14 +238,25 @@ private fun DebtCard(row: DebtCardUi, amountLabel: String, onClick: (DebtId) -> 
     )
     Row(
       modifier = Modifier.fillMaxWidth(),
-      horizontalArrangement = Arrangement.SpaceBetween,
+      horizontalArrangement = Arrangement.spacedBy(10.dp),
+      verticalAlignment = Alignment.CenterVertically,
     ) {
+      // Both are long enough to collide at these widths, so the progress line
+      // takes the slack and the date keeps its own.
       Text(
-        text = stringResource(R.string.debts_card_paid, "${row.paidWhole}${row.paidDecimal}", "${row.amountWhole}${row.amountDecimal}"),
+        text = stringResource(R.string.debts_card_paid, "${row.paidWhole}${row.paidDecimal}", row.originalAmount),
+        modifier = Modifier.weight(1f),
         style = FlowFinTheme.typography.caption,
         color = palette.textSoft,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
       )
-      Text(row.dateLabel.asString(), style = FlowFinTheme.typography.caption, color = palette.textFaint)
+      Text(
+        text = row.dateLabel.asString(),
+        style = FlowFinTheme.typography.caption,
+        color = palette.textFaint,
+        maxLines = 1,
+      )
     }
   }
 }
@@ -297,17 +308,17 @@ private fun PreviewDebts() = FlowFinTheme {
       allSettled = false,
       iOwe = DebtsTabUi(
         active = listOf(
-          DebtCardUi(fakeId(), "Ahmed", 3, "Borrowed for rent", "3,000", ".00", "2,000", ".00", 0.4f, UiText.Raw("20 May · 6 days ago")),
-          DebtCardUi(fakeId(), "Hassan", 2, null, "2,500", ".00", "0", ".00", 0f, UiText.Raw("1 May · 25 days ago")),
+          DebtCardUi(fakeId(), "Ahmed", 3, "Borrowed for rent", "3,000", ".00", "2,000", ".00", "Rs 5,000.00", 0.4f, UiText.Raw("20 May · 6 days ago")),
+          DebtCardUi(fakeId(), "Hassan", 2, null, "2,500", ".00", "0", ".00", "Rs 2,500.00", 0f, UiText.Raw("1 May · 25 days ago")),
         ),
         settled = emptyList(),
       ),
       oweMe = DebtsTabUi(
         active = listOf(
-          DebtCardUi(fakeId(), "Ali", 4, "Lunch", "2,000", ".00", "1,000", ".00", 0.33f, UiText.Raw("10 May · 16 days ago")),
+          DebtCardUi(fakeId(), "Ali", 4, "Lunch", "2,000", ".00", "1,000", ".00", "Rs 3,000.00", 0.33f, UiText.Raw("10 May · 16 days ago")),
         ),
         settled = listOf(
-          DebtCardUi(fakeId(), "Imran", 5, null, "0", ".00", "10,000", ".00", 1f, UiText.Raw("1 Apr · 55 days ago")),
+          DebtCardUi(fakeId(), "Imran", 5, null, "0", ".00", "10,000", ".00", "Rs 10,000.00", 1f, UiText.Raw("1 Apr · 55 days ago")),
         ),
       ),
     ),

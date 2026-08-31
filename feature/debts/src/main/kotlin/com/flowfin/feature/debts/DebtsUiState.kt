@@ -36,10 +36,13 @@ data class DebtCardUi(
   val personName: String,
   val avatarTintIndex: Int,
   val reason: String?,
+  /** The remaining, headlined on the card. */
   val amountWhole: String,
   val amountDecimal: String,
   val paidWhole: String,
   val paidDecimal: String,
+  /** The debt's original amount — the denominator of "X paid of Y". */
+  val originalAmount: String,
   val progress: Float,
   val dateLabel: UiText,
 )

@@ -11,6 +11,11 @@ import androidx.compose.ui.graphics.Color
  * Mirrors the CSS custom properties in `design/system/styles.css`. Two palettes
  * ship: [flowFinDarkColors] (the reference palette the design system was drawn
  * in) and [flowFinLightColors] (the same structure re-tuned for light surfaces).
+ *
+ * Note the [accent] departs from `styles.css` and `design/system/brand.html`,
+ * which are still on the brand's sand/cream `#E8DCC0`. The app's accent is now
+ * deliberately near-neutral so that hue is free to mean something — see the
+ * property's own note.
  */
 @Immutable
 data class FlowFinColors(
@@ -30,6 +35,13 @@ data class FlowFinColors(
   val textFaint: Color,
 
   // Semantic
+  /**
+   * Deliberately near-neutral — near-black on light, near-white on dark. The
+   * accent carries emphasis (buttons, the FAB, progress fills), not meaning:
+   * colour in FlowFin is reserved for semantic state ([positive], [negative],
+   * [warning], [transfer]) and category identity, so a hued accent would
+   * compete with the only signals that are supposed to mean something.
+   */
   val accent: Color,
   val positive: Color,
   val warning: Color,
@@ -101,12 +113,12 @@ val flowFinDarkColors = FlowFinColors(
   textSoft      = Color(0xFF8A8A92),
   textFaint     = Color(0xFF565660),
 
-  accent        = Color(0xFFE8DCC0),
+  accent        = Color(0xFFE8E8EA),
   positive      = Color(0xFF9CD4A2),
   warning       = Color(0xFFE8B66E),
   negative      = Color(0xFFE08A8A),
   transfer      = Color(0xFF82C5D4),
-  onAccent      = Color(0xFF08080A),
+  onAccent      = Color(0xFF0A0A0B),
 
   categories = CategoryColors(
     bank      = Color(0xFF82C5D4),
@@ -158,7 +170,7 @@ val flowFinLightColors = FlowFinColors(
   textSoft      = Color(0xFF74747E),
   textFaint     = Color(0xFF9E9EA8),
 
-  accent        = Color(0xFF6E5D33),
+  accent        = Color(0xFF22262B),
   positive      = Color(0xFF2E7D48),
   warning       = Color(0xFF9A6A17),
   negative      = Color(0xFFB3413C),

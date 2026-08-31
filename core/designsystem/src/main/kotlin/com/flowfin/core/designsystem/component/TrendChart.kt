@@ -69,8 +69,8 @@ fun FlowFinTrendChart(
   barCorner: Dp = 2.dp,
 ) {
   val palette = FlowFinTheme.colors
-  val baselineColor = Color.White.copy(alpha = 0.06f)
-  val futureColor = Color.White.copy(alpha = 0.07f)
+  val baselineColor = palette.border
+  val futureColor = palette.surface3
   val accent = palette.accent
   val referenceColor = palette.textFaint
   val measurer = rememberTextMeasurer()
