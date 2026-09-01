@@ -11,6 +11,7 @@ import androidx.navigation3.runtime.NavKey
 import com.flowfin.core.model.DebtId
 import com.flowfin.core.navigation.DebtDetailRoute
 import com.flowfin.core.navigation.Navigator
+import com.flowfin.core.navigation.RecordPaymentRoute
 import com.flowfin.core.ui.resolve
 import com.flowfin.feature.debts.DebtDetailEffect
 import com.flowfin.feature.debts.DebtDetailScreen
@@ -40,15 +41,9 @@ fun EntryProviderScope<NavKey>.debtDetailEntry(navigator: Navigator) {
       state = state,
       snackbarHostState = snackbarHostState,
       onBack = { navigator.goBack() },
-      onRecordPayment = viewModel::openSheet,
+      onRecordPayment = { navigator.navigate(RecordPaymentRoute(route.debtId)) },
       onToggleSettled = viewModel::toggleSettled,
       onConfirmDelete = viewModel::delete,
-      onCloseSheet = viewModel::closeSheet,
-      onAmountDigits = viewModel::onAmountDigits,
-      onLinkAccountChange = viewModel::onLinkAccountChange,
-      onAccountSelected = viewModel::onAccountSelected,
-      onNoteChange = viewModel::onNoteChange,
-      onSave = viewModel::save,
     )
   }
 }

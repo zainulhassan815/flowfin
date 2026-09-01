@@ -73,6 +73,10 @@
   <string name="tx_allocation">Allocation</string>
   <string name="tx_reallocation">Reallocation</string>
   <string name="tx_debt">Debt</string>
+  <string name="tx_debt_borrow">Borrowed from %1$s</string>
+  <string name="tx_debt_lend">Lent to %1$s</string>
+  <string name="tx_debt_repay_out">Repaid %1$s</string>
+  <string name="tx_debt_repay_in">%1$s repaid you</string>
   <!-- Fallback when an income/expense has no category. -->
   <string name="tx_uncategorized">—</string>
 
@@ -99,6 +103,53 @@
   <string name="add_account_error_generic">Couldn\'t create the account. Please try again.</string>
 
   <!-- Account kinds (real-account presets) -->
+  <string name="accounts_budgets_add">New budget</string>
+  <string name="add_tx_field_amount">Amount</string>
+  <string name="add_tx_blocked_amount">Enter an amount</string>
+  <string name="add_tx_blocked_from">Pick an account to pay from</string>
+  <string name="add_tx_blocked_from_income">Pick the account it landed in</string>
+  <string name="add_tx_blocked_to">Pick an account to move it to</string>
+  <string name="add_tx_blocked_category">Choose a category</string>
+  <string name="add_tx_hint_account">Which account?</string>
+  <string name="add_tx_hint_category">e.g. Groceries</string>
+  <string name="add_tx_hint_note">Add a note</string>
+
+  <string name="add_recurring_blocked_amount">Enter an amount</string>
+  <string name="add_recurring_blocked_name">Give it a name</string>
+  <string name="add_recurring_blocked_account">Pick an account</string>
+  <string name="add_recurring_blocked_category">Choose a category</string>
+  <string name="add_recurring_hint_name">e.g. Netflix</string>
+
+  <string name="add_debt_blocked_amount">Enter an amount</string>
+  <string name="add_debt_blocked_person">Who is it with?</string>
+  <string name="add_debt_blocked_account">Pick the account it moved through</string>
+
+  <string name="add_account_blocked_name">Give the account a name</string>
+  <string name="add_account_blocked_taken">That name is already in use</string>
+
+  <string name="add_budget_title">New budget</string>
+  <string name="add_budget_amount_label">Fund it with</string>
+  <string name="add_budget_name_label">Name</string>
+  <string name="add_budget_name_hint">e.g. Food</string>
+  <string name="add_budget_parent_label">From</string>
+  <string name="add_budget_parent_hint">Which account?</string>
+  <string name="add_budget_parent_sub">The real account it draws from</string>
+  <string name="add_budget_icon_label">Icon</string>
+  <string name="add_budget_colour_label">Colour</string>
+  <string name="add_budget_refill_title">Refill every month</string>
+  <string name="add_budget_refill_sub">Tops the envelope up on a schedule</string>
+  <string name="add_budget_refill_day">On</string>
+  <string name="add_budget_refill_next">Next</string>
+  <string name="add_budget_refill_day_sheet">Refill on</string>
+  <string name="add_budget_fund_now">Fund it today too</string>
+  <string name="add_budget_submit">Create budget</string>
+  <string name="add_budget_blocked_name">Give the budget a name</string>
+  <string name="add_budget_blocked_parent">Choose the account it draws from</string>
+  <string name="add_budget_blocked_amount">Enter an amount to fund it with</string>
+  <string name="add_budget_duplicate_name">An account called “%1$s” already exists</string>
+  <string name="add_budget_error_generic">Couldn\'t create the budget. Please try again.</string>
+  <string name="add_budget_day_of_month">%1$d of every month</string>
+
   <string name="account_kind_bank">Bank</string>
   <string name="account_kind_cash">Cash</string>
   <string name="account_kind_mobile">Mobile</string>

@@ -73,3 +73,9 @@ data class RecentGroup(
   val dateLabel: UiText,
   val rows: List<TxRowUi>,
 )
+
+/** One-shot messages from [HomeViewModel] — the confirmation (or failure) after
+ *  paying a pending recurring payment straight from the Pending strip. */
+sealed interface HomeEffect {
+  data class ShowMessage(val text: UiText) : HomeEffect
+}

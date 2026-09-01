@@ -18,8 +18,9 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 
 /**
- * Creates a recurring schedule. Validates the same income/expense shape a one-off
- * recording would, then stamps the first due date as the next occurrence after now.
+ * Creates a recurring schedule. Validates the same shape a one-off recording would
+ * — income, expense, or a budget's funding allocation — then stamps the first due
+ * date as the next occurrence after now.
  */
 class CreateRecurringSchedule(
   private val accounts: AccountRepository,
@@ -41,6 +42,17 @@ class CreateRecurringSchedule(
       is RecurringDraft.Expense -> {
         activeAccount(draft.fromAccount) // spend from a real account or a budget — both allowed
         requireCategory(draft.category, CategoryScope.EXPENSE)
+      }
+
+      is RecurringDraft.Allocation -> {
+        // Same rules RecordTransaction applies to a one-off allocation: out of a
+        // real account, into a budget under it.
+        val from = activeAccount(draft.fromAccount)
+        val to = activeAccount(draft.toBudget)
+        ensure(draft.fromAccount != draft.toBudget) { RecurringError.InvalidAccountForKind("a budget can't fund itself") }
+        ensure(from.isReal) { RecurringError.InvalidAccountForKind("funding must come from a real account") }
+        ensure(to.isBudget) { RecurringError.InvalidAccountForKind("funding must go into a budget") }
+        ensure(from.currency == to.currency) { RecurringError.InvalidAccountForKind("currency mismatch") }
       }
     }
     val firstDueAt = draft.recurrence.nextDueAfter(clock.now(), zone)

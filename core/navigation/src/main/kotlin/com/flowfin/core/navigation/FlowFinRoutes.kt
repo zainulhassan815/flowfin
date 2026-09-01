@@ -30,11 +30,22 @@ import kotlinx.serialization.Serializable
  */
 @Serializable data class DebtDetailRoute(val debtId: String) : NavKey
 
+/**
+ * Record a payment against one debt. Its own route, not a sheet on debt detail:
+ * it is a form with an amount, an account, a date and a note, and a sheet that
+ * has to open further sheets to be usable isn't a sheet any more.
+ */
+@Serializable data class RecordPaymentRoute(val debtId: String) : NavKey
+
 @Serializable data object ReportsRoute : NavKey
 
 @Serializable data object AddTransactionRoute : NavKey
 
 @Serializable data object AddAccountRoute : NavKey
+
+/** Create a budget envelope under a real account — the counterpart to
+ *  [AddAccountRoute], which only ever makes real accounts. */
+@Serializable data object AddBudgetRoute : NavKey
 
 @Serializable data object AddRecurringRoute : NavKey
 

@@ -25,7 +25,27 @@ data class RecurringSchedule(
   val updatedAt: Instant,
 ) {
   val isActive: Boolean get() = status == RecurringStatus.ACTIVE
+
+  /**
+   * What this schedule fires, read off the account columns — the same shape the
+   * database's per-kind CHECK enforces on the transactions it produces:
+   * income lands *in* one account, an expense pays *out of* one, and an allocation
+   * moves between two (a real account into its budget).
+   */
+  val kind: RecurringKind
+    get() = when {
+      fromAccountId != null && toAccountId != null -> RecurringKind.ALLOCATION
+      toAccountId != null -> RecurringKind.INCOME
+      else -> RecurringKind.EXPENSE
+    }
+
+  /** Money actually leaving your accounts. An allocation isn't spending — it moves
+   *  money into an envelope you still own — so it is deliberately not an expense. */
+  val isExpense: Boolean get() = kind == RecurringKind.EXPENSE
 }
+
+/** The three transaction kinds a schedule can fire. */
+enum class RecurringKind { INCOME, EXPENSE, ALLOCATION }
 
 /**
  * The intent to create a schedule. Like [TransactionDraft], a variant per fireable
@@ -51,5 +71,17 @@ sealed interface RecurringDraft {
     override val recurrence: Recurrence,
     val fromAccount: AccountId,
     val category: CategoryId,
+  ) : RecurringDraft
+
+  /**
+   * A budget's funding schedule: money moves from a real account into its budget
+   * on a cadence. Carries no category — an allocation is a move, not spending.
+   */
+  data class Allocation(
+    override val name: String,
+    override val amount: Money,
+    override val recurrence: Recurrence,
+    val fromAccount: AccountId,
+    val toBudget: AccountId,
   ) : RecurringDraft
 }

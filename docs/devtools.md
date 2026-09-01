@@ -23,15 +23,29 @@ Each maps to the screens/states it lets you check (see [`empty-states.md`](empty
 
 | Scenario | Exercises |
 |---|---|
+| **Everyday — the full app** | **Start here.** Three months of an established user: Bank + Cash + JazzCash, four funded envelopes, ~100 ledger rows across every kind (income, expense, transfer, allocation, reallocation, debt), recurring in every bucket, debts both directions, custom + archived categories. The one to shoot screenshots from |
 | Empty | Fresh install, no accounts — full-empty Home / Accounts |
-| Accounts only | Bank + Cash, no activity — Account-detail opening + first-entry hint |
-| Loaded month | Accounts, budgets, salary + spend — Home full, flow strip |
-| Quiet week | History but nothing in the last ~2 weeks — Home "quiet stretch" |
+| Accounts only | Bank + Cash + JazzCash, no activity — Account-detail opening + first-entry hint |
+| Early days | Five days in — Home's "Day 5" hero, Reports' partial trend, the not-enough-yet states |
+| Quiet week | Two months of history but nothing in the last ~2 weeks — Home "quiet stretch" |
 | Overdue recurring | Active schedule past due — Home Pending (late) |
-| Recurring schedules | Full mix — pending, overdue, upcoming across weekly/monthly/yearly — the Recurring tab |
-| Debts | One I-owe + one owed-to-me |
+| Recurring schedules | Full mix — pending, overdue, upcoming across weekly/monthly/yearly, plus one paused — the Recurring tab |
+| Recurring — all paused | Active section empty, paused list inline, nothing pending |
+| Debts | Part-paid, untouched, off-book, overpaid, and one settled — detail timeline + settled disclosure |
+| Debts — all clear | Every debt settled — the "All clear." hero |
 | Negative balance | Spent more than the account holds — warning treatment |
 | Over-spent budget | Envelope spend exceeds funding — progress clamp |
+
+**Dates are calendar-anchored, not day offsets.** *Everyday* puts each month's income
+and envelope funding on the 1st and repeats a spending pattern with a deterministic
+per-month wobble, so Reports' month navigation always has full months behind it and no
+two months read the same. Nothing is ever stamped in the future — run it on the 1st and
+the current month legitimately holds only that day's rows.
+
+Seeding also backdates accounts and categories and pulls each debt's `created_at` onto
+its origin transaction, so "established user" reads consistently: Home clears its
+settling window, no category claims it was created after the rows filed under it, and
+a debt's audit stamp agrees with the date it says it was incurred.
 
 ## Keeping it out of release
 

@@ -24,6 +24,10 @@ interface DebtRepository {
 
   fun observeByDirection(direction: DebtDirection): Flow<List<DebtWithRemaining>>
 
+  /** Each debt's person, by debt id — what a transaction feed needs to name a
+   *  debt row without loading the whole aggregate. */
+  fun observePersonNames(): Flow<Map<DebtId, String>>
+
   /** One debt and its computed position, re-emitting as repayments land. Null once deleted. */
   fun observeWithRemaining(id: DebtId): Flow<DebtWithRemaining?>
 

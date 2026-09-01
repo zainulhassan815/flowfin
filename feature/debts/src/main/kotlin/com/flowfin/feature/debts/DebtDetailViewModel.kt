@@ -33,16 +33,13 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
 /**
  * Drives Debt detail: one debt, its person, and its movement timeline, all
- * observed so a recorded repayment lands on screen without a reload. The
- * record-payment sheet is held here too — it's a sub-state of this screen, not
- * a route, because it renders the debt's own remaining and person.
- *
- * Repayments go through [RecordRepayment] rather than the repository so the
- * account rules (real, active, matching currency) are enforced.
+ * observed so a repayment recorded on its own screen lands here without a reload.
  */
 class DebtDetailViewModel(
   private val debtId: DebtId,
@@ -57,9 +54,6 @@ class DebtDetailViewModel(
 
   private val zone = TimeZone.currentSystemDefault()
 
-  /** The sheet, or null when closed. Merged over the observed debt on every emission. */
-  private val sheet = MutableStateFlow<RecordPaymentUi?>(null)
-
   private val effectChannel = Channel<DebtDetailEffect>(Channel.BUFFERED)
   val effects = effectChannel.receiveAsFlow()
 
@@ -67,86 +61,10 @@ class DebtDetailViewModel(
     debts.observeWithRemaining(debtId),
     transactions.observeByDebt(debtId),
     persons.observeActive(),
-    accounts.observeBalances(),
-    sheet,
-  ) { debt, movements, people, balances, openSheet ->
+  ) { debt, movements, people ->
     if (debt == null) return@combine DebtDetailUiState.NotFound
-    val person = people.firstOrNull { it.id == debt.debt.personId }
-    debt.toContent(person, movements, openSheet?.refreshed(debt, person, balances))
+    debt.toContent(people.firstOrNull { it.id == debt.debt.personId }, movements)
   }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), DebtDetailUiState.Loading)
-
-  // --- Sheet ---
-
-  fun openSheet() {
-    val content = uiState.value as? DebtDetailUiState.Content ?: return
-    sheet.value = RecordPaymentUi(
-      title = UiText.Res(R.string.debt_detail_sheet_title),
-      amountLabel = UiText.Res(R.string.debt_detail_sheet_amount_label),
-      amountDigits = "",
-      amountWhole = "0",
-      amountDecimal = ".00",
-      personName = content.personName,
-      avatarTintIndex = content.avatarTintIndex,
-      reason = content.reason,
-      remainingWhole = content.remainingWhole,
-      remainingDecimal = content.remainingDecimal,
-      remainingLabel = content.remainingLabel,
-      afterRemaining = null,
-      linkAccount = false,
-      linkLabel = UiText.Res(R.string.debt_detail_sheet_link_label),
-      linkDescription = UiText.Res(R.string.debt_detail_sheet_link_desc),
-      accounts = emptyList(),
-      selectedAccountId = null,
-      dateLabel = detailDateLabel(clock.now().toLocalDateTime(zone).date),
-      saveLabel = UiText.Res(R.string.debt_detail_sheet_save),
-      note = "",
-      saving = false,
-    )
-  }
-
-  fun closeSheet() {
-    sheet.value = null
-  }
-
-  fun onAmountDigits(digits: String) {
-    // Digits only, and capped so the buffer can't outgrow what Money can hold.
-    val cleaned = digits.filter { it.isDigit() }.trimStart('0').take(MAX_AMOUNT_DIGITS)
-    sheet.update { it.copy(amountDigits = cleaned) }
-  }
-
-  fun onLinkAccountChange(linked: Boolean) {
-    sheet.update { it.copy(linkAccount = linked, selectedAccountId = if (linked) it.selectedAccountId else null) }
-  }
-
-  fun onAccountSelected(id: AccountId) {
-    sheet.update { it.copy(selectedAccountId = id, linkAccount = true) }
-  }
-
-  fun onNoteChange(note: String) {
-    sheet.update { it.copy(note = note) }
-  }
-
-  fun save() {
-    val form = sheet.value ?: return
-    if (!form.canSave) return
-    sheet.update { it.copy(saving = true) }
-    viewModelScope.launch {
-      val result = recordRepayment(
-        debtId = debtId,
-        account = form.selectedAccountId.takeIf { form.linkAccount },
-        amount = Money(form.amountMinor),
-        recordedAt = clock.now(),
-        note = form.note.trim().ifBlank { null },
-      )
-      when (result) {
-        is Either.Right -> sheet.value = null // the observed debt re-emits with the new remaining
-        is Either.Left -> {
-          sheet.update { it.copy(saving = false) }
-          effectChannel.send(DebtDetailEffect.ShowMessage(UiText.Res(R.string.debt_action_error)))
-        }
-      }
-    }
-  }
 
   // --- Debt actions ---
 
@@ -172,71 +90,9 @@ class DebtDetailViewModel(
 
   // --- Mapping ---
 
-  private fun MutableStateFlow<RecordPaymentUi?>.update(block: (RecordPaymentUi) -> RecordPaymentUi) {
-    value = value?.let(block)
-  }
-
-  /**
-   * Re-derives the sheet's read-only halves — the debt's live remaining, the
-   * account list, and the "after this" preview — from the latest emission, so
-   * the sheet stays truthful while it's open.
-   */
-  private fun RecordPaymentUi.refreshed(
-    debt: DebtWithRemaining,
-    person: Person?,
-    balances: List<AccountBalance>,
-  ): RecordPaymentUi {
-    val amount = Money(amountMinor)
-    val after = debt.remaining - amount
-    val owing = debt.debt.direction == DebtDirection.I_OWE
-    return copy(
-      title = UiText.Res(if (owing) R.string.debt_detail_sheet_title else R.string.debt_detail_sheet_title_receipt),
-      amountLabel = UiText.Res(
-        if (owing) R.string.debt_detail_sheet_amount_label else R.string.debt_detail_sheet_amount_label_receipt,
-      ),
-      amountWhole = money.group(amountMinor / 100),
-      amountDecimal = "." + (amountMinor % 100).toString().padStart(2, '0'),
-      personName = person?.name.orEmpty(),
-      avatarTintIndex = person?.avatarTintIndex ?: 1,
-      reason = debt.debt.reason,
-      remainingWhole = money.whole(debt.remaining),
-      remainingDecimal = money.fraction(debt.remaining),
-      remainingLabel = UiText.Res(if (owing) R.string.debts_amount_label_i_owe else R.string.debts_amount_label_owe_me),
-      afterRemaining = when {
-        amountMinor == 0L -> null
-        // Past the remaining is allowed — forgiveness / settling up — so say so
-        // plainly rather than blocking the save.
-        after.isNegative -> UiText.Res(R.string.debt_detail_sheet_after_overpaid, listOf(money.display(-after)))
-        else -> UiText.Res(
-          if (owing) R.string.debt_detail_sheet_after_i_owe else R.string.debt_detail_sheet_after_owe_me,
-          listOf(money.display(after)),
-        )
-      },
-      linkLabel = UiText.Res(if (owing) R.string.debt_detail_sheet_link_label else R.string.debt_detail_sheet_link_label_receipt),
-      linkDescription = UiText.Res(
-        if (owing) R.string.debt_detail_sheet_link_desc else R.string.debt_detail_sheet_link_desc_receipt,
-      ),
-      saveLabel = UiText.Res(if (owing) R.string.debt_detail_sheet_save else R.string.debt_detail_sheet_save_receipt),
-      // Debt money only moves through real, active accounts (RecordRepayment
-      // enforces it) — so only offer those.
-      accounts = balances
-        .filter { it.account.isReal && !it.account.isArchived && it.account.currency == debt.debt.currency }
-        .map {
-          RepaymentAccountUi(
-            id = it.account.id,
-            name = it.account.name,
-            iconKey = it.account.icon,
-            colorKey = it.account.color,
-            balance = money.display(it.balance),
-          )
-        },
-    )
-  }
-
   private fun DebtWithRemaining.toContent(
     person: Person?,
     movements: List<Transaction>,
-    openSheet: RecordPaymentUi?,
   ): DebtDetailUiState.Content {
     val owing = debt.direction == DebtDirection.I_OWE
     val original = debt.originalAmount.minorUnits
@@ -260,7 +116,6 @@ class DebtDetailViewModel(
       isFullyPaid = !remaining.isPositive,
       timeline = movements.sortedByDescending { it.recordedAt }.map { it.toTimelineItem(personName, owing) },
       paymentCount = movements.count { it.kind.isRepayment },
-      sheet = openSheet,
     )
   }
 

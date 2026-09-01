@@ -41,6 +41,7 @@ class TransactionsListViewModelTest {
     transactions = FakeTransactionRepository(feed),
     accounts = FakeAccountRepository(listOf(bank, cash)),
     categories = FakeCategoryRepository(listOf(salary, food)),
+    debts = FakeDebtRepository(),
     clock = FixedClock(now),
     money = MoneyFormatter(),
   )

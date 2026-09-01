@@ -314,7 +314,7 @@ private fun AccountRow(ui: AccountCardUi, onClick: () -> Unit, showDivider: Bool
 
 fun LazyListScope.pendingSection(
   state: HomeUiState.Content,
-  onPay: (RecurringScheduleId) -> Unit,
+  onPay: (RecurringScheduleId, String) -> Unit,
   onAll: () -> Unit,
 ) {
   if (state.pending.isEmpty()) return
@@ -327,7 +327,7 @@ fun LazyListScope.pendingSection(
 }
 
 @Composable
-private fun PendingStrip(rows: List<PendingRowUi>, onPay: (RecurringScheduleId) -> Unit) {
+private fun PendingStrip(rows: List<PendingRowUi>, onPay: (RecurringScheduleId, String) -> Unit) {
   val palette = FlowFinTheme.colors
   val shape = RoundedCornerShape(14.dp)
   Box(modifier = Modifier.fillMaxWidth().padding(horizontal = HORIZONTAL, vertical = 8.dp)) {
@@ -340,7 +340,7 @@ private fun PendingStrip(rows: List<PendingRowUi>, onPay: (RecurringScheduleId) 
         .padding(4.dp),
     ) {
       rows.forEachIndexed { index, row ->
-        PendingRow(row, onPay = { onPay(row.id) }, showDivider = index < rows.lastIndex)
+        PendingRow(row, onPay = { onPay(row.id, row.name) }, showDivider = index < rows.lastIndex)
       }
     }
   }

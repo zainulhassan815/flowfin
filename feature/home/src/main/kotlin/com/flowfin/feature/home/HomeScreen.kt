@@ -13,8 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,19 +42,20 @@ import kotlin.uuid.Uuid
 @Composable
 fun HomeScreen(
   state: HomeUiState,
+  snackbarHostState: SnackbarHostState,
   modifier: Modifier = Modifier,
   onTransactionClick: (TransactionId) -> Unit = {},
   onAccountClick: (AccountId) -> Unit = {},
-  onPayPending: (RecurringScheduleId) -> Unit = {},
-  onSearch: () -> Unit = {},
+  onPayPending: (RecurringScheduleId, String) -> Unit = { _, _ -> },
   onSettings: () -> Unit = {},
   onAddAccount: () -> Unit = {},
   onAllAccounts: () -> Unit = {},
   onAllPending: () -> Unit = {},
   onAllRecent: () -> Unit = {},
 ) {
-  Column(modifier.fillMaxSize().background(FlowFinTheme.colors.bg)) {
-    HomeTopBar(onSearch = onSearch, onSettings = onSettings)
+  Box(modifier.fillMaxSize().background(FlowFinTheme.colors.bg)) {
+   Column(Modifier.fillMaxSize()) {
+    HomeTopBar(onSettings = onSettings)
     when (state) {
       HomeUiState.Loading -> Box(Modifier.weight(1f).fillMaxWidth())
       is HomeUiState.Empty -> Column(Modifier.weight(1f).fillMaxWidth()) {
@@ -81,6 +85,10 @@ fun HomeScreen(
         onAllRecent = onAllRecent,
       )
     }
+   }
+    // Home is a tab screen with no scaffold of its own, so the host sits in the
+    // same Box the content does, above the shell's bottom bar.
+    SnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter).padding(bottom = 12.dp))
   }
 }
 
@@ -90,7 +98,7 @@ private fun HomeContent(
   modifier: Modifier = Modifier,
   onTransactionClick: (TransactionId) -> Unit,
   onAccountClick: (AccountId) -> Unit,
-  onPayPending: (RecurringScheduleId) -> Unit,
+  onPayPending: (RecurringScheduleId, String) -> Unit,
   onAllAccounts: () -> Unit,
   onAllPending: () -> Unit,
   onAllRecent: () -> Unit,
@@ -103,8 +111,11 @@ private fun HomeContent(
   }
 }
 
+// Search is designed (design/mockups/search/empty.html) but has no destination yet.
+// The icon is absent rather than inert: a header action that opens nothing is worse
+// than one that isn't there. Restore it with the search screen.
 @Composable
-private fun HomeTopBar(onSearch: () -> Unit, onSettings: () -> Unit) {
+private fun HomeTopBar(onSettings: () -> Unit) {
   val palette = FlowFinTheme.colors
   Row(
     modifier = Modifier
@@ -129,11 +140,6 @@ private fun HomeTopBar(onSearch: () -> Unit, onSettings: () -> Unit) {
     }
     Spacer(Modifier.weight(1f))
     FlowFinIconButton(
-      onClick = onSearch,
-      icon = FlowFinIcons.Search,
-      contentDescription = stringResource(R.string.home_action_search),
-    )
-    FlowFinIconButton(
       onClick = onSettings,
       icon = FlowFinIcons.Settings,
       contentDescription = stringResource(R.string.home_action_settings),
@@ -145,6 +151,7 @@ private fun HomeTopBar(onSearch: () -> Unit, onSettings: () -> Unit) {
 @Composable
 private fun PreviewHome() = FlowFinTheme {
   HomeScreen(
+    snackbarHostState = remember { SnackbarHostState() },
     state = HomeUiState.Content(
       currency = "Rs",
       totalWhole = "47,000",
@@ -191,13 +198,14 @@ private fun PreviewHome() = FlowFinTheme {
 @Preview(name = "Home · empty", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
 private fun PreviewHomeEmpty() = FlowFinTheme {
-  HomeScreen(state = HomeUiState.Empty(currency = "Rs"))
+  HomeScreen(state = HomeUiState.Empty(currency = "Rs"), snackbarHostState = remember { SnackbarHostState() })
 }
 
 @Preview(name = "Home · no entries", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
 private fun PreviewHomeNoEntries() = FlowFinTheme {
   HomeScreen(
+    snackbarHostState = remember { SnackbarHostState() },
     state = HomeUiState.Content(
       currency = "Rs",
       totalWhole = "47,000",
@@ -224,6 +232,7 @@ private fun PreviewHomeNoEntries() = FlowFinTheme {
 @Composable
 private fun PreviewHomeQuiet() = FlowFinTheme {
   HomeScreen(
+    snackbarHostState = remember { SnackbarHostState() },
     state = HomeUiState.Content(
       currency = "Rs",
       totalWhole = "47,000",
@@ -250,6 +259,7 @@ private fun PreviewHomeQuiet() = FlowFinTheme {
 @Composable
 private fun PreviewHomeEarlyData() = FlowFinTheme {
   HomeScreen(
+    snackbarHostState = remember { SnackbarHostState() },
     state = HomeUiState.Content(
       currency = "Rs",
       totalWhole = "47,000",

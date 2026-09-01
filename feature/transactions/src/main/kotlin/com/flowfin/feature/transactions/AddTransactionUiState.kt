@@ -3,7 +3,9 @@ package com.flowfin.feature.transactions
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.CategoryId
 import com.flowfin.core.model.CategoryScope
+import androidx.annotation.StringRes
 import com.flowfin.core.model.Money
+import com.flowfin.core.resources.R
 import com.flowfin.core.ui.CalculatorState
 import kotlinx.datetime.LocalDate
 import org.dreamerslab.formz.Form
@@ -63,6 +65,8 @@ data class AddTransactionUiState(
   val accountOptions: List<AccountOption> = emptyList(),
   val categoryOptions: List<CategoryOption> = emptyList(),
   val openSheet: AddSheet? = null,
+  /** A money event, so the form opens on the amount and the keypad opens with it. */
+  val amountFocused: Boolean = true,
   val submitting: Boolean = false,
 ) : Form {
   override val inputs: List<FormInput<*, *>> = when (type) {
@@ -72,6 +76,23 @@ data class AddTransactionUiState(
   }
 
   val canSave: Boolean get() = isValid && !submitting
+
+  /**
+   * The first thing still missing, in reading order — what a blocked Save says
+   * instead of sitting inert. Null once the form is valid.
+   */
+  @get:StringRes
+  val blockedReason: Int?
+    get() = when {
+      !amount.isValid -> R.string.add_tx_blocked_amount
+      type != EntryType.Income && !fromAccount.isValid -> {
+        if (type == EntryType.Transfer) R.string.add_tx_blocked_from else R.string.add_tx_blocked_from
+      }
+      type == EntryType.Income && !toAccount.isValid -> R.string.add_tx_blocked_from_income
+      type == EntryType.Transfer && !toAccount.isValid -> R.string.add_tx_blocked_to
+      type != EntryType.Transfer && !category.isValid -> R.string.add_tx_blocked_category
+      else -> null
+    }
 
   fun selectedFrom(): AccountOption? = accountOptions.firstOrNull { it.id == fromAccount.value }
   fun selectedTo(): AccountOption? = accountOptions.firstOrNull { it.id == toAccount.value }

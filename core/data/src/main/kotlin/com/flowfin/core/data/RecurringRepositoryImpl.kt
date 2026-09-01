@@ -7,6 +7,7 @@ import com.flowfin.core.database.FlowFinDatabase
 import com.flowfin.core.domain.error.RecurringError
 import com.flowfin.core.domain.repository.RecurringRepository
 import com.flowfin.core.model.RecurringDraft
+import com.flowfin.core.model.RecurringKind
 import com.flowfin.core.model.RecurringSchedule
 import com.flowfin.core.model.RecurringScheduleId
 import com.flowfin.core.model.RecurringStatus
@@ -48,11 +49,21 @@ internal class RecurringRepositoryImpl(
   ): Either<RecurringError, RecurringSchedule> = withContext(dispatcher) {
     val now = clock.now()
     val id = RecurringScheduleId(ids.next())
-    val fromAccount = (draft as? RecurringDraft.Expense)?.fromAccount
-    val toAccount = (draft as? RecurringDraft.Income)?.toAccount
+    // The account columns are the schedule's direction — see RecurringSchedule.kind.
+    val fromAccount = when (draft) {
+      is RecurringDraft.Expense -> draft.fromAccount
+      is RecurringDraft.Allocation -> draft.fromAccount
+      is RecurringDraft.Income -> null
+    }
+    val toAccount = when (draft) {
+      is RecurringDraft.Income -> draft.toAccount
+      is RecurringDraft.Allocation -> draft.toBudget
+      is RecurringDraft.Expense -> null
+    }
     val category = when (draft) {
       is RecurringDraft.Income -> draft.category
       is RecurringDraft.Expense -> draft.category
+      is RecurringDraft.Allocation -> null // a move, not spending
     }
     val recurrence = draft.recurrence
     Either.catch {
@@ -95,14 +106,20 @@ internal class RecurringRepositoryImpl(
     nextDueAt: Instant,
   ): Either<RecurringError, Unit> = withContext(dispatcher) {
     val now = clock.now()
-    val income = schedule.toAccountId != null
+    // The fired row must match the per-kind CHECK exactly: an allocation carries
+    // both accounts and no category, income only `to`, an expense only `from`.
+    val kind = when (schedule.kind) {
+      RecurringKind.INCOME -> TransactionKind.INCOME
+      RecurringKind.EXPENSE -> TransactionKind.EXPENSE
+      RecurringKind.ALLOCATION -> TransactionKind.ALLOCATION
+    }
     Either.catch {
       // One transaction: record the firing (linked via recurring_id) and advance
       // the due date together, so a schedule never fires without also advancing.
       db.transaction {
         transactions.insert(
           id = TransactionId(ids.next()),
-          kind = if (income) TransactionKind.INCOME else TransactionKind.EXPENSE,
+          kind = kind,
           from_account_id = schedule.fromAccountId,
           to_account_id = schedule.toAccountId,
           amount_minor = schedule.amount.minorUnits,

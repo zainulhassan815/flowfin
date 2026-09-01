@@ -74,6 +74,11 @@ class AddRecurringViewModel(
 
   fun onKey(key: CalculatorKey) = form.update { it.withCalculator(it.calculator.press(key)) }
 
+  /** Focusing the amount raises the keypad; anything else taking focus drops it. */
+  fun onFocusAmount() = form.update { it.copy(amountFocused = true, openSheet = null) }
+
+  fun onBlurAmount() = form.update { it.copy(amountFocused = false) }
+
   fun onNameChange(text: String) = form.update { it.copy(name = text) }
 
   fun onSelectType(type: RecurringEntryType) {
@@ -100,7 +105,7 @@ class AddRecurringViewModel(
   fun onPickAccount(id: AccountId) = form.update { it.copy(account = id, openSheet = null) }
   fun onPickCategory(id: CategoryId) = form.update { it.copy(category = id, openSheet = null) }
   fun onNoteChange(text: String) = form.update { it.copy(note = text) }
-  fun openSheet(sheet: AddRecurringSheet) = form.update { it.copy(openSheet = sheet) }
+  fun openSheet(sheet: AddRecurringSheet) = form.update { it.copy(openSheet = sheet, amountFocused = false) }
   fun dismissSheet() = form.update { it.copy(openSheet = null) }
 
   fun save() {

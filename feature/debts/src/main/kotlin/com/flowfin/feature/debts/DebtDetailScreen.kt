@@ -56,6 +56,7 @@ import com.flowfin.core.designsystem.component.TimelineTone
 import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.resources.R
+import kotlinx.datetime.LocalDate
 import com.flowfin.core.ui.UiText
 import com.flowfin.core.ui.asString
 
@@ -74,11 +75,6 @@ fun DebtDetailScreen(
   onRecordPayment: () -> Unit = {},
   onToggleSettled: () -> Unit = {},
   onConfirmDelete: () -> Unit = {},
-  onCloseSheet: () -> Unit = {},
-  onAmountDigits: (String) -> Unit = {},
-  onLinkAccountChange: (Boolean) -> Unit = {},
-  onAccountSelected: (AccountId) -> Unit = {},
-  onNoteChange: (String) -> Unit = {},
   onSave: () -> Unit = {},
 ) {
   var confirmDelete by remember { mutableStateOf(false) }
@@ -115,17 +111,6 @@ fun DebtDetailScreen(
     )
   }
 
-  content?.sheet?.let { sheet ->
-    RecordPaymentSheet(
-      state = sheet,
-      onDismiss = onCloseSheet,
-      onAmountDigits = onAmountDigits,
-      onLinkAccountChange = onLinkAccountChange,
-      onAccountSelected = onAccountSelected,
-      onNoteChange = onNoteChange,
-      onSave = onSave,
-    )
-  }
 }
 
 @Composable
@@ -386,7 +371,6 @@ private fun PreviewDebtDetail() = FlowFinTheme {
         DebtTimelineItemUi("4", UiText.Raw("Wed · 10 Dec 2026"), UiText.Raw("Borrowed from Ahmed"), UiText.Raw("Original amount"), "+8,000", ".00", true),
       ),
       paymentCount = 3,
-      sheet = null,
     ),
     snackbarHostState = remember { SnackbarHostState() },
   )

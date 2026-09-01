@@ -23,6 +23,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -36,6 +39,11 @@ import androidx.compose.ui.unit.sp
 import com.flowfin.core.designsystem.component.FlowFinButton
 import com.flowfin.core.designsystem.component.FlowFinPageHeader
 import com.flowfin.core.designsystem.component.FlowFinScreenScaffold
+import com.flowfin.core.designsystem.component.CalculatorKey
+import com.flowfin.core.designsystem.component.FlowFinAmountField
+import com.flowfin.core.designsystem.component.FlowFinCalculatorPad
+import com.flowfin.core.designsystem.component.FlowFinFormDock
+import com.flowfin.core.designsystem.component.FlowFinKeyGrid
 import com.flowfin.core.designsystem.component.FlowFinTextField
 import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.resources.R
@@ -53,9 +61,17 @@ fun AddAccountScreen(
   onBack: () -> Unit = {},
   onNameChange: (String) -> Unit = {},
   onSelectKind: (AccountKind) -> Unit = {},
-  onBalanceChange: (String) -> Unit = {},
+  onSelectColor: (String) -> Unit = {},
+  onKey: (CalculatorKey) -> Unit = {},
+  onFocusAmount: () -> Unit = {},
+  onBlurAmount: () -> Unit = {},
   onSave: () -> Unit = {},
 ) {
+  val focusManager = LocalFocusManager.current
+  val focusAmount = {
+    focusManager.clearFocus()
+    onFocusAmount()
+  }
   FlowFinScreenScaffold(
     modifier = modifier,
     topBar = {
@@ -65,7 +81,17 @@ fun AddAccountScreen(
         backContentDescription = stringResource(R.string.action_back),
       )
     },
-    bottomBar = { BottomActions(state, onSave) },
+    bottomBar = {
+      FlowFinFormDock(
+        saveLabel = stringResource(R.string.add_account_submit),
+        onSave = onSave,
+        padVisible = state.amountFocused,
+        onHidePad = onBlurAmount,
+        blockedReason = state.blockedReason?.let { stringResource(it) },
+        saving = state.submitting,
+        pad = { FlowFinCalculatorPad(onKey = onKey, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) },
+      )
+    },
     snackbarHost = { SnackbarHost(snackbarHostState) },
   ) {
     Column(
@@ -74,12 +100,36 @@ fun AddAccountScreen(
         .verticalScroll(rememberScrollState())
         .padding(horizontal = HORIZONTAL),
     ) {
-      Spacer(Modifier.height(8.dp))
+      FlowFinAmountField(
+        whole = state.amountWhole,
+        label = stringResource(R.string.add_account_balance_label),
+        focused = state.amountFocused,
+        onFocus = focusAmount,
+        currency = state.currency,
+        decimal = state.amountDecimal,
+        expression = state.expression,
+        empty = state.openingBalance == null,
+      )
+      Spacer(Modifier.height(12.dp))
       NameField(state, onNameChange)
       Spacer(Modifier.height(28.dp))
       KindChooser(state.kind, onSelectKind)
       Spacer(Modifier.height(28.dp))
-      BalanceField(state, onBalanceChange)
+      Text(
+        text = stringResource(R.string.add_budget_colour_label).uppercase(),
+        modifier = Modifier.padding(bottom = 10.dp),
+        style = FlowFinTheme.typography.label,
+        color = FlowFinTheme.colors.textSoft,
+      )
+      FlowFinKeyGrid(
+        keys = ACCOUNT_COLOR_KEYS,
+        selected = state.colorKey ?: state.kind.colorKey,
+        ringShape = CircleShape,
+        ringColor = categoryColor(state.colorKey ?: state.kind.colorKey),
+        onSelect = onSelectColor,
+      ) { key, _ ->
+        Box(Modifier.size(34.dp).clip(CircleShape).background(categoryColor(key)))
+      }
       Spacer(Modifier.height(24.dp))
     }
   }

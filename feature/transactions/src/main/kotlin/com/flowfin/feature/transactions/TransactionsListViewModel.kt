@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.flowfin.core.domain.repository.AccountRepository
 import com.flowfin.core.domain.repository.CategoryRepository
+import com.flowfin.core.domain.repository.DebtRepository
 import com.flowfin.core.domain.repository.TransactionRepository
 import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.Category
 import com.flowfin.core.model.CategoryId
+import com.flowfin.core.model.DebtId
 import com.flowfin.core.model.Money
 import com.flowfin.core.designsystem.component.TransactionKind as RowKind
 import com.flowfin.core.model.Transaction
@@ -47,6 +49,7 @@ class TransactionsListViewModel(
   transactions: TransactionRepository,
   accounts: AccountRepository,
   categories: CategoryRepository,
+  debts: DebtRepository,
   clock: Clock,
   private val money: MoneyFormatter,
 ) : ViewModel() {
@@ -72,14 +75,16 @@ class TransactionsListViewModel(
     },
     accounts.observeActiveAccounts(),
     categories.observeAll(),
-  ) { (active, feed), accountList, categoryList ->
-    buildState(feed, accountList, categoryList, active)
+    debts.observePersonNames(),
+  ) { (active, feed), accountList, categoryList, debtPersons ->
+    buildState(feed, accountList, categoryList, debtPersons, active)
   }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), TransactionsListUiState.Loading)
 
   private fun buildState(
     feed: List<Transaction>,
     accountList: List<Account>,
     categoryList: List<Category>,
+    debtPersons: Map<DebtId, String>,
     active: TxFilter,
   ): TransactionsListUiState {
     if (feed.isEmpty()) {
@@ -99,7 +104,7 @@ class TransactionsListViewModel(
         date = tx.recordedAt.toLocalDateTime(zone).date,
         kind = tx.kind,
         amount = tx.amount,
-        row = tx.toRowUi(accountsById, categoriesById, money),
+        row = tx.toRowUi(accountsById, categoriesById, money, debtPersons = debtPersons),
       )
     }
 

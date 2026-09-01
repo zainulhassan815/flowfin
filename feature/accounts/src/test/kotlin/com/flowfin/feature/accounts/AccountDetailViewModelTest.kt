@@ -48,6 +48,7 @@ class AccountDetailViewModelTest {
     accounts = FakeAccountRepository(balances = balances),
     transactions = FakeTransactionRepository(byAccount = feed, flow = flow),
     categories = FakeCategoryRepository(categories),
+    debts = FakeDebtRepository(),
     clock = FixedClock(now),
     money = MoneyFormatter(),
   )

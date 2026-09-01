@@ -52,6 +52,9 @@ import com.flowfin.core.designsystem.component.FlowFinPageHeader
 import com.flowfin.core.designsystem.component.FlowFinScopeTabs
 import com.flowfin.core.designsystem.component.FlowFinScreenScaffold
 import com.flowfin.core.designsystem.component.FlowFinSheetHeader
+import com.flowfin.core.designsystem.component.FlowFinKeyGrid
+import com.flowfin.core.designsystem.component.FlowFinKeyGridCellPadding
+import com.flowfin.core.designsystem.component.FlowFinKeyGridTileRadius
 import com.flowfin.core.designsystem.component.FlowFinTextField
 import com.flowfin.core.designsystem.component.FlowFinTileIcon
 import com.flowfin.core.designsystem.icon.FlowFinIcons
@@ -257,7 +260,10 @@ private fun CategoryRow(
           modifier = Modifier.padding(top = 2.dp),
           style = FlowFinTheme.typography.caption,
           color = palette.textFaint,
-          maxLines = 1,
+          // Two facts ("Created … · last used …") next to a count pill and a
+          // chevron don't fit one line at this width; truncating hid the more
+          // useful half.
+          maxLines = 2,
           overflow = TextOverflow.Ellipsis,
         )
       }
@@ -368,10 +374,10 @@ private fun CategoryEditorSheet(
       )
 
       PickerLabel(stringResource(R.string.categories_field_icon))
-      KeyGrid(
+      FlowFinKeyGrid(
         keys = CATEGORY_ICON_KEYS,
         selected = state.form.iconKey,
-        ringShape = RoundedCornerShape(TILE_SIZE_RADIUS + CELL_PADDING),
+        ringShape = RoundedCornerShape(FlowFinKeyGridTileRadius + FlowFinKeyGridCellPadding),
         ringColor = categoryColor(state.form.colorKey),
         onSelect = onIconChange,
       ) { key, isSelected ->
@@ -383,7 +389,7 @@ private fun CategoryEditorSheet(
       }
 
       PickerLabel(stringResource(R.string.categories_field_color))
-      KeyGrid(
+      FlowFinKeyGrid(
         keys = CATEGORY_COLOR_KEYS,
         selected = state.form.colorKey,
         ringShape = CircleShape,
@@ -423,50 +429,6 @@ private fun PickerLabel(text: String) {
     style = FlowFinTheme.typography.label,
     color = FlowFinTheme.colors.textSoft,
   )
-}
-
-/** A wrapping grid of selectable keys — used for both the icon and colour picks. */
-/**
- * A wrapping grid of selectable keys — used for both the icon and colour picks.
- *
- * [ringShape] is the caller's job because the selection ring has to stay
- * concentric with what it surrounds: a rounded tile's ring takes the tile's
- * radius plus [CELL_PADDING], a circular swatch's ring is simply a circle.
- */
-@Composable
-private fun KeyGrid(
-  keys: List<String>,
-  selected: String,
-  ringShape: Shape,
-  ringColor: Color,
-  onSelect: (String) -> Unit,
-  cell: @Composable (key: String, isSelected: Boolean) -> Unit,
-) {
-  Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-    keys.chunked(6).forEach { rowKeys ->
-      Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        rowKeys.forEach { key ->
-          val isSelected = key == selected
-          // No cell background: the icon draws its own tile and the swatch is
-          // its own shape, so a plate behind either just doubles it. Selection
-          // is a tinted ring — the icon's own tint is invisible while the
-          // colour is still the neutral default.
-          Box(
-            modifier = Modifier
-              .clip(ringShape)
-              .then(
-                if (isSelected) Modifier.border(1.5.dp, ringColor, ringShape) else Modifier,
-              )
-              .clickable { onSelect(key) }
-              .padding(CELL_PADDING),
-            contentAlignment = Alignment.Center,
-          ) {
-            cell(key, isSelected)
-          }
-        }
-      }
-    }
-  }
 }
 
 @Preview(name = "Categories", widthDp = 390, heightDp = 844)

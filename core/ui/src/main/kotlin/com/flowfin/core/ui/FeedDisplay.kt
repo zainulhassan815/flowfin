@@ -5,6 +5,7 @@ import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.Category
 import com.flowfin.core.model.CategoryId
+import com.flowfin.core.model.DebtId
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.model.TransactionKind
 import com.flowfin.core.resources.R
@@ -12,16 +13,21 @@ import kotlinx.datetime.LocalDate
 
 /**
  * Display mapping shared by every transaction feed (Home, Account detail). A row
- * is joined in-memory against the supplied account and category lookups; the +/−
- * sign and the 3-way colour bucket ([RowKind]) follow from the domain
- * [TransactionKind]. Money is already formatted by [money]; the screen resolves
- * the [UiText] name and the icon/colour keys.
+ * is joined in-memory against the supplied account, category and debt-person
+ * lookups; the +/− sign and the 3-way colour bucket ([RowKind]) follow from the
+ * domain [TransactionKind]. Money is already formatted by [money]; the screen
+ * resolves the [UiText] name and the icon/colour keys.
+ *
+ * [debtPersons] names the counterparty on a debt row. Without it a debt reads as
+ * a bare "Debt" with no second line — the amount moved and nothing says who with —
+ * so a feed that renders debt kinds should always pass it.
  */
 fun Transaction.toRowUi(
   accountsById: Map<AccountId, Account>,
   categoriesById: Map<CategoryId, Category>,
   money: MoneyFormatter,
   perspective: AccountId? = null,
+  debtPersons: Map<DebtId, String> = emptyMap(),
 ): TxRowUi {
   val category = categoryId?.let { categoriesById[it] }
   val fromName = fromAccountId?.let { accountsById[it]?.name }.orEmpty()
@@ -39,7 +45,7 @@ fun Transaction.toRowUi(
       TransactionKind.ALLOCATION -> UiText.Res(R.string.tx_allocation)
       TransactionKind.REALLOCATION -> UiText.Res(R.string.tx_reallocation)
       TransactionKind.DEBT_BORROW, TransactionKind.DEBT_LEND,
-      TransactionKind.DEBT_REPAY_OUT, TransactionKind.DEBT_REPAY_IN -> UiText.Res(R.string.tx_debt)
+      TransactionKind.DEBT_REPAY_OUT, TransactionKind.DEBT_REPAY_IN -> debtName(debtPersons)
     },
     meta = rowMeta(perspective, fromName, toName),
     amount = (if (moneyIn) "+" else "−") + money.whole(amount),
@@ -54,6 +60,22 @@ fun Transaction.toRowUi(
       else -> null
     },
   )
+}
+
+/**
+ * A debt row's title — what happened, and with whom. Falls back to a bare "Debt"
+ * only when the person can't be resolved (a caller that passed no lookup, or a
+ * debt deleted out from under the feed).
+ */
+private fun Transaction.debtName(debtPersons: Map<DebtId, String>): UiText {
+  val person = debtId?.let { debtPersons[it] } ?: return UiText.Res(R.string.tx_debt)
+  val res = when (kind) {
+    TransactionKind.DEBT_BORROW -> R.string.tx_debt_borrow
+    TransactionKind.DEBT_LEND -> R.string.tx_debt_lend
+    TransactionKind.DEBT_REPAY_OUT -> R.string.tx_debt_repay_out
+    else -> R.string.tx_debt_repay_in
+  }
+  return UiText.Res(res, listOf(UiText.Raw(person)))
 }
 
 /**
@@ -94,7 +116,9 @@ private fun Transaction.rowMeta(perspective: AccountId?, fromName: String, toNam
     TransactionKind.INCOME -> toName
     TransactionKind.EXPENSE -> fromName
     TransactionKind.TRANSFER, TransactionKind.ALLOCATION, TransactionKind.REALLOCATION -> "$fromName → $toName"
-    else -> ""
+    // A debt touches at most one account, and an off-book one touches none — then
+    // the note (the reason it was recorded) is the only thing left to show.
+    else -> toName.ifEmpty { fromName }.ifEmpty { note.orEmpty() }
   }
   kind == TransactionKind.TRANSFER || kind == TransactionKind.ALLOCATION || kind == TransactionKind.REALLOCATION ->
     if (toAccountId == perspective) "From $fromName" else "To $toName"

@@ -55,8 +55,10 @@ CREATE TABLE transactions (
   -- Recurring schedules don't fire debt payments in v0.
   CHECK (recurring_id IS NULL OR debt_id IS NULL),
 
-  -- Only INCOME / EXPENSE rows are linked to a schedule.
-  CHECK ((kind IN ('INCOME', 'EXPENSE')) OR recurring_id IS NULL),
+  -- Only INCOME / EXPENSE / ALLOCATION rows are linked to a schedule. Allocation
+  -- is here because a budget funds itself on a schedule ("Food, Rs 28,000, the
+  -- 1st"), which is a recurring move from a real account into its envelope.
+  CHECK ((kind IN ('INCOME', 'EXPENSE', 'ALLOCATION')) OR recurring_id IS NULL),
 
   -- No self-loops.
   CHECK (from_account_id IS NULL OR to_account_id IS NULL OR from_account_id != to_account_id)

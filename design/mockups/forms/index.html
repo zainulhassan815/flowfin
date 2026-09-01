@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFin — Form system / Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300..700;1,7..72,300..700&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #08080A;
+  --surface: #101013;
+  --surface-2: #16161A;
+  --surface-3: #1C1C20;
+  --border: #1E1E22;
+  --border-strong: #2A2A2F;
+  --text: #F2F2F4;
+  --text-mute: #B4B4BC;
+  --text-soft: #8A8A92;
+  --text-faint: #565660;
+
+  --page-bg: #1C1C20;
+
+  --accent: #E8DCC0;
+  --pos: #9CD4A2;
+  --warn: #E8B66E;
+  --neg: #E08A8A;
+  --transfer: #82C5D4;
+
+  --cat-bank: #82C5D4;
+  --cat-cash: #C5D982;
+  --cat-food: #E8A87B;
+  --cat-transport: #8AB4E0;
+  --cat-fun: #C98ED4;
+  --cat-salary: #9CD4A2;
+  --cat-subs: #9A8AE0;
+  --cat-health: #E08A8A;
+
+  --font-serif: 'Literata';
+  --font-mono: 'Geist Mono';
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: var(--font-serif), serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  padding: 56px 40px 80px;
+  min-height: 100vh;
+}
+
+/* ===== Page chrome ===== */
+.page-head { max-width: 940px; margin: 0 auto 56px; }
+.page-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+}
+.page-title {
+  font-size: 38px;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  margin-top: 14px;
+  line-height: 1.1;
+}
+.page-title em { font-style: italic; }
+.page-sub {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--text-mute);
+  margin-top: 16px;
+  max-width: 620px;
+}
+
+.panels { max-width: 940px; margin: 0 auto 64px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 24px 24px;
+}
+.panel h3 {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+.panel ol, .panel ul { margin: 0; padding-left: 18px; }
+.panel li { font-size: 14.5px; line-height: 1.7; color: var(--text-mute); margin-bottom: 9px; }
+.panel li:last-child { margin-bottom: 0; }
+.panel li b { color: var(--text); font-weight: 500; }
+.panel li code {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  color: var(--accent);
+  background: rgba(232,220,192,0.07);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.rail {
+  display: flex;
+  gap: 44px;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding: 8px 4px 40px;
+  scrollbar-width: thin;
+}
+.rail::-webkit-scrollbar { height: 8px; }
+.rail::-webkit-scrollbar-thumb { background: #2A2A2F; border-radius: 4px; }
+
+.slot { flex-shrink: 0; width: 390px; }
+.slot-cap {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.slot-cap b { color: var(--accent); font-weight: 500; }
+.slot-note {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--text-soft);
+  margin-bottom: 18px;
+  line-height: 1.55;
+  min-height: 44px;
+}
+
+.section-rule {
+  max-width: 940px;
+  margin: 0 auto 26px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.section-rule span {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.section-rule::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ===== Phone frame ===== */
+.phone {
+  width: 390px;
+  height: 844px;
+  background: var(--bg);
+  border-radius: 52px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px #1A1A1E,
+    0 0 0 12px #0A0A0C,
+    0 0 0 13px #3A3A42,
+    0 24px 48px rgba(0,0,0,0.28),
+    0 6px 14px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+}
+.notch {
+  position: absolute;
+  top: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 32px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 30;
+}
+.status-bar {
+  height: 50px;
+  padding: 18px 32px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+  z-index: 5;
+}
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ===== Sheet ===== */
+.sheet {
+  flex: 1;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+}
+.sheet-header {
+  height: 56px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sheet-back {
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: var(--text-mute);
+  margin-left: -8px;
+}
+.sheet-title {
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  flex: 1;
+  text-align: center;
+  padding-right: 30px;
+}
+
+/* Type-aware accent */
+.sheet[data-type="expense"]  { --type-color: var(--accent); }
+.sheet[data-type="income"]   { --type-color: var(--pos); }
+.sheet[data-type="account"]  { --type-color: var(--cat-bank); }
+.sheet[data-type="budget"]   { --type-color: var(--cat-food); }
+.sheet[data-type="recurring"]{ --type-color: var(--cat-subs); }
+.sheet[data-type="debt"]     { --type-color: var(--warn); }
+
+/* ===== Tabs ===== */
+.sheet-tabs {
+  display: flex;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.tab-btn {
+  flex: 1;
+  background: transparent; border: none;
+  padding: 12px 0 14px;
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  color: var(--text-soft);
+  letter-spacing: -0.01em;
+  position: relative;
+}
+.tab-btn::after {
+  content: '';
+  position: absolute; bottom: -1px; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 2px;
+  background: var(--type-color);
+  border-radius: 2px;
+}
+.tab-btn.active { color: var(--text); font-style: italic; }
+.tab-btn.active::after { width: 60%; }
+
+/* ===== Amount hero ===== */
+.amount {
+  padding: 20px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  position: relative;
+}
+.amount-kicker {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+.result-line { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+.amount-currency {
+  font-style: italic;
+  font-size: 24px;
+  color: var(--text-mute);
+  letter-spacing: -0.02em;
+}
+.amount-value {
+  font-family: var(--font-mono), monospace;
+  font-size: 52px;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text);
+}
+.amount-value.zero { color: var(--text-faint); }
+.amount-decimal {
+  font-family: var(--font-mono), monospace;
+  font-size: 22px;
+  color: var(--text-mute);
+}
+.amount-caret {
+  display: inline-block;
+  width: 2px; height: 40px;
+  background: var(--type-color);
+  border-radius: 1px;
+  animation: blink 1s infinite;
+  margin-left: 2px;
+  align-self: center;
+}
+@keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+
+/* The amount is a text field, drawn like one. Underline faint at rest, accent when
+   focused — the same cue every other input on the phone uses, so it needs no label
+   telling you it's tappable. */
+.amount-rule {
+  width: 168px;
+  height: 1px;
+  background: var(--border-strong);
+  margin-top: 12px;
+}
+.amount.focused .amount-rule { background: var(--type-color); height: 1.5px; }
+.amount:not(.focused) .amount-caret { display: none; }
+
+/* ===== Form rows ===== */
+.form { padding: 4px 20px 0; flex: 1; overflow-y: auto; min-height: 0; }
+.form::-webkit-scrollbar { display: none; }
+
+.form-group + .form-group { margin-top: 18px; }
+.group-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 500;
+  padding: 10px 0 4px;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  padding: 11px 0;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+  min-height: 52px;
+}
+.form-row:last-child { border-bottom: none; }
+.form-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  width: 84px;             /* fits CATEGORY at this tracking — 64px wrapped it */
+  flex-shrink: 0;
+  font-weight: 500;
+}
+.form-value { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; }
+.form-icon {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--icon-border, var(--border-strong));
+  background: var(--icon-bg, transparent);
+  border-radius: 8px;
+  color: var(--icon-color, var(--text-mute));
+  flex-shrink: 0;
+}
+.form-icon.budget { border-style: dashed; }
+.form-icon.cat-food      { --icon-color: var(--cat-food);      --icon-border: rgba(232,168,123,0.36); --icon-bg: rgba(232,168,123,0.08); }
+.form-icon.cat-transport { --icon-color: var(--cat-transport); --icon-border: rgba(138,180,224,0.36); --icon-bg: rgba(138,180,224,0.08); }
+.form-icon.cat-bank      { --icon-color: var(--cat-bank);      --icon-border: rgba(130,197,212,0.32); --icon-bg: rgba(130,197,212,0.08); }
+.form-icon.cat-cash      { --icon-color: var(--cat-cash);      --icon-border: rgba(197,217,130,0.32); --icon-bg: rgba(197,217,130,0.08); }
+.form-icon.cat-subs      { --icon-color: var(--cat-subs);      --icon-border: rgba(154,138,224,0.36); --icon-bg: rgba(154,138,224,0.08); }
+.form-icon.cat-health    { --icon-color: var(--cat-health);    --icon-border: rgba(224,138,138,0.36); --icon-bg: rgba(224,138,138,0.08); }
+
+.form-text {
+  flex: 1;
+  font-size: 16px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* Placeholders are italic AND faint AND "e.g." — never mistakable for a value. */
+.form-text.placeholder { color: var(--text-faint); font-style: italic; }
+.form-aux {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-mute);
+}
+.form-chevron { color: var(--text-faint); flex-shrink: 0; }
+.form-sub {
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  color: var(--text-faint);
+  letter-spacing: 0.04em;
+  margin-top: 3px;
+}
+.form-stack { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+
+/* An optional field is an invitation, not an empty row. */
+.form-add {
+  display: flex; align-items: center; gap: 8px;
+  padding: 13px 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+/* ===== Chip row (kind / colour) ===== */
+.chips { display: flex; gap: 8px; padding: 6px 0 2px; }
+.chip {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 11px 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 11px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  font-weight: 500;
+}
+.chip.active {
+  border-color: var(--type-color);
+  color: var(--type-color);
+  background: rgba(255,255,255,0.03);
+}
+.swatches { display: flex; gap: 9px; padding: 8px 0 2px; flex-wrap: wrap; }
+.sw { width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); }
+.sw.on { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px currentColor; }
+
+/* ===== Contextual card ===== */
+.card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 15px 16px;
+  margin-top: 14px;
+}
+.card-head { display: flex; align-items: flex-start; gap: 12px; }
+.card-title { font-size: 16px; letter-spacing: -0.01em; }
+.card-sub {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.toggle {
+  width: 44px; height: 26px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  border: 1px solid var(--border-strong);
+  position: relative;
+  flex-shrink: 0;
+}
+.toggle .knob {
+  position: absolute; top: 2px; left: 2px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--text-faint);
+}
+.toggle.on { background: rgba(232,182,110,0.18); border-color: var(--warn); }
+.toggle.on .knob { left: auto; right: 2px; background: var(--warn); }
+
+.card-divider { height: 1px; background: var(--border); margin: 14px -16px; }
+.card-line { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.card-line + .card-line { margin-top: 10px; }
+.card-key {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+.card-val { font-size: 15.5px; color: var(--text); }
+.card-val em { font-style: italic; color: var(--text-mute); }
+
+/* ===== Bottom dock =====
+   Keypad and Save are one pinned unit: the pad sits on top of the Save bar, the
+   content scrolls underneath, and Save never moves whether the pad is up or down. */
+.dock {
+  flex-shrink: 0;
+  background: var(--bg);
+  box-shadow: 0 -14px 22px -14px rgba(0,0,0,0.75);
+  position: relative;
+  z-index: 3;
+}
+.pad-handle {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 9px 0 8px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  flex-shrink: 0;
+}
+.calcpad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+  padding: 10px 14px 14px;
+  background: var(--surface);
+  flex-shrink: 0;
+}
+.key {
+  height: 44px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-family: var(--font-mono), monospace;
+  font-size: 20px;
+  color: var(--text);
+  display: flex; align-items: center; justify-content: center;
+}
+.key.fn { color: var(--text-mute); font-size: 14px; letter-spacing: 0.05em; font-weight: 500; }
+.key.op {
+  color: var(--type-color);
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.14);
+  font-size: 22px;
+}
+.key.equals { background: var(--type-color); color: #0A0A0B; border-color: var(--type-color); font-weight: 600; font-size: 22px; }
+
+/* ===== Save bar ===== */
+.savebar {
+  padding: 12px 20px 26px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.save {
+  width: 100%;
+  height: 52px;
+  border-radius: 14px;
+  border: none;
+  background: var(--type-color);
+  color: #0A0A0B;
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+}
+/* Blocked Save names its blocker instead of sitting inert and unexplained. */
+.save.blocked {
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  color: var(--text-faint);
+  flex-direction: column;
+  gap: 3px;
+}
+.save.blocked .why {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--warn);
+  text-transform: none;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* ===== Anatomy callouts ===== */
+.anno {
+  position: absolute;
+  right: -14px;
+  transform: translateX(100%);
+  width: 200px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  line-height: 1.5;
+  z-index: 40;
+}
+.anno em {
+  display: block;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-mute);
+  margin-top: 3px;
+}
+.anno::before {
+  content: '';
+  position: absolute;
+  left: -16px; top: 6px;
+  width: 12px; height: 1px;
+  background: var(--accent);
+  opacity: 0.5;
+}
+.slot.annotated { width: 620px; }
+.slot.annotated .phone { position: relative; }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <div class="page-eyebrow">Design · Forms</div>
+  <h1 class="page-title">One form, <em>five fillings</em></h1>
+  <p class="page-sub">
+    Today FlowFin has four add-forms and four layouts. Two field idioms — label-above
+    and label-beside — are mixed, sometimes on the same screen; only Add-transaction
+    has a keypad; placeholder text is dark enough to read as data already entered; and
+    Save sits inert without saying what it wants. This page defines one anatomy and
+    fills it five ways, including the Add-budget screen that doesn't exist yet.
+  </p>
+</div>
+
+<div class="panels">
+  <div class="panel">
+    <h3>What's wrong today</h3>
+    <ol>
+      <li><b>Four layouts.</b> Add-recurring alone uses label-above fields for Name and Frequency and label-beside rows for From, Category and Note.</li>
+      <li><b>No keypad on recurring or debt.</b> Their amount reads as a heading, not the form's primary input.</li>
+      <li><b>Placeholders read as values.</b> "Gym Membership" and "Monthly gym fees…" look filled in.</li>
+      <li><b>Add-account is half empty</b> — three fields, then 400px of nothing, and a plain <code>Rs 0.00</code> text field.</li>
+      <li><b>Save never says why it's off.</b> Every form opens on a grey button with no hint of what's missing.</li>
+      <li><b>Add-debt defaults to off-book</b> — the toggle is off, so the rarer case is the default.</li>
+    </ol>
+  </div>
+  <div class="panel">
+    <h3>The rules</h3>
+    <ul>
+      <li><b>One field idiom.</b> Every input is a <code>form-row</code>: mono label left at 84px, serif value right. A row that <em>chooses</em> (account, category, date, person) carries a chevron and opens a sheet. A row that <em>types</em> (name, note, reason) edits in place — it has to, or "opens on the name" would mean opening with a sheet already in your face.</li>
+      <li><b>Amount is always first and always live.</b> Where it isn't the opening move it collapses to a tappable pill, never a dead readout.</li>
+      <li><b>A form opens on the field it is about.</b> A <em>money event</em> — transaction, debt — opens on the amount, because the number is the point. A <em>thing you are naming</em> — account, budget, recurring — opens on the name. Nothing is configured per screen; it falls out of what the screen is.</li>
+      <li><b>The keypad follows focus.</b> Focus the amount and it rises; touch any other field and it drops. One mechanism, and with four or five inputs per form of which exactly one is numeric, "is the amount focused?" is the whole state.</li>
+      <li><b>Keypad and Save are one pinned dock.</b> The pad sits on top of the Save bar, content scrolls underneath, and Save never moves — so it can never fall below the fold again. When a text row has focus the system keyboard takes the pad's place in the dock; the two are never both up.</li>
+      <li><b>Placeholders are faint, italic, and prefixed <em>e.g.</em></b></li>
+      <li><b>Optional fields are invitations</b> — <code>+ Add a note</code>, not an empty row taking up space.</li>
+      <li><b>A blocked Save names its blocker.</b></li>
+    </ul>
+  </div>
+</div>
+
+<div class="section-rule"><span>01 · Anatomy</span></div>
+
+<div class="rail">
+  <div class="slot annotated">
+    <div class="slot-cap"><b>Anatomy</b> · every add-form</div>
+    <div class="slot-note">Six bands, top to bottom. A form uses the ones it needs and never invents a seventh.</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span class="status-icons">▮▮▮ ⌁</span></div>
+      <div class="sheet" data-type="expense">
+        <div class="sheet-header">
+          <button class="sheet-back">‹</button>
+          <div class="sheet-title">New expense</div>
+          <div class="anno" style="top:56px">1 · Header<em>Back, title, nothing else. Save lives at the bottom where the thumb is.</em></div>
+        </div>
+        <div class="sheet-tabs">
+          <button class="tab-btn active">Expense</button>
+          <button class="tab-btn">Income</button>
+          <button class="tab-btn">Transfer</button>
+          <div class="anno" style="top:112px">2 · Variant<em>Only when the form has real variants. Absent on account and budget.</em></div>
+        </div>
+        <div class="amount focused">
+          <div class="amount-kicker">Amount</div>
+          <div class="result-line">
+            <span class="amount-currency">Rs</span>
+            <span class="amount-value">1,240</span><span class="amount-caret"></span>
+          </div>
+          <div class="amount-rule"></div>
+          <div class="anno" style="top:180px">3 · Amount<em>The one field every form shares, and the reason people opened the screen.</em></div>
+        </div>
+        <div class="form">
+          <div class="form-row">
+            <div class="form-label">From</div>
+            <div class="form-value">
+              <div class="form-icon cat-bank">▤</div>
+              <div class="form-text">Bank</div>
+              <div class="form-aux">2,00,258</div>
+            </div>
+            <div class="form-chevron">›</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Category</div>
+            <div class="form-value">
+              <div class="form-icon cat-food">◗</div>
+              <div class="form-text">Food &amp; Dining</div>
+            </div>
+            <div class="form-chevron">›</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Date</div>
+            <div class="form-value"><div class="form-text">Today · 1 Sep 2026</div></div>
+            <div class="form-chevron">›</div>
+          </div>
+          <div class="form-add">＋ Add a note</div>
+          <div class="anno" style="top:300px">4 · Fields<em>One idiom. Label 84px so CATEGORY never wraps. Optional fields are invitations.</em></div>
+        </div>
+        <div class="dock">
+        <div class="pad-handle">▾ &nbsp;Hide keypad</div>
+        <div class="calcpad">
+          <div class="key fn">C</div><div class="key fn">⌫</div><div class="key fn">%</div><div class="key op">÷</div>
+          <div class="key">7</div><div class="key">8</div><div class="key">9</div><div class="key op">×</div>
+          <div class="key">4</div><div class="key">5</div><div class="key">6</div><div class="key op">−</div>
+          <div class="key">1</div><div class="key">2</div><div class="key">3</div><div class="key op">+</div>
+          <div class="anno" style="top:600px">5 · Dock<em>Keypad + Save, pinned as one unit. The pad rises when the amount takes focus and drops when any other field does.</em></div>
+        </div>
+        <div class="savebar">
+          <div class="save">Save expense</div>
+          <div class="anno" style="top:790px">6 · Save<em>Always here, pad up or down. Names its blocker when it can't fire.</em></div>
+        </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-rule"><span>02 · The five forms</span></div>
+
+<div class="rail">
+
+  <!-- ============ ADD TRANSACTION ============ -->
+  <div class="slot">
+    <div class="slot-cap">Add transaction · <b>keypad open</b></div>
+    <div class="slot-note">The reference. Opens with the amount focused, so the pad is already up — and Save still sits below it, not off-screen.</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span class="status-icons">▮▮▮ ⌁</span></div>
+      <div class="sheet" data-type="expense">
+        <div class="sheet-header"><button class="sheet-back">‹</button><div class="sheet-title">New expense</div></div>
+        <div class="sheet-tabs">
+          <button class="tab-btn active">Expense</button>
+          <button class="tab-btn">Income</button>
+          <button class="tab-btn">Transfer</button>
+        </div>
+        <div class="amount focused">
+          <div class="amount-kicker">Amount</div>
+          <div class="result-line">
+            <span class="amount-currency">Rs</span>
+            <span class="amount-value">1,240</span><span class="amount-caret"></span>
+          </div>
+          <div class="amount-rule"></div>
+        </div>
+        <div class="form">
+          <div class="form-row">
+            <div class="form-label">From</div>
+            <div class="form-value"><div class="form-text placeholder">Which account?</div></div>
+            <div class="form-chevron">›</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Category</div>
+            <div class="form-value">
+              <div class="form-icon cat-food">◗</div>
+              <div class="form-text">Food &amp; Dining</div>
+            </div>
+            <div class="form-chevron">›</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Date</div>
+            <div class="form-value"><div class="form-text">Today · 1 Sep 2026</div></div>
+            <div class="form-chevron">›</div>
+          </div>
+          <div class="form-add">＋ Add a note</div>
+        </div>
+        <div class="dock">
+        <div class="pad-handle">▾ &nbsp;Hide keypad</div>
+        <div class="calcpad">
+          <div class="key fn">C</div><div class="key fn">⌫</div><div class="key fn">%</div><div class="key op">÷</div>
+          <div class="key">7</div><div class="key">8</div><div class="key">9</div><div class="key op">×</div>
+          <div class="key">4</div><div class="key">5</div><div class="key">6</div><div class="key op">−</div>
+          <div class="key">1</div><div class="key">2</div><div class="key">3</div><div class="key op">+</div>
+        </div>
+        <div class="savebar">
+          <div class="save blocked">Save expense<span class="why">Pick an account to pay from</span></div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ADD ACCOUNT ============ -->
+  <div class="slot">
+    <div class="slot-cap">Add account · <b>rebuilt</b></div>
+    <div class="slot-note">Was three fields and 400px of nothing. Opening balance is a real amount field now — underlined, unfocused, pad down until you tap it.</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span class="status-icons">▮▮▮ ⌁</span></div>
+      <div class="sheet" data-type="account">
+        <div class="sheet-header"><button class="sheet-back">‹</button><div class="sheet-title">New account</div></div>
+        <div class="amount">
+          <div class="amount-kicker">Opening balance</div>
+          <div class="result-line">
+            <span class="amount-currency">Rs</span>
+            <span class="amount-value zero">0</span>
+          </div>
+          <div class="amount-rule"></div>
+        </div>
+        <div class="form">
+          <div class="form-row">
+            <div class="form-label">Name</div>
+            <div class="form-value"><div class="form-text placeholder">e.g. HBL Savings</div></div>
+            <div class="form-chevron">›</div>
+          </div>
+          <div class="form-group">
+            <div class="group-label">Kind</div>
+            <div class="chips">
+              <div class="chip active">▤ Bank</div>
+              <div class="chip">▣ Cash</div>
+              <div class="chip">▯ Mobile</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="group-label">Colour</div>
+            <div class="swatches">
+              <div class="sw on" style="background:var(--cat-bank); color:var(--cat-bank)"></div>
+              <div class="sw" style="background:var(--cat-cash)"></div>
+              <div class="sw" style="background:var(--cat-food)"></div>
+              <div class="sw" style="background:var(--cat-transport)"></div>
+              <div class="sw" style="background:var(--cat-salary)"></div>
+              <div class="sw" style="background:var(--cat-fun)"></div>
+              <div class="sw" style="background:var(--cat-subs)"></div>
+            </div>
+          </div>
+        </div>
+        <div class="dock">
+        <div class="pad-handle">▴ &nbsp;Show keypad</div>
+        <div class="savebar">
+          <div class="save blocked">Add account<span class="why">Give it a name first</span></div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ADD BUDGET (NEW) ============ -->
+  <div class="slot">
+    <div class="slot-cap"><b style="color:var(--cat-food)">New screen</b> · Add budget</div>
+    <div class="slot-note">A thing you name, so it opens on the name with the pad down. Doesn't exist in the app today — <code style="font-family:var(--font-mono);font-size:12px">CreateBudget</code> is only ever called by devtools. The envelope stays the truth; a funding schedule gives it the monthly rhythm.</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span class="status-icons">▮▮▮ ⌁</span></div>
+      <div class="sheet" data-type="budget">
+        <div class="sheet-header"><button class="sheet-back">‹</button><div class="sheet-title">New budget</div></div>
+        <div class="amount">
+          <div class="amount-kicker">Fund it with</div>
+          <div class="result-line">
+            <span class="amount-currency">Rs</span>
+            <span class="amount-value">28,000</span>
+          </div>
+          <div class="amount-rule"></div>
+        </div>
+        <div class="form">
+          <div class="form-row">
+            <div class="form-label">Name</div>
+            <div class="form-value">
+              <div class="form-icon cat-food budget">◗</div>
+              <div class="form-text">Food</div>
+            </div>
+            <div class="form-chevron">›</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">From</div>
+            <div class="form-value">
+              <div class="form-icon cat-bank">▤</div>
+              <div class="form-stack">
+                <div class="form-text">Bank</div>
+                <div class="form-sub">The real account it draws from</div>
+              </div>
+            </div>
+            <div class="form-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div style="flex:1">
+                <div class="card-title">Refill every month</div>
+                <div class="card-sub">Tops the envelope up on a schedule</div>
+              </div>
+              <div class="toggle on" style="--warn:var(--cat-food)"><div class="knob"></div></div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-line">
+              <div class="card-key">On</div>
+              <div class="card-val">1st of every month <span style="color:var(--text-faint)">›</span></div>
+            </div>
+            <div class="card-line">
+              <div class="card-key">Next</div>
+              <div class="card-val"><em>1 Oct 2026 · in 30 days</em></div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-line">
+              <div class="card-key">Now</div>
+              <div class="card-val">Fund it today too <span style="color:var(--cat-food)">✓</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="dock">
+        <div class="pad-handle">▴ &nbsp;Show keypad</div>
+        <div class="savebar">
+          <div class="save">Create budget</div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ADD RECURRING ============ -->
+  <div class="slot">
+    <div class="slot-cap">Add recurring · <b>unified</b></div>
+    <div class="slot-note">Was the worst offender — two field idioms on one screen. Frequency becomes a row that opens a picker, like every other choice. Name takes focus first, so the pad stays down.</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span class="status-icons">▮▮▮ ⌁</span></div>
+      <div class="sheet" data-type="recurring">
+        <div class="sheet-header"><button class="sheet-back">‹</button><div class="sheet-title">New recurring</div></div>
+        <div class="sheet-tabs">
+          <button class="tab-btn active">Expense</button>
+          <button class="tab-btn">Income</button>
+        </div>
+        <div class="amount">
+          <div class="amount-kicker">Amount</div>
+          <div class="result-line">
+            <span class="amount-currency">Rs</span>
+            <span class="amount-value">1,500</span>
+          </div>
+          <div class="amount-rule"></div>
+        </div>
+        <div class="form">
+          <div class="form-row">
+            <div class="form-label">Name</div>
+            <div class="form-value">
+              <div class="form-icon cat-subs">↻</div>
+              <div class="form-text">Netflix</div>
+            </div>
+            <div class="form-chevron">›</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Repeats</div>
+            <div class="form-value">
+              <div class="form-stack">
+                <div class="form-text">Monthly · 22nd</div>
+                <div class="form-sub">Next: 22 Sep 2026 · in 21 days</div>
+              </div>
+            </div>
+            <div class="form-chevron">›</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">From</div>
+            <div class="form-value">
+              <div class="form-icon cat-bank">▤</div>
+              <div class="form-text">Bank</div>
+              <div class="form-aux">2,00,258</div>
+            </div>
+            <div class="form-chevron">›</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Category</div>
+            <div class="form-value"><div class="form-text placeholder">e.g. Subscriptions</div></div>
+            <div class="form-chevron">›</div>
+          </div>
+          <div class="form-add">＋ Add a note</div>
+        </div>
+        <div class="dock">
+        <div class="pad-handle">▴ &nbsp;Show keypad</div>
+        <div class="savebar">
+          <div class="save blocked">Save recurring<span class="why">Choose a category</span></div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ADD DEBT ============ -->
+  <div class="slot">
+    <div class="slot-cap">Add debt · <b>unified</b></div>
+    <div class="slot-note">A money event, so it opens on the amount like a transaction does. Off-book flips to the exception it is: the toggle defaults on, explainer beneath it.</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span>9:41</span><span class="status-icons">▮▮▮ ⌁</span></div>
+      <div class="sheet" data-type="debt">
+        <div class="sheet-header"><button class="sheet-back">‹</button><div class="sheet-title">New debt</div></div>
+        <div class="sheet-tabs">
+          <button class="tab-btn active">I owe</button>
+          <button class="tab-btn">Owe me</button>
+        </div>
+        <div class="amount focused">
+          <div class="amount-kicker">Borrowed</div>
+          <div class="result-line">
+            <span class="amount-currency">Rs</span>
+            <span class="amount-value">80,000</span><span class="amount-caret"></span>
+          </div>
+          <div class="amount-rule"></div>
+        </div>
+        <div class="form">
+          <div class="form-row">
+            <div class="form-label">Person</div>
+            <div class="form-value">
+              <div class="form-icon cat-health">A</div>
+              <div class="form-text">Ali Raza</div>
+            </div>
+            <div class="form-chevron">›</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Reason</div>
+            <div class="form-value"><div class="form-text placeholder">e.g. Rent top-up</div></div>
+            <div class="form-chevron">›</div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">Date</div>
+            <div class="form-value"><div class="form-text">Today · 1 Sep 2026</div></div>
+            <div class="form-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div style="flex:1">
+                <div class="card-title">Landed in an account</div>
+                <div class="card-sub">The money actually moved</div>
+              </div>
+              <div class="toggle on"><div class="knob"></div></div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-line">
+              <div class="card-key">Into</div>
+              <div class="card-val">Bank <span style="color:var(--text-faint)">›</span></div>
+            </div>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);letter-spacing:0.06em;line-height:1.6;padding:10px 2px 0">
+            Turn off to track off-book — the debt is recorded, no balance changes.
+          </div>
+        </div>
+        <div class="dock">
+        <div class="pad-handle">▾ &nbsp;Hide keypad</div>
+        <div class="calcpad">
+          <div class="key fn">C</div><div class="key fn">⌫</div><div class="key fn">%</div><div class="key op">÷</div>
+          <div class="key">7</div><div class="key">8</div><div class="key">9</div><div class="key op">×</div>
+          <div class="key">4</div><div class="key">5</div><div class="key">6</div><div class="key op">−</div>
+          <div class="key">1</div><div class="key">2</div><div class="key">3</div><div class="key op">+</div>
+        </div>
+        <div class="savebar">
+          <div class="save">Save debt</div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section-rule"><span>03 · What this changes in code</span></div>
+
+<div class="panels">
+  <div class="panel">
+    <h3>Reuses what exists</h3>
+    <ul>
+      <li><code>FlowFinFormRow</code> becomes the only field. Its label column is already 84px and single-line.</li>
+      <li>The keypad, amount hero, chips, swatch grid and toggle card all exist in <code>core/designsystem</code>.</li>
+      <li>The budget's schedule reuses <code>Recurrence</code>, <code>RecurringDraft</code> and <code>FireSchedule</code> — no new period concept in the data model.</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h3>Genuinely new</h3>
+    <ul>
+      <li><b>Add-budget screen + route.</b> <code>CreateBudget</code> already exists and is unreachable from the app.</li>
+      <li><b>A budget's funding schedule.</b> A recurring <code>Allocation</code> — the one kind <code>RecurringDraft</code> can't express yet.</li>
+      <li><b>The dock</b> — keypad and Save pinned together, pad bound to which field has focus. Initial focus is a property of the form (money event → amount, named thing → name), not a flag to set per screen.</li>
+      <li><b>The blocked-Save reason</b>, new to the design system.</li>
+      <li>Once a budget has a monthly funding figure, the Accounts card can honestly read <em>"Rs 22,000 of Rs 28,000 this month"</em> instead of a lifetime total.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="section-rule"><span>04 · Before we build</span></div>
+
+<div class="panels">
+  <div class="panel">
+    <h3>Blockers — code says no</h3>
+    <ol>
+      <li><b>The database forbids a recurring allocation.</b> <code>Transactions.sq</code> carries <code>CHECK ((kind IN ('INCOME','EXPENSE')) OR recurring_id IS NULL)</code>. A budget's funding schedule is a recurring <em>allocation</em>, so this CHECK has to widen — and in SQLite that means a table rebuild, i.e. a real migration or a deliberate pre-launch wipe. There are no <code>.sqm</code> files yet, so this is the first one.</li>
+      <li><b>A schedule's direction is inferred, and an allocation breaks the inference.</b> <code>RecurringRepositoryImpl.fire()</code> reads <code>income = toAccountId != null</code>; an allocation sets <em>both</em> accounts, so it would be filed as INCOME with both sides populated and no category — which the per-kind CHECK rejects at insert. Same trap in <code>RecurringSchedule.isExpense</code>. Either add an explicit kind, or make "both set = allocation" an written rule in the model.</li>
+      <li><b>Nothing can be edited.</b> There is no edit route in <code>FlowFinRoutes</code> and nothing calls <code>TransactionRepository.updateContent</code> — it is unreachable, exactly like <code>CreateBudget</code>. Decide now whether these five forms double as edit forms; retrofitting an edit mode into a form built only to create is the expensive way round.</li>
+    </ol>
+  </div>
+  <div class="panel">
+    <h3>Not drawn yet</h3>
+    <ul>
+      <li><b>Ad-hoc allocation.</b> "Move Rs 5,000 into Food, now" has no screen today and none here. A funding schedule doesn't remove the need — it's the top-up you do when the envelope runs dry mid-month.</li>
+      <li><b>Record a payment</b> against a debt — an existing form with its own mockup, not folded into this anatomy.</li>
+      <li><b>Category add / edit</b> — a bottom-sheet form with the icon and colour grids. Add-budget needs those same grids, so the two should be settled together.</li>
+      <li><b>Transfer and Income</b> variants of add-transaction. The tabs are drawn; their field sets differ (Transfer has From <em>and</em> To, no category) and aren't.</li>
+      <li><b>Add-budget has no icon or colour picker</b>, while add-account does — budgets are identified by their tint everywhere else in the app.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="panels">
+  <div class="panel">
+    <h3>New to the design system</h3>
+    <ul>
+      <li><b>The dock</b> — pad + Save pinned as one unit, occupant bound to focus.</li>
+      <li><b>Blocked Save</b> with its reason line. Needs a precedence rule when more than one field is missing — first empty in reading order is the honest answer.</li>
+      <li><b><code>FlowFinFormRow</code> sub-line</b> — used three times here ("Next: 22 Sep 2026", "The real account it draws from"). The component has label / value / valueDetail / aux and no second line.</li>
+      <li><b>The <code>＋ Add a note</code> invitation row.</b></li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h3>Already built — reuse, don't rebuild</h3>
+    <ul>
+      <li><code>FlowFinCalculatorPad</code>, <code>FlowFinHeroAmount</code>, <code>FlowFinTextField</code>, <code>FlowFinSwitch</code>, <code>FlowFinSegmentedControl</code>, <code>FlowFinTileIcon</code>, <code>FlowFinScopeTabs</code>, <code>FlowFinFormRow</code>.</li>
+      <li><code>FlowFinScreenScaffold</code> already owns IME insets, which is what makes the dock's keyboard swap cheap.</li>
+      <li><code>CreateBudget</code> exists and is fully tested — the Add-budget screen is UI and routing, not domain work.</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

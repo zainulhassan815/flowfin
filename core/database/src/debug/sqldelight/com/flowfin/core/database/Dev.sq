@@ -30,3 +30,16 @@ DELETE FROM persons;
 -- Backdate creation so "established" seed scenarios clear Home's settling window.
 backdateAccountsCreatedAt:
 UPDATE accounts SET created_at = :createdAt, updated_at = :createdAt;
+
+-- Custom categories show a "Created …" line, so a scenario that backdates its
+-- history has to move them too — otherwise a category reads as created after the
+-- transactions filed under it.
+backdateCategoriesCreatedAt:
+UPDATE categories SET created_at = :createdAt, updated_at = :createdAt;
+
+-- The Debts list orders by created_at while each row shows its origin's recorded
+-- date, so a seeded history has to align the two or the list reads unsorted.
+alignDebtsCreatedAtToOrigin:
+UPDATE debts SET created_at = (
+  SELECT t.recorded_at FROM transactions t WHERE t.id = debts.origin_transaction_id
+);

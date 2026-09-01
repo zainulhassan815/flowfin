@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.flowfin.core.domain.repository.AccountRepository
 import com.flowfin.core.domain.repository.CategoryRepository
+import com.flowfin.core.domain.repository.DebtRepository
 import com.flowfin.core.domain.repository.TransactionRepository
 import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountBalance
@@ -11,6 +12,7 @@ import com.flowfin.core.model.AccountFlow
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.Category
 import com.flowfin.core.model.CategoryId
+import com.flowfin.core.model.DebtId
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.resources.R
 import com.flowfin.core.ui.MoneyFormatter
@@ -46,6 +48,7 @@ class AccountDetailViewModel(
   accounts: AccountRepository,
   transactions: TransactionRepository,
   categories: CategoryRepository,
+  debts: DebtRepository,
   clock: Clock,
   private val money: MoneyFormatter,
 ) : ViewModel() {
@@ -62,8 +65,9 @@ class AccountDetailViewModel(
     categories.observeAll(),
     transactions.observeByAccount(accountId, ACTIVITY_LIMIT, offset = 0),
     transactions.observeFlow(accountId, monthStart, monthEnd),
-  ) { balances, categoryList, feed, flow ->
-    buildState(balances, categoryList, feed, flow)
+    debts.observePersonNames(),
+  ) { balances, categoryList, feed, flow, debtPersons ->
+    buildState(balances, categoryList, feed, flow, debtPersons)
   }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), AccountDetailUiState.Loading)
 
   private fun buildState(
@@ -71,6 +75,7 @@ class AccountDetailViewModel(
     categoryList: List<Category>,
     feed: List<Transaction>,
     flow: AccountFlow,
+    debtPersons: Map<DebtId, String>,
   ): AccountDetailUiState {
     val self = balances.firstOrNull { it.account.id == accountId } ?: return AccountDetailUiState.NotFound
     val account = self.account
@@ -90,7 +95,7 @@ class AccountDetailViewModel(
       balanceDecimal = money.fraction(self.balance),
       noActivity = feed.isEmpty(),
       flow = flow.toUi(),
-      activity = feed.groupActivity(accountsById, categoriesById),
+      activity = feed.groupActivity(accountsById, categoriesById, debtPersons),
     )
   }
 
@@ -111,10 +116,11 @@ class AccountDetailViewModel(
   private fun List<Transaction>.groupActivity(
     accountsById: Map<AccountId, Account>,
     categoriesById: Map<CategoryId, Category>,
+    debtPersons: Map<DebtId, String>,
   ): List<TxGroup> =
     groupBy { it.recordedAt.toLocalDateTime(zone).date } // newest-first feed → dates stay descending
       .map { (date, txns) ->
-        TxGroup(dateLabel(date, today), txns.map { it.toRowUi(accountsById, categoriesById, money, perspective = accountId) })
+        TxGroup(dateLabel(date, today), txns.map { it.toRowUi(accountsById, categoriesById, money, accountId, debtPersons) })
       }
 }
 

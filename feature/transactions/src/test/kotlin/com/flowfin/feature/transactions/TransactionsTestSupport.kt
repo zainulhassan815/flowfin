@@ -4,9 +4,11 @@ import app.cash.turbine.ReceiveTurbine
 import arrow.core.Either
 import com.flowfin.core.domain.error.AccountError
 import com.flowfin.core.domain.error.CategoryError
+import com.flowfin.core.domain.error.DebtError
 import com.flowfin.core.domain.error.TransactionError
 import com.flowfin.core.domain.repository.AccountRepository
 import com.flowfin.core.domain.repository.CategoryRepository
+import com.flowfin.core.domain.repository.DebtRepository
 import com.flowfin.core.domain.repository.TransactionRepository
 import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountBalance
@@ -19,8 +21,12 @@ import com.flowfin.core.model.CategoryScope
 import com.flowfin.core.model.CategoryTotal
 import com.flowfin.core.model.DatedAmount
 import com.flowfin.core.model.CategoryUsage
+import com.flowfin.core.model.Debt
+import com.flowfin.core.model.DebtDirection
 import com.flowfin.core.model.DebtId
+import com.flowfin.core.model.DebtWithRemaining
 import com.flowfin.core.model.Money
+import com.flowfin.core.model.PersonId
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.model.TransactionDraft
 import com.flowfin.core.model.TransactionId
@@ -127,6 +133,21 @@ internal class FakeAccountRepository(
   override suspend fun updateBasics(id: AccountId, name: String, color: String?, icon: String?, displayOrder: Int): Either<AccountError, Unit> = throw NotImplementedError()
   override suspend fun archive(id: AccountId): Either<AccountError, Unit> = throw NotImplementedError()
   override suspend fun unarchive(id: AccountId): Either<AccountError, Unit> = throw NotImplementedError()
+}
+
+internal class FakeDebtRepository(
+  private val personNames: Map<DebtId, String> = emptyMap(),
+) : DebtRepository {
+  override fun observePersonNames(): Flow<Map<DebtId, String>> = flowOf(personNames)
+  override fun observeAll(): Flow<List<DebtWithRemaining>> = throw NotImplementedError()
+  override fun observeByDirection(direction: DebtDirection): Flow<List<DebtWithRemaining>> = throw NotImplementedError()
+  override fun observeWithRemaining(id: DebtId): Flow<DebtWithRemaining?> = throw NotImplementedError()
+  override suspend fun getById(id: DebtId): Debt? = throw NotImplementedError()
+  override suspend fun open(direction: DebtDirection, personId: PersonId, accountId: AccountId?, amount: Money, currency: String, reason: String?, recordedAt: Instant): Either<DebtError, Debt> = throw NotImplementedError()
+  override suspend fun recordRepayment(debt: Debt, accountId: AccountId?, amount: Money, note: String?, recordedAt: Instant): Either<DebtError, Unit> = throw NotImplementedError()
+  override suspend fun markSettled(id: DebtId): Either<DebtError, Unit> = throw NotImplementedError()
+  override suspend fun reopen(id: DebtId): Either<DebtError, Unit> = throw NotImplementedError()
+  override suspend fun delete(id: DebtId): Either<DebtError, Unit> = throw NotImplementedError()
 }
 
 internal class FakeCategoryRepository(

@@ -32,6 +32,7 @@ import com.flowfin.core.designsystem.component.FlowFinAccountCard
 import com.flowfin.core.designsystem.component.FlowFinEmptyState
 import com.flowfin.core.designsystem.component.FlowFinIconButton
 import com.flowfin.core.designsystem.component.FlowFinSectionEmptyHint
+import com.flowfin.core.designsystem.component.FlowFinTextButton
 import com.flowfin.core.designsystem.icon.FlowFinIcons
 import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.model.AccountId
@@ -197,6 +198,16 @@ private fun LazyListScope.budgetSection(
     }
   } else {
     items(state.budgets, key = { "acct-${it.id.value}" }) { card -> AccountCardItem(card, onAccountClick) }
+    // Once the section is populated its empty-state link is gone, and the header's
+    // "+" makes real accounts — so without this there is no route to a second budget.
+    item(key = "budgets-add") {
+      Box(Modifier.padding(horizontal = HORIZONTAL, vertical = 6.dp)) {
+        FlowFinTextButton(
+          text = stringResource(R.string.accounts_budgets_add),
+          onClick = onSetBudget,
+        )
+      }
+    }
   }
 }
 

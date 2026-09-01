@@ -2,6 +2,7 @@ package com.flowfin.feature.accounts
 
 import app.cash.turbine.test
 import com.flowfin.core.domain.usecase.CreateRealAccount
+import com.flowfin.core.designsystem.component.CalculatorKey
 import com.flowfin.core.model.Money
 import com.flowfin.core.ui.MoneyFormatter
 import kotlinx.coroutines.Dispatchers
@@ -63,7 +64,12 @@ class AddAccountViewModelTest {
     val vm = viewModel(repo)
     vm.onNameChange("Cash")
     vm.onSelectKind(AccountKind.Cash)
-    vm.onBalanceChange("12.50")
+    // The opening balance is keyed in now, like every other amount in the app.
+    vm.onKey(CalculatorKey.Digit(1))
+    vm.onKey(CalculatorKey.Digit(2))
+    vm.onKey(CalculatorKey.Decimal)
+    vm.onKey(CalculatorKey.Digit(5))
+    vm.onKey(CalculatorKey.Digit(0))
 
     vm.effects.test {
       vm.save()

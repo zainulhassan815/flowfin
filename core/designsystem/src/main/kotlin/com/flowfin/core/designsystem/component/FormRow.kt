@@ -20,10 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.flowfin.core.designsystem.theme.FlowFinTheme
+
+private val LABEL_WIDTH = 84.dp
 
 /**
  * Horizontal label-then-value row used wherever the user opens a picker —
@@ -32,6 +35,10 @@ import com.flowfin.core.designsystem.theme.FlowFinTheme
  *
  * Pass `value = null` to render [placeholder] in italic muted text — the
  * "not chosen yet" state, suitable for empty forms.
+ *
+ * [valueSub] adds a quiet second line under the value, for the consequence of the
+ * choice rather than the choice itself — "Next: 22 Sep 2026 · in 21 days" under a
+ * cadence, "The real account it draws from" under a budget's parent.
  */
 @Composable
 fun FlowFinFormRow(
@@ -40,6 +47,7 @@ fun FlowFinFormRow(
   modifier: Modifier = Modifier,
   value: String? = null,
   valueDetail: String? = null,
+  valueSub: String? = null,
   placeholder: String = "Tap to set",
   leadingIcon: @Composable (() -> Unit)? = null,
   auxText: String? = null,
@@ -59,7 +67,12 @@ fun FlowFinFormRow(
       text = label.uppercase(),
       style = FlowFinTheme.typography.caption.copy(letterSpacing = 0.22.em),
       color = palette.textSoft,
-      modifier = Modifier.width(64.dp),
+      // Fixed so the value column lines up down the form, and wide enough for the
+      // longest label the app uses ("CATEGORY") at this tracking. Capped at one
+      // line: a wrapped label reflows the row instead of just looking cramped.
+      modifier = Modifier.width(LABEL_WIDTH),
+      maxLines = 1,
+      overflow = TextOverflow.Ellipsis,
     )
 
     Spacer(Modifier.width(14.dp))
@@ -69,26 +82,36 @@ fun FlowFinFormRow(
       Spacer(Modifier.width(10.dp))
     }
 
-    Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-      if (value != null) {
-        Text(
-          text = value,
-          style = FlowFinTheme.typography.bodyLg,
-          color = palette.text,
-        )
-        if (valueDetail != null) {
-          Spacer(Modifier.width(6.dp))
+    Column(modifier = Modifier.weight(1f)) {
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        if (value != null) {
           Text(
-            text = valueDetail,
+            text = value,
             style = FlowFinTheme.typography.bodyLg,
-            color = palette.textMute,
+            color = palette.text,
+          )
+          if (valueDetail != null) {
+            Spacer(Modifier.width(6.dp))
+            Text(
+              text = valueDetail,
+              style = FlowFinTheme.typography.bodyLg,
+              color = palette.textMute,
+            )
+          }
+        } else {
+          Text(
+            text = placeholder,
+            style = FlowFinTheme.typography.bodyLg.copy(fontStyle = FontStyle.Italic),
+            color = palette.textFaint,
           )
         }
-      } else {
+      }
+      if (valueSub != null) {
         Text(
-          text = placeholder,
-          style = FlowFinTheme.typography.bodyLg.copy(fontStyle = FontStyle.Italic),
-          color = palette.textSoft,
+          text = valueSub,
+          modifier = Modifier.padding(top = 2.dp),
+          style = FlowFinTheme.typography.caption,
+          color = palette.textFaint,
         )
       }
     }

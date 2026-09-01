@@ -30,7 +30,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
 /**
@@ -56,7 +59,7 @@ class AddDebtViewModel(
   private val now = clock.now()
 
   private val form = MutableStateFlow(
-    AddDebtUiState(dateLabel = detailDateLabel(now.toLocalDateTime(zone).date)),
+    AddDebtUiState(dateLabel = detailDateLabel(now.toLocalDateTime(zone).date), date = now.toLocalDateTime(zone).date),
   )
 
   private val effectChannel = Channel<AddDebtEffect>(Channel.BUFFERED)
@@ -78,9 +81,22 @@ class AddDebtViewModel(
 
   fun onKey(key: CalculatorKey) = form.update { it.withCalculator(it.calculator.press(key)) }
 
+  /** Focusing the amount raises the keypad; anything else taking focus drops it. */
+  fun onFocusAmount() = form.update { it.copy(amountFocused = true, openSheet = null) }
+
+  fun onBlurAmount() = form.update { it.copy(amountFocused = false) }
+
+  /** Midday, so a backdated debt can't slip across a timezone boundary into the
+   *  day before. Falls back to "now" only if the date was never resolved. */
+  private fun AddDebtUiState.recordedAt() = date?.atTime(12, 0)?.toInstant(zone) ?: now
+
+  fun onPickDate(date: LocalDate) = form.update {
+    it.copy(date = date, dateLabel = detailDateLabel(date), openSheet = null)
+  }
+
   fun onSelectDirection(direction: DebtDirection) = form.update { it.copy(direction = direction) }
 
-  fun onOpenSheet(sheet: AddDebtSheet) = form.update { it.copy(openSheet = sheet) }
+  fun onOpenSheet(sheet: AddDebtSheet) = form.update { it.copy(openSheet = sheet, amountFocused = false) }
 
   fun onDismissSheet() = form.update { it.copy(openSheet = null, personQuery = "") }
 
@@ -121,9 +137,9 @@ class AddDebtViewModel(
 
       val account = state.account.takeIf { state.linkAccount }
       val result = if (state.isBorrowing) {
-        recordBorrow(personId, account, amount, state.reason.trim().ifBlank { null }, now)
+        recordBorrow(personId, account, amount, state.reason.trim().ifBlank { null }, state.recordedAt())
       } else {
-        recordLend(personId, account, amount, state.reason.trim().ifBlank { null }, now)
+        recordLend(personId, account, amount, state.reason.trim().ifBlank { null }, state.recordedAt())
       }
 
       when (result) {

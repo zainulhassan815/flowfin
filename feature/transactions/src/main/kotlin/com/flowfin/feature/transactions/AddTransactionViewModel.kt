@@ -59,6 +59,11 @@ class AddTransactionViewModel(
 
   fun onKey(key: CalculatorKey) = form.update { it.withCalculator(it.calculator.press(key)) }
 
+  /** Focusing the amount raises the keypad; anything else taking focus drops it. */
+  fun onFocusAmount() = form.update { it.copy(amountFocused = true, openSheet = null) }
+
+  fun onBlurAmount() = form.update { it.copy(amountFocused = false) }
+
   fun onSelectType(type: EntryType) = form.update {
     it.copy(type = type, category = CategorySelection(null)) // category scope changes with type
   }
@@ -68,7 +73,7 @@ class AddTransactionViewModel(
   fun onPickCategory(id: CategoryId) = form.update { it.copy(category = CategorySelection(id, isPristine = false), openSheet = null) }
   fun onPickDate(date: LocalDate) = form.update { it.copy(date = date, openSheet = null) }
   fun onNoteChange(text: String) = form.update { it.copy(note = text) }
-  fun openSheet(sheet: AddSheet) = form.update { it.copy(openSheet = sheet) }
+  fun openSheet(sheet: AddSheet) = form.update { it.copy(openSheet = sheet, amountFocused = false) }
   fun dismissSheet() = form.update { it.copy(openSheet = null) }
 
   fun save() {

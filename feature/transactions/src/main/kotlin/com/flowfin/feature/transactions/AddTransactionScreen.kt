@@ -3,6 +3,8 @@
 package com.flowfin.feature.transactions
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -25,7 +28,10 @@ import com.flowfin.core.designsystem.component.FlowFinButton
 import com.flowfin.core.designsystem.component.FlowFinCalculatorPad
 import com.flowfin.core.designsystem.component.FlowFinCalendar
 import com.flowfin.core.designsystem.component.FlowFinFormRow
+import com.flowfin.core.designsystem.component.FlowFinAmountField
+import com.flowfin.core.designsystem.component.FlowFinFormDock
 import com.flowfin.core.designsystem.component.FlowFinHeroAmount
+import com.flowfin.core.designsystem.component.FlowFinTileIcon
 import com.flowfin.core.designsystem.component.FlowFinModalBottomSheet
 import com.flowfin.core.designsystem.component.FlowFinPageHeader
 import com.flowfin.core.designsystem.component.FlowFinPickerRow
@@ -52,6 +58,8 @@ fun AddTransactionScreen(
   onSelectType: (EntryType) -> Unit = {},
   onKey: (CalculatorKey) -> Unit = {},
   onOpenSheet: (AddSheet) -> Unit = {},
+  onFocusAmount: () -> Unit = {},
+  onBlurAmount: () -> Unit = {},
   onDismissSheet: () -> Unit = {},
   onPickFromAccount: (AccountId) -> Unit = {},
   onPickToAccount: (AccountId) -> Unit = {},
@@ -61,6 +69,16 @@ fun AddTransactionScreen(
   onSave: () -> Unit = {},
 ) {
   val palette = FlowFinTheme.colors
+  // The pad and the system keyboard share the dock, so taking one gives up the other.
+  val focusManager = LocalFocusManager.current
+  val focusAmount = {
+    focusManager.clearFocus()
+    onFocusAmount()
+  }
+  val openSheet = { sheet: AddSheet ->
+    focusManager.clearFocus()
+    onOpenSheet(sheet)
+  }
   val tint = when (state.type) {
     EntryType.Expense -> palette.accent
     EntryType.Income -> palette.positive
@@ -71,14 +89,14 @@ fun AddTransactionScreen(
     modifier = modifier,
     topBar = { FlowFinPageHeader(title = stringResource(R.string.add_tx_title), onBack = onBack) },
     bottomBar = {
-      FlowFinButton(
-        onClick = onSave,
-        text = stringResource(R.string.add_tx_save),
-        enabled = state.canSave,
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 24.dp)
-          .padding(top = 8.dp, bottom = 12.dp),
+      FlowFinFormDock(
+        saveLabel = stringResource(R.string.add_tx_save),
+        onSave = onSave,
+        padVisible = state.amountFocused,
+        onHidePad = onBlurAmount,
+        blockedReason = state.blockedReason?.let { stringResource(it) },
+        saving = state.submitting,
+        pad = { FlowFinCalculatorPad(onKey = onKey, tint = tint, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) },
       )
     },
     snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -111,38 +129,42 @@ fun AddTransactionScreen(
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
       )
 
-      FlowFinHeroAmount(
+      FlowFinAmountField(
         whole = state.amountWhole,
+        label = stringResource(R.string.add_tx_field_amount),
+        focused = state.amountFocused,
+        onFocus = focusAmount,
         decimal = state.amountDecimal,
         expression = state.expression,
         tint = tint,
-        modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
+        empty = state.amount.value == null,
+        modifier = Modifier.padding(horizontal = 24.dp),
       )
 
       Column(modifier = Modifier.padding(horizontal = 24.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         when (state.type) {
           EntryType.Expense -> {
-            AccountRow(stringResource(R.string.add_tx_field_from), state.selectedFrom()) { onOpenSheet(AddSheet.FromAccount) }
-            CategoryRow(state.selectedCategory()) { onOpenSheet(AddSheet.Category) }
+            AccountRow(stringResource(R.string.add_tx_field_from), state.selectedFrom()) { openSheet(AddSheet.FromAccount) }
+            CategoryRow(state.selectedCategory()) { openSheet(AddSheet.Category) }
           }
           EntryType.Income -> {
-            AccountRow(stringResource(R.string.add_tx_field_to), state.selectedTo()) { onOpenSheet(AddSheet.ToAccount) }
-            CategoryRow(state.selectedCategory()) { onOpenSheet(AddSheet.Category) }
+            AccountRow(stringResource(R.string.add_tx_field_to), state.selectedTo()) { openSheet(AddSheet.ToAccount) }
+            CategoryRow(state.selectedCategory()) { openSheet(AddSheet.Category) }
           }
           EntryType.Transfer -> {
-            AccountRow(stringResource(R.string.add_tx_field_from), state.selectedFrom()) { onOpenSheet(AddSheet.FromAccount) }
-            AccountRow(stringResource(R.string.add_tx_field_to), state.selectedTo()) { onOpenSheet(AddSheet.ToAccount) }
+            AccountRow(stringResource(R.string.add_tx_field_from), state.selectedFrom()) { openSheet(AddSheet.FromAccount) }
+            AccountRow(stringResource(R.string.add_tx_field_to), state.selectedTo()) { openSheet(AddSheet.ToAccount) }
           }
         }
-        FlowFinFormRow(label = stringResource(R.string.add_tx_field_date), value = formatDate(state.date), onClick = { onOpenSheet(AddSheet.Date) })
-        FlowFinFormRow(label = stringResource(R.string.add_tx_field_note), value = state.note.ifBlank { null }, onClick = { onOpenSheet(AddSheet.Note) })
+        FlowFinFormRow(label = stringResource(R.string.add_tx_field_date), value = formatDate(state.date), onClick = { openSheet(AddSheet.Date) })
+        FlowFinFormRow(
+          label = stringResource(R.string.add_tx_field_note),
+          value = state.note.ifBlank { null },
+          placeholder = stringResource(R.string.add_tx_hint_note),
+          onClick = { openSheet(AddSheet.Note) },
+        )
       }
-
-      FlowFinCalculatorPad(
-        onKey = onKey,
-        tint = tint,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
-      )
+      Spacer(Modifier.height(16.dp))
     }
   }
 
@@ -158,12 +180,25 @@ fun AddTransactionScreen(
 
 @Composable
 private fun AccountRow(label: String, selected: AccountOption?, onClick: () -> Unit) {
-  FlowFinFormRow(label = label, value = selected?.name, onClick = onClick)
+  FlowFinFormRow(
+    label = label,
+    value = selected?.name,
+    placeholder = stringResource(R.string.add_tx_hint_account),
+    auxText = selected?.balance,
+    leadingIcon = selected?.let { { FlowFinTileIcon(icon = categoryIcon(it.iconKey), tint = categoryColor(it.colorKey), size = 28.dp) } },
+    onClick = onClick,
+  )
 }
 
 @Composable
 private fun CategoryRow(selected: CategoryOption?, onClick: () -> Unit) {
-  FlowFinFormRow(label = stringResource(R.string.add_tx_field_category), value = selected?.name, onClick = onClick)
+  FlowFinFormRow(
+    label = stringResource(R.string.add_tx_field_category),
+    value = selected?.name,
+    placeholder = stringResource(R.string.add_tx_hint_category),
+    leadingIcon = selected?.let { { FlowFinTileIcon(icon = categoryIcon(it.iconKey), tint = categoryColor(it.colorKey), size = 28.dp) } },
+    onClick = onClick,
+  )
 }
 
 @Composable

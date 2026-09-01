@@ -39,6 +39,8 @@ fun EntryProviderScope<NavKey>.addTransactionEntry(navigator: Navigator) {
       onSelectType = viewModel::onSelectType,
       onKey = viewModel::onKey,
       onOpenSheet = viewModel::openSheet,
+      onFocusAmount = viewModel::onFocusAmount,
+      onBlurAmount = viewModel::onBlurAmount,
       onDismissSheet = viewModel::dismissSheet,
       onPickFromAccount = viewModel::onPickFromAccount,
       onPickToAccount = viewModel::onPickToAccount,

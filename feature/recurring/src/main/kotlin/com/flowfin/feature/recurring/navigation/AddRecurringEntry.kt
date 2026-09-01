@@ -41,6 +41,8 @@ fun EntryProviderScope<NavKey>.addRecurringEntry(navigator: Navigator) {
       onNameChange = viewModel::onNameChange,
       onSelectFrequency = viewModel::onSelectFrequency,
       onOpenSheet = viewModel::openSheet,
+      onFocusAmount = viewModel::onFocusAmount,
+      onBlurAmount = viewModel::onBlurAmount,
       onDismissSheet = viewModel::dismissSheet,
       onPickWeekday = viewModel::onPickWeekday,
       onPickMonthDay = viewModel::onPickMonthDay,

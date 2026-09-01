@@ -87,7 +87,9 @@ SELECT
   ), 0) AS remaining_minor
 FROM debts d
 JOIN transactions origin ON origin.id = d.origin_transaction_id
-ORDER BY d.status, d.created_at DESC;
+-- By the date the debt was incurred, which is what the row shows. `created_at`
+-- is the audit stamp and drifts from it whenever a debt is backdated.
+ORDER BY d.status, origin.recorded_at DESC;
 
 -- One debt with its computed remaining — the detail screen's headline, which
 -- has to re-read after every repayment.
@@ -114,7 +116,16 @@ SELECT
 FROM debts d
 JOIN transactions origin ON origin.id = d.origin_transaction_id
 WHERE d.direction = ?
-ORDER BY d.status, d.created_at DESC;
+-- By the date the debt was incurred, which is what the row shows. `created_at`
+-- is the audit stamp and drifts from it whenever a debt is backdated.
+ORDER BY d.status, origin.recorded_at DESC;
+
+-- Who each debt is with. The transaction feed renders debt rows by person, and
+-- joining the whole debt aggregate just to read a name is wasteful.
+selectPersonNames:
+SELECT d.id AS debtId, p.name AS personName
+FROM debts d
+JOIN persons p ON p.id = d.person_id;
 
 insert:
 INSERT INTO debts (

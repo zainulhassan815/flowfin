@@ -6,6 +6,8 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -184,6 +186,57 @@ private fun PreviewHeroAmount() = FlowFinTheme {
       whole = "2,500",
       decimal = ".00",
       tint = palette.positive,
+    )
+  }
+}
+
+/**
+ * The amount as a *field*: the hero, plus a kicker label above and a rule beneath
+ * that goes accent when it has focus — the same cue a text field uses, so nothing
+ * has to tell the user it's tappable.
+ *
+ * Focus is what raises the keypad (see [FlowFinFormDock]), so the whole block is
+ * the tap target rather than the digits alone.
+ */
+@Composable
+fun FlowFinAmountField(
+  whole: String,
+  label: String,
+  focused: Boolean,
+  onFocus: () -> Unit,
+  modifier: Modifier = Modifier,
+  currency: String = "Rs",
+  decimal: String? = null,
+  expression: String? = null,
+  tint: Color = FlowFinTheme.colors.accent,
+  empty: Boolean = false,
+) {
+  val palette = FlowFinTheme.colors
+  Column(
+    modifier = modifier
+      .fillMaxWidth()
+      .clickable(onClick = onFocus)
+      .padding(top = 10.dp, bottom = 4.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    Text(
+      text = label.uppercase(),
+      style = FlowFinTheme.typography.label,
+      color = palette.textSoft,
+    )
+    FlowFinHeroAmount(
+      whole = whole,
+      currency = currency,
+      decimal = decimal,
+      expression = expression,
+      tint = if (empty) palette.textFaint else tint,
+    )
+    Box(
+      Modifier
+        .padding(top = 2.dp)
+        .width(168.dp)
+        .height(if (focused) 1.5.dp else 1.dp)
+        .background(if (focused) tint else palette.border),
     )
   }
 }

@@ -38,7 +38,10 @@ fun EntryProviderScope<NavKey>.addAccountEntry(navigator: Navigator) {
       onBack = { navigator.goBack() },
       onNameChange = viewModel::onNameChange,
       onSelectKind = viewModel::onSelectKind,
-      onBalanceChange = viewModel::onBalanceChange,
+      onSelectColor = viewModel::onSelectColor,
+      onKey = viewModel::onKey,
+      onFocusAmount = viewModel::onFocusAmount,
+      onBlurAmount = viewModel::onBlurAmount,
       onSave = viewModel::save,
     )
   }

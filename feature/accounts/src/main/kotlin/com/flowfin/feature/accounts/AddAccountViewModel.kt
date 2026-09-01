@@ -7,6 +7,8 @@ import com.flowfin.core.domain.repository.AccountRepository
 import com.flowfin.core.domain.usecase.CreateRealAccount
 import com.flowfin.core.model.Account
 import com.flowfin.core.model.Money
+import com.flowfin.core.designsystem.component.CalculatorKey
+import com.flowfin.core.ui.press
 import com.flowfin.core.ui.MoneyFormatter
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +29,7 @@ import kotlinx.coroutines.launch
 class AddAccountViewModel(
   private val createRealAccount: CreateRealAccount,
   accounts: AccountRepository,
-  money: MoneyFormatter,
+  private val money: MoneyFormatter,
 ) : ViewModel() {
 
   private val form = MutableStateFlow(AddAccountUiState(currency = money.symbol))
@@ -50,7 +52,23 @@ class AddAccountViewModel(
 
   fun onSelectKind(kind: AccountKind) = form.update { it.copy(kind = kind) }
 
-  fun onBalanceChange(text: String) = form.update { it.copy(balance = sanitizeAmount(text)) }
+  fun onSelectColor(key: String) = form.update { it.copy(colorKey = key) }
+
+  /** The opening balance is entered on the keypad now, like every other amount. */
+  fun onKey(key: CalculatorKey) = form.update { current ->
+    val next = current.calculator.press(key)
+    current.copy(
+      calculator = next,
+      amountWhole = money.group(next.wholeDigits.toLong()),
+      amountDecimal = next.decimalPart,
+      expression = next.expression { money.group(it.toLong()) },
+      openingBalance = next.settled().value,
+    )
+  }
+
+  fun onFocusAmount() = form.update { it.copy(amountFocused = true) }
+
+  fun onBlurAmount() = form.update { it.copy(amountFocused = false) }
 
   fun save() {
     // Gate on the form itself (the live duplicate check only runs while the screen
@@ -61,8 +79,8 @@ class AddAccountViewModel(
     viewModelScope.launch {
       val result = createRealAccount(
         name = state.name.trim(),
-        openingBalance = parseAmount(state.balance),
-        color = state.kind.colorKey,
+        openingBalance = state.calculator.settled().value ?: Money.ZERO,
+        color = state.colorKey ?: state.kind.colorKey,
         icon = state.kind.iconKey,
       )
       when (result) {

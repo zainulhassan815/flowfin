@@ -2,17 +2,22 @@ package com.flowfin.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arrow.core.Either
 import com.flowfin.core.domain.repository.AccountRepository
 import com.flowfin.core.domain.repository.CategoryRepository
+import com.flowfin.core.domain.repository.DebtRepository
 import com.flowfin.core.domain.repository.RecurringRepository
+import com.flowfin.core.domain.usecase.FireSchedule
 import com.flowfin.core.domain.repository.TransactionRepository
 import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountBalance
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.Category
 import com.flowfin.core.model.CategoryId
+import com.flowfin.core.model.DebtId
 import com.flowfin.core.model.Money
 import com.flowfin.core.model.RecurringSchedule
+import com.flowfin.core.model.RecurringScheduleId
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.resources.R
 import com.flowfin.core.ui.MoneyFormatter
@@ -20,10 +25,13 @@ import com.flowfin.core.ui.UiText
 import com.flowfin.core.ui.dateLabel
 import com.flowfin.core.ui.toCardUi
 import com.flowfin.core.ui.toRowUi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
@@ -50,6 +58,8 @@ class HomeViewModel(
   transactions: TransactionRepository,
   categories: CategoryRepository,
   recurring: RecurringRepository,
+  debts: DebtRepository,
+  private val fireSchedule: FireSchedule,
   clock: Clock,
   private val money: MoneyFormatter,
 ) : ViewModel() {
@@ -61,27 +71,61 @@ class HomeViewModel(
   private val monthEnd = LocalDate(today.year, today.month, 1).plus(1, DateTimeUnit.MONTH).atStartOfDayIn(zone)
   private val weekStart = today.minus(today.dayOfWeek.isoDayNumber - 1, DateTimeUnit.DAY)
 
+  /** The two pure lookups a feed row needs, paired so the state combine below
+   *  stays inside `combine`'s five-flow arity. */
+  private val lookups = combine(categories.observeAll(), debts.observePersonNames(), ::Lookups)
+
   val uiState: StateFlow<HomeUiState> = combine(
     accounts.observeBalances(),
     transactions.feed(RECENT_LIMIT),
-    categories.observeAll(),
+    lookups,
     recurring.observePending(now),
     transactions.observeNetChange(monthStart, monthEnd),
-  ) { balances, recent, categoryList, pending, net ->
-    buildState(balances, recent, categoryList, pending, net)
+  ) { balances, recent, lookup, pending, net ->
+    buildState(balances, recent, lookup, pending, net)
   }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), HomeUiState.Loading)
+
+  private data class Lookups(val categories: List<Category>, val debtPersons: Map<DebtId, String>)
+
+  private val effectChannel = Channel<HomeEffect>(Channel.BUFFERED)
+  val effects = effectChannel.receiveAsFlow()
+
+  /** Guards a double-tap from firing the same schedule twice before the reactive
+   *  list drops its row. Touched only on the main thread, so a plain set is enough. */
+  private val inFlight = mutableSetOf<RecurringScheduleId>()
+
+  /**
+   * Record the pending payment and advance its due date — the row leaves the
+   * Pending strip on the next emission. Mirrors the Recurring tab's Mark paid; the
+   * two surfaces show the same schedules and have to do the same thing to them.
+   * [name] is only for the confirmation message.
+   */
+  fun payPending(id: RecurringScheduleId, name: String) {
+    if (!inFlight.add(id)) return
+    viewModelScope.launch {
+      try {
+        val effect = when (fireSchedule(id)) {
+          is Either.Right -> HomeEffect.ShowMessage(UiText.Res(R.string.recurring_paid_confirm, listOf(name)))
+          is Either.Left -> HomeEffect.ShowMessage(UiText.Res(R.string.recurring_action_error))
+        }
+        effectChannel.send(effect)
+      } finally {
+        inFlight.remove(id)
+      }
+    }
+  }
 
   private fun buildState(
     balances: List<AccountBalance>,
     recent: List<Transaction>,
-    categoryList: List<Category>,
+    lookup: Lookups,
     pending: List<RecurringSchedule>,
     net: Money,
   ): HomeUiState {
     if (balances.isEmpty()) return HomeUiState.Empty(money.symbol)
 
     val accountsById = balances.associate { it.account.id to it.account }
-    val categoriesById = categoryList.associateBy(Category::id)
+    val categoriesById = lookup.categories.associateBy(Category::id)
 
     val real = balances.filter { it.account.isReal }
     val budget = balances.filter { it.account.isBudget }
@@ -101,7 +145,7 @@ class HomeViewModel(
       budgetAccounts = budget.map { it.toCardUi(accountsById, money) },
       pending = pending.take(PENDING_LIMIT).map { it.toPendingUi(accountsById) },
       pendingTotal = pending.size,
-      recent = classifyRecent(recent, accountsById, categoriesById),
+      recent = classifyRecent(recent, accountsById, categoriesById, lookup.debtPersons),
     )
   }
 
@@ -112,10 +156,11 @@ class HomeViewModel(
     recent: List<Transaction>,
     accountsById: Map<AccountId, Account>,
     categoriesById: Map<CategoryId, Category>,
+    debtPersons: Map<DebtId, String>,
   ): RecentSection {
     val thisWeek = recent.filter { it.recordedAt.toLocalDateTime(zone).date >= weekStart }
     return when {
-      thisWeek.isNotEmpty() -> RecentSection.Activity(groupRecent(thisWeek, accountsById, categoriesById))
+      thisWeek.isNotEmpty() -> RecentSection.Activity(groupRecent(thisWeek, accountsById, categoriesById, debtPersons))
       recent.isEmpty() -> RecentSection.NoEntries
       else -> RecentSection.Quiet(lastEntry = daysAgo(recent.first().recordedAt))
     }
@@ -174,13 +219,14 @@ class HomeViewModel(
     recent: List<Transaction>,
     accountsById: Map<AccountId, Account>,
     categoriesById: Map<CategoryId, Category>,
+    debtPersons: Map<DebtId, String>,
   ): List<RecentGroup> =
     recent
       .groupBy { it.recordedAt.toLocalDateTime(zone).date } // newest-first feed → dates stay descending
       .map { (date, txns) ->
         RecentGroup(
           dateLabel = dateLabel(date, today),
-          rows = txns.map { it.toRowUi(accountsById, categoriesById, money) },
+          rows = txns.map { it.toRowUi(accountsById, categoriesById, money, debtPersons = debtPersons) },
         )
       }
 }

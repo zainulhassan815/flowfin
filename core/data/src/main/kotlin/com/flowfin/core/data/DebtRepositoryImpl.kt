@@ -40,6 +40,9 @@ internal class DebtRepositoryImpl(
   override fun observeByDirection(direction: DebtDirection): Flow<List<DebtWithRemaining>> =
     debts.selectByDirectionWithRemaining(direction).asFlow().mapToList(dispatcher).map { rows -> rows.map { it.toDebtWithRemaining() } }
 
+  override fun observePersonNames(): Flow<Map<DebtId, String>> =
+    debts.selectPersonNames().asFlow().mapToList(dispatcher).map { rows -> rows.associate { it.debtId to it.personName } }
+
   override fun observeWithRemaining(id: DebtId): Flow<DebtWithRemaining?> =
     debts.selectByIdWithRemaining(id).asFlow().mapToOneOrNull(dispatcher).map { it?.toDebtWithRemaining() }
 

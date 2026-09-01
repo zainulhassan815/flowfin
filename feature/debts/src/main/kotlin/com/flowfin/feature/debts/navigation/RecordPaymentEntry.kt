@@ -8,17 +8,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import com.flowfin.core.navigation.AddDebtRoute
+import com.flowfin.core.model.DebtId
 import com.flowfin.core.navigation.Navigator
+import com.flowfin.core.navigation.RecordPaymentRoute
 import com.flowfin.core.ui.resolve
-import com.flowfin.feature.debts.AddDebtEffect
-import com.flowfin.feature.debts.AddDebtScreen
-import com.flowfin.feature.debts.AddDebtViewModel
+import com.flowfin.feature.debts.RecordPaymentEffect
+import com.flowfin.feature.debts.RecordPaymentScreen
+import com.flowfin.feature.debts.RecordPaymentViewModel
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
+import kotlin.uuid.Uuid
 
-fun EntryProviderScope<NavKey>.addDebtEntry(navigator: Navigator) {
-  entry<AddDebtRoute> {
-    val viewModel = koinViewModel<AddDebtViewModel>()
+fun EntryProviderScope<NavKey>.recordPaymentEntry(navigator: Navigator) {
+  entry<RecordPaymentRoute> { route ->
+    val debtId = DebtId(Uuid.parse(route.debtId))
+    val viewModel = koinViewModel<RecordPaymentViewModel> { parametersOf(debtId) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -26,29 +30,25 @@ fun EntryProviderScope<NavKey>.addDebtEntry(navigator: Navigator) {
     LaunchedEffect(viewModel) {
       viewModel.effects.collect { effect ->
         when (effect) {
-          AddDebtEffect.Saved -> navigator.goBack()
-          is AddDebtEffect.ShowMessage -> snackbarHostState.showSnackbar(effect.text.resolve(context))
+          RecordPaymentEffect.NavigateBack -> navigator.goBack()
+          is RecordPaymentEffect.ShowMessage -> snackbarHostState.showSnackbar(effect.text.resolve(context))
         }
       }
     }
 
-    AddDebtScreen(
+    RecordPaymentScreen(
       state = state,
       snackbarHostState = snackbarHostState,
       onBack = { navigator.goBack() },
-      onSelectDirection = viewModel::onSelectDirection,
       onKey = viewModel::onKey,
-      onOpenSheet = viewModel::onOpenSheet,
-      onPickDate = viewModel::onPickDate,
       onFocusAmount = viewModel::onFocusAmount,
       onBlurAmount = viewModel::onBlurAmount,
-      onDismissSheet = viewModel::onDismissSheet,
-      onPersonQueryChange = viewModel::onPersonQueryChange,
-      onPickPerson = viewModel::onPickPerson,
-      onUseTypedPerson = viewModel::onUseTypedPerson,
-      onReasonChange = viewModel::onReasonChange,
       onLinkAccountChange = viewModel::onLinkAccountChange,
-      onPickAccount = viewModel::onPickAccount,
+      onAccountSelected = viewModel::onAccountSelected,
+      onNoteChange = viewModel::onNoteChange,
+      onOpenSheet = viewModel::onOpenSheet,
+      onDismissSheet = viewModel::onDismissSheet,
+      onPickDate = viewModel::onPickDate,
       onSave = viewModel::save,
     )
   }

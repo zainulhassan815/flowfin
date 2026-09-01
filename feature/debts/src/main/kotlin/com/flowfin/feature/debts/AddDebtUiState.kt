@@ -1,5 +1,8 @@
 package com.flowfin.feature.debts
 
+import androidx.annotation.StringRes
+import com.flowfin.core.resources.R
+import kotlinx.datetime.LocalDate
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.DebtDirection
 import com.flowfin.core.model.Money
@@ -8,7 +11,8 @@ import com.flowfin.core.ui.CalculatorState
 import com.flowfin.core.ui.UiText
 
 /** Which picker sheet is open. */
-enum class AddDebtSheet { Amount, Person, Account, Reason }
+enum class AddDebtSheet {
+  Date, Amount, Person, Account, Reason }
 
 /** A contact the debt can be opened against. */
 data class DebtPersonOption(val id: PersonId, val name: String, val avatarTintIndex: Int)
@@ -49,6 +53,10 @@ data class AddDebtUiState(
   val personOptions: List<DebtPersonOption> = emptyList(),
   val accountOptions: List<DebtAccountOption> = emptyList(),
   val openSheet: AddDebtSheet? = null,
+  /** A debt is usually recorded after it happened, so the date is the user's. */
+  val date: LocalDate? = null,
+  /** A money event, so the form opens on the amount with the keypad up. */
+  val amountFocused: Boolean = true,
   val submitting: Boolean = false,
 ) {
   val isBorrowing: Boolean get() = direction == DebtDirection.I_OWE
@@ -72,6 +80,16 @@ data class AddDebtUiState(
       amount?.isPositive == true &&
       personName != null &&
       (!linkAccount || account != null)
+
+  /** The first thing still missing, in reading order — what a blocked Save says. */
+  @get:StringRes
+  val blockedReason: Int?
+    get() = when {
+      amount?.isPositive != true -> R.string.add_debt_blocked_amount
+      personName == null -> R.string.add_debt_blocked_person
+      linkAccount && account == null -> R.string.add_debt_blocked_account
+      else -> null
+    }
 
   fun selectedPerson(): DebtPersonOption? = personOptions.firstOrNull { it.id == person }
   fun selectedAccount(): DebtAccountOption? = accountOptions.firstOrNull { it.id == account }

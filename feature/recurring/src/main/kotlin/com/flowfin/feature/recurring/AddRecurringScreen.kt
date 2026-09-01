@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -32,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -46,6 +48,8 @@ import androidx.compose.ui.unit.sp
 import com.flowfin.core.designsystem.component.CalculatorKey
 import com.flowfin.core.designsystem.component.FlowFinButton
 import com.flowfin.core.designsystem.component.FlowFinCalculatorPad
+import com.flowfin.core.designsystem.component.FlowFinAmountField
+import com.flowfin.core.designsystem.component.FlowFinFormDock
 import com.flowfin.core.designsystem.component.FlowFinFormRow
 import com.flowfin.core.designsystem.component.FlowFinHeroAmount
 import com.flowfin.core.designsystem.component.FlowFinModalBottomSheet
@@ -80,6 +84,8 @@ fun AddRecurringScreen(
   onNameChange: (String) -> Unit = {},
   onSelectFrequency: (RecurringFrequency) -> Unit = {},
   onOpenSheet: (AddRecurringSheet) -> Unit = {},
+  onFocusAmount: () -> Unit = {},
+  onBlurAmount: () -> Unit = {},
   onDismissSheet: () -> Unit = {},
   onPickWeekday: (Int) -> Unit = {},
   onPickMonthDay: (Int) -> Unit = {},
@@ -91,6 +97,15 @@ fun AddRecurringScreen(
   onSave: () -> Unit = {},
 ) {
   val palette = FlowFinTheme.colors
+  val focusManager = LocalFocusManager.current
+  val focusAmount = {
+    focusManager.clearFocus()
+    onFocusAmount()
+  }
+  val openSheet = { sheet: AddRecurringSheet ->
+    focusManager.clearFocus()
+    onOpenSheet(sheet)
+  }
   val tint = if (state.type == RecurringEntryType.Income) palette.positive else palette.accent
 
   FlowFinScreenScaffold(
@@ -103,14 +118,14 @@ fun AddRecurringScreen(
       )
     },
     bottomBar = {
-      FlowFinButton(
-        onClick = onSave,
-        text = stringResource(R.string.add_recurring_save),
-        enabled = state.canSave,
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = HORIZONTAL)
-          .padding(top = 8.dp, bottom = 12.dp),
+      FlowFinFormDock(
+        saveLabel = stringResource(R.string.add_recurring_save),
+        onSave = onSave,
+        padVisible = state.amountFocused,
+        onHidePad = onBlurAmount,
+        blockedReason = state.blockedReason?.let { stringResource(it) },
+        saving = state.submitting,
+        pad = { FlowFinCalculatorPad(onKey = onKey, tint = tint, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) },
       )
     },
     snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -138,63 +153,46 @@ fun AddRecurringScreen(
         modifier = Modifier.padding(horizontal = HORIZONTAL, vertical = 8.dp),
       )
 
-      Box(
-        modifier = Modifier
-          .fillMaxWidth()
-          .clickable { onOpenSheet(AddRecurringSheet.Amount) },
-        contentAlignment = Alignment.Center,
-      ) {
-        FlowFinHeroAmount(
-          whole = state.amountWhole,
-          decimal = state.amountDecimal,
-          expression = state.expression,
-          tint = tint,
-        )
-      }
+      FlowFinAmountField(
+        whole = state.amountWhole,
+        label = stringResource(R.string.add_tx_field_amount),
+        focused = state.amountFocused,
+        onFocus = focusAmount,
+        decimal = state.amountDecimal,
+        expression = state.expression,
+        tint = tint,
+        empty = state.amount == null,
+        modifier = Modifier.padding(horizontal = HORIZONTAL),
+      )
 
       Column(Modifier.padding(horizontal = HORIZONTAL)) {
         FlowFinTextField(
           value = state.name,
           onValueChange = onNameChange,
           label = stringResource(R.string.add_recurring_field_name),
-          placeholder = stringResource(R.string.add_recurring_name_placeholder),
+          placeholder = stringResource(R.string.add_recurring_hint_name),
           keyboardOptions = KeyboardOptions(
             capitalization = KeyboardCapitalization.Words,
             imeAction = ImeAction.Done,
           ),
         )
 
-        SectionLabel(
-          text = stringResource(R.string.add_recurring_field_frequency),
-          modifier = Modifier.padding(top = 24.dp, bottom = 10.dp),
+        Spacer(Modifier.height(8.dp))
+        // Cadence and its day were a segmented control plus a bespoke row; both are
+        // choices, so both are rows that open the same picker every other choice does.
+        val frequencyLabel = stringResource(
+          when (state.frequency) {
+            RecurringFrequency.Weekly -> R.string.recurring_freq_weekly
+            RecurringFrequency.Monthly -> R.string.recurring_freq_monthly
+            RecurringFrequency.Yearly -> R.string.recurring_freq_yearly
+          },
         )
-        val frequencyLabels = RecurringFrequency.entries.associateWith { freq ->
-          stringResource(
-            when (freq) {
-              RecurringFrequency.Weekly -> R.string.recurring_freq_weekly
-              RecurringFrequency.Monthly -> R.string.recurring_freq_monthly
-              RecurringFrequency.Yearly -> R.string.recurring_freq_yearly
-            },
-          )
-        }
-        FlowFinSegmentedControl(
-          options = RecurringFrequency.entries,
-          selected = state.frequency,
-          onSelect = onSelectFrequency,
-          label = { frequencyLabels.getValue(it) },
+        FlowFinFormRow(
+          label = stringResource(R.string.add_recurring_field_repeats),
+          value = frequencyLabel + " · " + state.repeatsOn.asString(),
+          valueSub = state.nextDue.asString(),
+          onClick = { openSheet(AddRecurringSheet.RepeatsOn) },
         )
-
-        SectionLabel(
-          text = stringResource(R.string.add_recurring_field_repeats),
-          modifier = Modifier.padding(top = 24.dp),
-        )
-        RepeatsOnRow(
-          value = state.repeatsOn.asString(),
-          nextDue = state.nextDue.asString(),
-          onClick = { onOpenSheet(AddRecurringSheet.RepeatsOn) },
-        )
-
-        HorizontalDivider(Modifier.padding(vertical = 8.dp), color = palette.border)
 
         val selectedAccount = state.selectedAccount()
         FlowFinFormRow(
@@ -202,23 +200,25 @@ fun AddRecurringScreen(
             if (state.type == RecurringEntryType.Income) R.string.add_tx_field_to else R.string.add_tx_field_from,
           ),
           value = selectedAccount?.name,
+          placeholder = stringResource(R.string.add_tx_hint_account),
           leadingIcon = selectedAccount?.let { OptionTile(it.iconKey, it.colorKey) },
           auxText = selectedAccount?.balance,
-          onClick = { onOpenSheet(AddRecurringSheet.Account) },
+          onClick = { openSheet(AddRecurringSheet.Account) },
         )
         val selectedCategory = state.selectedCategory()
         FlowFinFormRow(
           label = stringResource(R.string.add_tx_field_category),
           value = selectedCategory?.name,
+          placeholder = stringResource(R.string.add_tx_hint_category),
           leadingIcon = selectedCategory?.let { OptionTile(it.iconKey, it.colorKey) },
-          onClick = { onOpenSheet(AddRecurringSheet.Category) },
+          onClick = { openSheet(AddRecurringSheet.Category) },
         )
         FlowFinFormRow(
           label = stringResource(R.string.add_tx_field_note),
           value = state.note.ifBlank { null },
-          placeholder = stringResource(R.string.add_recurring_note_placeholder),
+          placeholder = stringResource(R.string.add_tx_hint_note),
           trailingChevron = false,
-          onClick = { onOpenSheet(AddRecurringSheet.Note) },
+          onClick = { openSheet(AddRecurringSheet.Note) },
         )
       }
     }
@@ -226,7 +226,7 @@ fun AddRecurringScreen(
 
   when (state.openSheet) {
     AddRecurringSheet.Amount -> AmountSheet(state, tint, onDismissSheet, onKey)
-    AddRecurringSheet.RepeatsOn -> RepeatsOnSheet(state, onDismissSheet, onPickWeekday, onPickMonthDay, onPickYearlyMonth, onPickYearlyDay)
+    AddRecurringSheet.RepeatsOn -> RepeatsOnSheet(state, onDismissSheet, onSelectFrequency, onPickWeekday, onPickMonthDay, onPickYearlyMonth, onPickYearlyDay)
     AddRecurringSheet.Account -> AccountSheet(state, onDismissSheet, onPickAccount)
     AddRecurringSheet.Category -> CategorySheet(state, onDismissSheet, onPickCategory)
     AddRecurringSheet.Note -> NoteSheet(state.note, onDismissSheet, onNoteChange)
@@ -322,6 +322,7 @@ private fun AmountSheet(
 private fun RepeatsOnSheet(
   state: AddRecurringUiState,
   onDismiss: () -> Unit,
+  onSelectFrequency: (RecurringFrequency) -> Unit,
   onPickWeekday: (Int) -> Unit,
   onPickMonthDay: (Int) -> Unit,
   onPickYearlyMonth: (Int) -> Unit,
@@ -329,6 +330,26 @@ private fun RepeatsOnSheet(
 ) {
   FlowFinModalBottomSheet(onDismissRequest = onDismiss) {
     FlowFinSheetHeader(title = stringResource(R.string.add_recurring_field_repeats), onClose = onDismiss)
+
+    // Cadence and the day within it are one decision — the row that opens this sheet
+    // shows them as one value ("Monthly · 1st"), so the sheet has to set both halves.
+    val frequencyLabels = RecurringFrequency.entries.associateWith { freq ->
+      stringResource(
+        when (freq) {
+          RecurringFrequency.Weekly -> R.string.recurring_freq_weekly
+          RecurringFrequency.Monthly -> R.string.recurring_freq_monthly
+          RecurringFrequency.Yearly -> R.string.recurring_freq_yearly
+        },
+      )
+    }
+    FlowFinSegmentedControl(
+      options = RecurringFrequency.entries,
+      selected = state.frequency,
+      onSelect = onSelectFrequency,
+      label = { frequencyLabels.getValue(it) },
+      modifier = Modifier.padding(horizontal = HORIZONTAL).padding(top = 4.dp, bottom = 16.dp),
+    )
+
     when (state.frequency) {
       RecurringFrequency.Weekly -> Column(Modifier.padding(bottom = 8.dp)) {
         (1..7).forEach { iso ->
@@ -515,7 +536,7 @@ private fun NoteSheet(note: String, onDismiss: () -> Unit, onChange: (String) ->
     FlowFinTextField(
       value = note,
       onValueChange = onChange,
-      placeholder = stringResource(R.string.add_recurring_note_placeholder),
+      placeholder = stringResource(R.string.add_tx_hint_note),
       modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = HORIZONTAL, vertical = 8.dp),

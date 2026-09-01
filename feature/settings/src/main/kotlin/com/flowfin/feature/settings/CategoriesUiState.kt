@@ -45,11 +45,20 @@ data class CategoryRowUi(
   val isDefault: Boolean,
 )
 
-/** The icon keys a custom category can take — the set `categoryIcon` resolves. */
+/**
+ * The icon keys a custom category can take. Every entry must resolve to a *distinct*
+ * glyph in `categoryIcon`: two keys that draw the same thing are two cells the user
+ * can't tell apart, and a key that falls through to the neutral default is a cell
+ * that looks like no choice at all. That excludes `card_giftcard` and `undo` (no
+ * glyph of their own yet), `work` (draws Salary, same as `payments`) and `store`
+ * (draws Shopping, same as `shopping_bag`). The shipped Gift / Refund / Freelance /
+ * Business defaults still store those keys and render whatever `categoryIcon` gives
+ * them — this list governs the picker, not the data.
+ */
 val CATEGORY_ICON_KEYS = listOf(
   "restaurant", "shopping_cart", "directions_bus", "bolt", "home", "shopping_bag",
-  "movie", "favorite", "school", "spa", "subscriptions", "payments", "work",
-  "store", "card_giftcard", "bank", "wallet", "mobile",
+  "movie", "favorite", "school", "spa", "subscriptions", "payments",
+  "bank", "wallet", "mobile",
 )
 
 /** The colour keys a custom category can take — the set `categoryColor` resolves. */
@@ -58,7 +67,9 @@ val CATEGORY_COLOR_KEYS = listOf(
   "utilities", "shop", "health", "edu", "care", "bank", "cash", "mobile",
 )
 
-const val DEFAULT_ICON_KEY = "card_giftcard"
+/** Must be one of [CATEGORY_ICON_KEYS], for the same reason [DEFAULT_COLOR_KEY]
+ *  must be a listed colour: a default outside the grid leaves nothing selected. */
+val DEFAULT_ICON_KEY = CATEGORY_ICON_KEYS.first()
 
 /**
  * Must be one of [CATEGORY_COLOR_KEYS] — a default outside the list leaves the

@@ -110,7 +110,7 @@ class RecurringViewModel(
     val (active, paused) = schedules.partition { it.isActive }
     val sortedActive = active.sortedBy { it.nextDueAt }
     val (pending, upcoming) = sortedActive.partition { it.dueDate() <= today }
-    val monthlyTotal = monthlyEquivalentTotal(active)
+    val monthlyTotal = monthlyEquivalentTotal(active.filter { it.isExpense })
 
     return RecurringUiState.Content(
       pendingCount = pending.size,
@@ -127,16 +127,25 @@ class RecurringViewModel(
     )
   }
 
-  /** Each active schedule's amount, normalized to its monthly-equivalent load and
-   *  summed — weekly ×52÷12 (average weeks/month), monthly ×1, yearly ÷12. */
-  private fun monthlyEquivalentTotal(active: List<RecurringSchedule>): Money = Money(
-    active.sumOf { schedule ->
+  /**
+   * What the active schedules cost per month: each amount normalized to its
+   * monthly-equivalent load and summed — weekly ×52÷12 (average weeks/month),
+   * monthly ×1, yearly ÷12.
+   *
+   * Expenses only. A salary schedule is an active schedule, and it belongs in the
+   * "N active" count, but adding money coming *in* to money going *out* produces a
+   * number that means nothing — a Rs 60k commitment reads as Rs 2.1L once a salary
+   * is scheduled. Rounded to whole units: it's an estimate, and ×52÷12 leaves
+   * fractions no one recorded.
+   */
+  private fun monthlyEquivalentTotal(schedules: List<RecurringSchedule>): Money = Money(
+    schedules.sumOf { schedule ->
       when (schedule.recurrence) {
         is Recurrence.Weekly -> schedule.amount.minorUnits * 52 / 12
         is Recurrence.Monthly -> schedule.amount.minorUnits
         is Recurrence.Yearly -> schedule.amount.minorUnits / 12
       }
-    },
+    } / 100 * 100,
   )
 
   private fun RecurringSchedule.dueDate(): LocalDate = nextDueAt.toLocalDateTime(zone).date

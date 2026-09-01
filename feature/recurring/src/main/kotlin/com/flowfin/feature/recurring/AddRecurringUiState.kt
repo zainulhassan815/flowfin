@@ -1,10 +1,13 @@
 package com.flowfin.feature.recurring
 
+import androidx.annotation.StringRes
+
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.CategoryId
 import com.flowfin.core.model.CategoryScope
 import com.flowfin.core.model.Money
 import com.flowfin.core.model.Recurrence
+import com.flowfin.core.resources.R
 import com.flowfin.core.ui.CalculatorState
 import com.flowfin.core.ui.UiText
 
@@ -63,6 +66,8 @@ data class AddRecurringUiState(
   val accountOptions: List<RecurringAccountOption> = emptyList(),
   val categoryOptions: List<RecurringCategoryOption> = emptyList(),
   val openSheet: AddRecurringSheet? = null,
+  /** A thing you name, so the form opens on the name with the pad down. */
+  val amountFocused: Boolean = false,
   val submitting: Boolean = false,
 ) {
   val recurrence: Recurrence
@@ -74,6 +79,17 @@ data class AddRecurringUiState(
 
   val canSave: Boolean
     get() = amount?.isPositive == true && name.isNotBlank() && account != null && category != null && !submitting
+
+  /** The first thing still missing, in reading order — what a blocked Save says. */
+  @get:StringRes
+  val blockedReason: Int?
+    get() = when {
+      amount?.isPositive != true -> R.string.add_recurring_blocked_amount
+      name.isBlank() -> R.string.add_recurring_blocked_name
+      account == null -> R.string.add_recurring_blocked_account
+      category == null -> R.string.add_recurring_blocked_category
+      else -> null
+    }
 
   fun selectedAccount(): RecurringAccountOption? = accountOptions.firstOrNull { it.id == account }
   fun selectedCategory(): RecurringCategoryOption? = categoryOptions.firstOrNull { it.id == category }

@@ -19,9 +19,13 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -32,6 +36,9 @@ import androidx.compose.ui.unit.dp
 import com.flowfin.core.designsystem.component.CalculatorKey
 import com.flowfin.core.designsystem.component.FlowFinButton
 import com.flowfin.core.designsystem.component.FlowFinCalculatorPad
+import com.flowfin.core.designsystem.component.FlowFinAmountField
+import com.flowfin.core.designsystem.component.FlowFinFormDock
+import com.flowfin.core.designsystem.component.FlowFinCalendar
 import com.flowfin.core.designsystem.component.FlowFinFormRow
 import com.flowfin.core.designsystem.component.FlowFinHeroAmount
 import com.flowfin.core.designsystem.component.FlowFinModalBottomSheet
@@ -49,6 +56,10 @@ import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.DebtDirection
 import com.flowfin.core.model.PersonId
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 import com.flowfin.core.resources.R
 import com.flowfin.core.ui.UiText
 import com.flowfin.core.ui.asString
@@ -66,6 +77,9 @@ fun AddDebtScreen(
   onSelectDirection: (DebtDirection) -> Unit = {},
   onKey: (CalculatorKey) -> Unit = {},
   onOpenSheet: (AddDebtSheet) -> Unit = {},
+  onPickDate: (LocalDate) -> Unit = {},
+  onFocusAmount: () -> Unit = {},
+  onBlurAmount: () -> Unit = {},
   onDismissSheet: () -> Unit = {},
   onPersonQueryChange: (String) -> Unit = {},
   onPickPerson: (PersonId) -> Unit = {},
@@ -76,6 +90,15 @@ fun AddDebtScreen(
   onSave: () -> Unit = {},
 ) {
   val palette = FlowFinTheme.colors
+  val focusManager = LocalFocusManager.current
+  val focusAmount = {
+    focusManager.clearFocus()
+    onFocusAmount()
+  }
+  val openSheet = { sheet: AddDebtSheet ->
+    focusManager.clearFocus()
+    onOpenSheet(sheet)
+  }
   // Money coming in reads positive; money going out reads as the accent spend tone.
   val tint = if (state.isBorrowing) palette.positive else palette.accent
 
@@ -89,14 +112,14 @@ fun AddDebtScreen(
       )
     },
     bottomBar = {
-      FlowFinButton(
-        onClick = onSave,
-        text = stringResource(R.string.add_debt_save),
-        enabled = state.canSave,
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = HORIZONTAL)
-          .padding(top = 8.dp, bottom = 12.dp),
+      FlowFinFormDock(
+        saveLabel = stringResource(R.string.add_debt_save),
+        onSave = onSave,
+        padVisible = state.amountFocused,
+        onHidePad = onBlurAmount,
+        blockedReason = state.blockedReason?.let { stringResource(it) },
+        saving = state.submitting,
+        pad = { FlowFinCalculatorPad(onKey = onKey, tint = tint, modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) },
       )
     },
     snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -117,27 +140,19 @@ fun AddDebtScreen(
         modifier = Modifier.padding(horizontal = HORIZONTAL, vertical = 8.dp),
       )
 
-      Text(
-        text = stringResource(
+      FlowFinAmountField(
+        whole = state.amountWhole,
+        label = stringResource(
           if (state.isBorrowing) R.string.add_debt_stamp_borrowed else R.string.add_debt_stamp_lent,
-        ).uppercase(),
-        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-        style = FlowFinTheme.typography.caption,
-        color = palette.textFaint,
-        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        ),
+        focused = state.amountFocused,
+        onFocus = focusAmount,
+        decimal = state.amountDecimal,
+        expression = state.expression,
+        tint = tint,
+        empty = state.amount == null,
+        modifier = Modifier.padding(horizontal = HORIZONTAL),
       )
-
-      Box(
-        modifier = Modifier.fillMaxWidth().clickable { onOpenSheet(AddDebtSheet.Amount) },
-        contentAlignment = Alignment.Center,
-      ) {
-        FlowFinHeroAmount(
-          whole = state.amountWhole,
-          decimal = state.amountDecimal,
-          expression = state.expression,
-          tint = tint,
-        )
-      }
 
       Column(Modifier.padding(horizontal = HORIZONTAL)) {
         FlowFinFormRow(
@@ -153,21 +168,19 @@ fun AddDebtScreen(
               )
             }
           },
-          onClick = { onOpenSheet(AddDebtSheet.Person) },
+          onClick = { openSheet(AddDebtSheet.Person) },
         )
         FlowFinFormRow(
           label = stringResource(R.string.add_debt_field_reason),
           value = state.reason.ifBlank { null },
           placeholder = stringResource(R.string.add_debt_reason_placeholder),
           trailingChevron = false,
-          onClick = { onOpenSheet(AddDebtSheet.Reason) },
+          onClick = { openSheet(AddDebtSheet.Reason) },
         )
         FlowFinFormRow(
           label = stringResource(R.string.debt_detail_sheet_date),
           value = state.dateLabel.asString(),
-          trailingChevron = false,
-          enabled = false,
-          onClick = {},
+          onClick = { openSheet(AddDebtSheet.Date) },
         )
 
         HorizontalDivider(Modifier.padding(vertical = 12.dp), color = palette.border)
@@ -191,7 +204,7 @@ fun AddDebtScreen(
             value = selected?.name,
             leadingIcon = selected?.let { OptionTile(it.iconKey, it.colorKey) },
             auxText = selected?.balance,
-            onClick = { onOpenSheet(AddDebtSheet.Account) },
+            onClick = { openSheet(AddDebtSheet.Account) },
           )
         } else {
           Text(
@@ -206,6 +219,7 @@ fun AddDebtScreen(
   }
 
   when (state.openSheet) {
+    AddDebtSheet.Date -> DebtDateSheet(state.date, onDismissSheet, onPickDate)
     AddDebtSheet.Amount -> AmountSheet(state, tint, onDismissSheet, onKey)
     AddDebtSheet.Person -> PersonSheet(state, onDismissSheet, onPersonQueryChange, onPickPerson, onUseTypedPerson)
     AddDebtSheet.Account -> AccountSheet(state, onDismissSheet, onPickAccount)
@@ -377,4 +391,21 @@ private fun PreviewAddDebt() = FlowFinTheme {
     ),
     snackbarHostState = remember { SnackbarHostState() },
   )
+}
+
+@Composable
+private fun DebtDateSheet(date: LocalDate?, onDismiss: () -> Unit, onPick: (LocalDate) -> Unit) {
+  val selected = date ?: return
+  FlowFinModalBottomSheet(onDismissRequest = onDismiss) {
+    FlowFinSheetHeader(title = stringResource(R.string.debt_detail_sheet_date), onClose = onDismiss)
+    var month by remember { mutableStateOf(selected) }
+    FlowFinCalendar(
+      month = month,
+      onPreviousMonth = { month = month.minus(1, DateTimeUnit.MONTH) },
+      onNextMonth = { month = month.plus(1, DateTimeUnit.MONTH) },
+      onSelectDate = onPick,
+      selectedDate = selected,
+      modifier = Modifier.padding(16.dp),
+    )
+  }
 }
