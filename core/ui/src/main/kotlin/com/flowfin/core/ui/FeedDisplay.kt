@@ -39,8 +39,11 @@ fun Transaction.toRowUi(
   return TxRowUi(
     id = id,
     name = when (kind) {
+      // A row fired by a schedule is named by the schedule — "Netflix", not
+      // "Subscriptions". The category is the filing; the name is what you recognise.
       TransactionKind.INCOME, TransactionKind.EXPENSE ->
-        category?.name?.let(UiText::Raw) ?: UiText.Res(R.string.tx_uncategorized)
+        (recurringId?.let { note?.takeIf(String::isNotBlank) } ?: category?.name)
+          ?.let(UiText::Raw) ?: UiText.Res(R.string.tx_uncategorized)
       TransactionKind.TRANSFER -> UiText.Res(R.string.tx_transfer)
       TransactionKind.ALLOCATION -> UiText.Res(R.string.tx_allocation)
       TransactionKind.REALLOCATION -> UiText.Res(R.string.tx_reallocation)

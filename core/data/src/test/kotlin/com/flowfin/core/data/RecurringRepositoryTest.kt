@@ -39,7 +39,7 @@ class RecurringRepositoryTest {
   private val createBudget = CreateBudget(accounts)
   private val createCategory = CreateCategory(categories)
   private val createSchedule = CreateRecurringSchedule(accounts, categories, recurring, clock, zone)
-  private val fire = FireSchedule(recurring, zone)
+  private val fire = FireSchedule(recurring, clock, zone)
   private val skip = SkipSchedule(recurring, zone)
 
   private suspend fun monthlySalaryInto(accountId: com.flowfin.core.model.AccountId, amount: Money = Money(15_000_000)) =
@@ -73,6 +73,10 @@ class RecurringRepositoryTest {
     assertEquals(Money(16_000_000), accounts.balanceOf(bank.id))
     val firing = transactions.feed(10).first().firstOrNull { it.recurringId == schedule.id }
     assertNotNull(firing)
+    // Dated when it fired, not when it fell due — the money moved today.
+    assertEquals(date(2024, 1, 10), firing.recordedAt)
+    // …but the cadence still advances from the due date, so late payment
+    // doesn't drag the schedule forward.
     assertEquals(date(2024, 2, 15), recurring.getById(schedule.id)?.nextDueAt)
   }
 

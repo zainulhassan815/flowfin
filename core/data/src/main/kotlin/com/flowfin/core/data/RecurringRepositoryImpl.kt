@@ -124,7 +124,10 @@ internal class RecurringRepositoryImpl(
           to_account_id = schedule.toAccountId,
           amount_minor = schedule.amount.minorUnits,
           category_id = schedule.categoryId,
-          note = null,
+          // The schedule's name is the only thing that identifies the row as
+          // "Netflix" rather than one more Subscriptions expense. Dropping it made
+          // a fired payment indistinguishable from a manual one in the same category.
+          note = schedule.name,
           recorded_at = recordedAt,
           recurring_id = schedule.id,
           debt_id = null,

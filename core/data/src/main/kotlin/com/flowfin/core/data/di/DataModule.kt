@@ -72,6 +72,6 @@ val dataModule = module {
   factory { RecordLend(get(), get(), get()) }
   factory { RecordRepayment(get(), get()) }
   factory { CreateRecurringSchedule(get(), get(), get(), get(), get()) }
-  factory { FireSchedule(get(), get()) }
+  factory { FireSchedule(get(), get(), get()) }
   factory { SkipSchedule(get(), get()) }
 }
