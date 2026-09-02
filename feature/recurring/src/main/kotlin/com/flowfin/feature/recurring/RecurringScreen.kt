@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -34,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.flowfin.core.designsystem.component.FlowFinIconButton
+import com.flowfin.core.designsystem.component.FlowFinOutlinedButton
 import com.flowfin.core.designsystem.component.FlowFinPendingPaymentCard
 import com.flowfin.core.designsystem.component.PaymentStatus
 import com.flowfin.core.designsystem.component.PaymentUrgency
@@ -77,6 +79,7 @@ fun RecurringScreen(
           if (state.pending.isNotEmpty()) pendingSection(state.pending, onMarkPaid, onSkip)
           val nothingRunning = state.pendingCount == 0 && state.activeCount == 0 && state.paused.isNotEmpty()
           activeSection(state.activeCount, state.upcoming, nothingRunning, onOpenDetail)
+          item(key = "add-schedule") { ListAction(stringResource(R.string.recurring_add_action), onAdd) }
           if (state.paused.isNotEmpty()) pausedSection(state.paused, onResume, onOpenDetail)
         }
       }
@@ -122,11 +125,7 @@ private fun Header(state: RecurringUiState, onAdd: () -> Unit) {
         )
       }
     }
-    FlowFinIconButton(
-      onClick = onAdd,
-      icon = FlowFinIcons.Add,
-      contentDescription = stringResource(R.string.recurring_add_action),
-    )
+
   }
 }
 
@@ -389,5 +388,16 @@ private fun PreviewRecurringAllPaused() = FlowFinTheme {
         RecurringPausedUi(id(), "Netflix", UiText.Raw("Monthly"), UiText.Raw("Paused since 4 May"), "1,500", ".00", "subscriptions", "subs"),
       ),
     ),
+  )
+}
+
+/** The screen's create-action — the same outlined button every other list uses. */
+@Composable
+private fun ListAction(text: String, onClick: () -> Unit) {
+  FlowFinOutlinedButton(
+    onClick = onClick,
+    text = text,
+    modifier = Modifier.fillMaxWidth().padding(top = 14.dp, bottom = 4.dp),
+    leadingIcon = FlowFinIcons.Add,
   )
 }

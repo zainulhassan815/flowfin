@@ -85,9 +85,7 @@ data class AddTransactionUiState(
   val blockedReason: Int?
     get() = when {
       !amount.isValid -> R.string.add_tx_blocked_amount
-      type != EntryType.Income && !fromAccount.isValid -> {
-        if (type == EntryType.Transfer) R.string.add_tx_blocked_from else R.string.add_tx_blocked_from
-      }
+      type != EntryType.Income && !fromAccount.isValid -> R.string.add_tx_blocked_from
       type == EntryType.Income && !toAccount.isValid -> R.string.add_tx_blocked_from_income
       type == EntryType.Transfer && !toAccount.isValid -> R.string.add_tx_blocked_to
       type != EntryType.Transfer && !category.isValid -> R.string.add_tx_blocked_category

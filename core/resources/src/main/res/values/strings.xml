@@ -112,6 +112,7 @@
   <string name="add_tx_blocked_category">Choose a category</string>
   <string name="add_tx_hint_account">Which account?</string>
   <string name="add_tx_hint_category">e.g. Groceries</string>
+  <string name="add_tx_hint_category_income">e.g. Salary</string>
   <string name="add_tx_hint_note">Add a note</string>
 
   <string name="add_recurring_blocked_amount">Enter an amount</string>
@@ -156,7 +157,7 @@
 
   <!-- Accounts list (tab) -->
   <string name="accounts_title">Accounts</string>
-  <string name="accounts_action_add">Add account</string>
+  <string name="accounts_action_add">New account</string>
   <string name="accounts_total_label">Total holdings</string>
   <string name="accounts_breakdown_real">Real</string>
   <string name="accounts_breakdown_budget">Budget</string>
@@ -276,7 +277,7 @@
   <!-- Stats-line pill when nothing's currently running. -->
   <string name="recurring_all_paused_pill">All paused</string>
   <!-- The + action in the tab header. -->
-  <string name="recurring_add_action">Add recurring</string>
+  <string name="recurring_add_action">New schedule</string>
 
   <!-- Paused schedules — a section in the tab's own flow, like Pending / Active -->
   <string name="recurring_paused_title">Paused</string>
@@ -471,7 +472,7 @@
 
   <!-- Add debt -->
   <string name="add_debt_title">New debt</string>
-  <string name="add_debt_action">Add debt</string>
+  <string name="add_debt_action">New debt</string>
   <!-- Stamp above the amount, naming the direction in plain words. -->
   <string name="add_debt_stamp_borrowed">Borrowed from</string>
   <string name="add_debt_stamp_lent">Lent to</string>

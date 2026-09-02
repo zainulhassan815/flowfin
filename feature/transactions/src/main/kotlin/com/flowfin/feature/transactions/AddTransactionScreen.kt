@@ -145,11 +145,11 @@ fun AddTransactionScreen(
         when (state.type) {
           EntryType.Expense -> {
             AccountRow(stringResource(R.string.add_tx_field_from), state.selectedFrom()) { openSheet(AddSheet.FromAccount) }
-            CategoryRow(state.selectedCategory()) { openSheet(AddSheet.Category) }
+            CategoryRow(state.selectedCategory(), state.type) { openSheet(AddSheet.Category) }
           }
           EntryType.Income -> {
             AccountRow(stringResource(R.string.add_tx_field_to), state.selectedTo()) { openSheet(AddSheet.ToAccount) }
-            CategoryRow(state.selectedCategory()) { openSheet(AddSheet.Category) }
+            CategoryRow(state.selectedCategory(), state.type) { openSheet(AddSheet.Category) }
           }
           EntryType.Transfer -> {
             AccountRow(stringResource(R.string.add_tx_field_from), state.selectedFrom()) { openSheet(AddSheet.FromAccount) }
@@ -191,11 +191,13 @@ private fun AccountRow(label: String, selected: AccountOption?, onClick: () -> U
 }
 
 @Composable
-private fun CategoryRow(selected: CategoryOption?, onClick: () -> Unit) {
+private fun CategoryRow(selected: CategoryOption?, type: EntryType, onClick: () -> Unit) {
   FlowFinFormRow(
     label = stringResource(R.string.add_tx_field_category),
     value = selected?.name,
-    placeholder = stringResource(R.string.add_tx_hint_category),
+    placeholder = stringResource(
+      if (type == EntryType.Income) R.string.add_tx_hint_category_income else R.string.add_tx_hint_category,
+    ),
     leadingIcon = selected?.let { { FlowFinTileIcon(icon = categoryIcon(it.iconKey), tint = categoryColor(it.colorKey), size = 28.dp) } },
     onClick = onClick,
   )

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.flowfin.core.designsystem.component.FlowFinHeroAmount
 import com.flowfin.core.designsystem.component.FlowFinIconButton
+import com.flowfin.core.designsystem.component.FlowFinOutlinedButton
 import com.flowfin.core.designsystem.component.FlowFinPersonAvatar
 import com.flowfin.core.designsystem.component.FlowFinProgressBar
 import com.flowfin.core.designsystem.component.FlowFinSegmentedControl
@@ -67,7 +69,7 @@ fun DebtsScreen(
         title = stringResource(R.string.debts_empty_title),
         body = stringResource(R.string.debts_empty_body),
       )
-      is DebtsUiState.Content -> DebtsTabs(state, onDebtClick, Modifier.weight(1f))
+      is DebtsUiState.Content -> DebtsTabs(state, onDebtClick, onAddDebt, Modifier.weight(1f))
     }
   }
 }
@@ -90,12 +92,7 @@ private fun Header(state: DebtsUiState, onAddDebt: () -> Unit) {
         style = FlowFinTheme.typography.h2.copy(fontSize = 26.sp),
         color = palette.text,
       )
-      Spacer(Modifier.weight(1f))
-      FlowFinIconButton(
-        onClick = onAddDebt,
-        icon = FlowFinIcons.Add,
-        contentDescription = stringResource(R.string.add_debt_action),
-      )
+
     }
     if (state is DebtsUiState.Content) HeroNetPosition(state)
   }
@@ -137,6 +134,7 @@ private fun HeroNetPosition(state: DebtsUiState.Content) {
 private fun DebtsTabs(
   state: DebtsUiState.Content,
   onDebtClick: (DebtId) -> Unit,
+  onAddDebt: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   var direction by remember { mutableStateOf(DebtDirection.I_OWE) }
@@ -158,6 +156,7 @@ private fun DebtsTabs(
 
     LazyColumn(contentPadding = PaddingValues(start = HORIZONTAL, end = HORIZONTAL, bottom = 96.dp)) {
       items(tab.active, key = { it.id.value.toString() }) { DebtCard(it, stringResource(amountLabelRes), onDebtClick) }
+      item(key = "add-debt") { ListAction(stringResource(R.string.add_debt_action), onAddDebt) }
       if (tab.settled.isNotEmpty()) {
         item(key = "settled-toggle") { SettledToggle(tab.settled.size) { showSettled = !showSettled } }
         if (showSettled) {
@@ -330,5 +329,16 @@ private fun PreviewDebts() = FlowFinTheme {
         ),
       ),
     ),
+  )
+}
+
+/** The screen's create-action — the same outlined button every other list uses. */
+@Composable
+private fun ListAction(text: String, onClick: () -> Unit) {
+  FlowFinOutlinedButton(
+    onClick = onClick,
+    text = text,
+    modifier = Modifier.fillMaxWidth().padding(top = 14.dp, bottom = 4.dp),
+    leadingIcon = FlowFinIcons.Add,
   )
 }

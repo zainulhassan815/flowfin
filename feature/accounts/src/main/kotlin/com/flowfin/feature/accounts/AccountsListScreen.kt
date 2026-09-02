@@ -32,7 +32,7 @@ import com.flowfin.core.designsystem.component.FlowFinAccountCard
 import com.flowfin.core.designsystem.component.FlowFinEmptyState
 import com.flowfin.core.designsystem.component.FlowFinIconButton
 import com.flowfin.core.designsystem.component.FlowFinSectionEmptyHint
-import com.flowfin.core.designsystem.component.FlowFinTextButton
+import com.flowfin.core.designsystem.component.FlowFinOutlinedButton
 import com.flowfin.core.designsystem.icon.FlowFinIcons
 import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.model.AccountId
@@ -53,7 +53,7 @@ fun AccountsListScreen(
   onSetBudget: () -> Unit = {},
 ) {
   Column(modifier.fillMaxSize().background(FlowFinTheme.colors.bg)) {
-    AccountsTopBar(onAddAccount = onAddAccount)
+    AccountsTopBar()
     when (state) {
       AccountsListUiState.Loading -> Box(Modifier.weight(1f).fillMaxWidth())
       AccountsListUiState.Empty -> Box(
@@ -73,7 +73,7 @@ fun AccountsListScreen(
         contentPadding = PaddingValues(bottom = 96.dp),
       ) {
         item(key = "hero") { Hero(state) }
-        accountSection(R.string.accounts_section_real, state.realTotal, state.real, onAccountClick)
+        accountSection(R.string.accounts_section_real, state.realTotal, state.real, onAccountClick, onAddAccount)
         budgetSection(state, onAccountClick, onSetBudget)
       }
     }
@@ -81,7 +81,7 @@ fun AccountsListScreen(
 }
 
 @Composable
-private fun AccountsTopBar(onAddAccount: () -> Unit) {
+private fun AccountsTopBar() {
   Row(
     modifier = Modifier
       .fillMaxWidth()
@@ -93,12 +93,6 @@ private fun AccountsTopBar(onAddAccount: () -> Unit) {
       text = stringResource(R.string.accounts_title),
       style = FlowFinTheme.typography.h2.copy(fontSize = 26.sp),
       color = FlowFinTheme.colors.text,
-    )
-    Spacer(Modifier.weight(1f))
-    FlowFinIconButton(
-      onClick = onAddAccount,
-      icon = FlowFinIcons.Add,
-      contentDescription = stringResource(R.string.accounts_action_add),
     )
   }
 }
@@ -165,10 +159,12 @@ private fun LazyListScope.accountSection(
   total: String,
   cards: List<AccountCardUi>,
   onAccountClick: (AccountId) -> Unit,
+  onAdd: () -> Unit,
 ) {
   if (cards.isEmpty()) return
   item(key = "header-$titleRes") { SectionHeader(stringResource(titleRes), total) }
   items(cards, key = { "acct-${it.id.value}" }) { card -> AccountCardItem(card, onAccountClick) }
+  item(key = "add-$titleRes") { SectionAction(stringResource(R.string.accounts_action_add), onAdd) }
 }
 
 private fun LazyListScope.budgetSection(
@@ -200,15 +196,27 @@ private fun LazyListScope.budgetSection(
     items(state.budgets, key = { "acct-${it.id.value}" }) { card -> AccountCardItem(card, onAccountClick) }
     // Once the section is populated its empty-state link is gone, and the header's
     // "+" makes real accounts — so without this there is no route to a second budget.
-    item(key = "budgets-add") {
-      Box(Modifier.padding(horizontal = HORIZONTAL, vertical = 6.dp)) {
-        FlowFinTextButton(
-          text = stringResource(R.string.accounts_budgets_add),
-          onClick = onSetBudget,
-        )
-      }
-    }
+    item(key = "budgets-add") { SectionAction(stringResource(R.string.accounts_budgets_add), onSetBudget) }
   }
+}
+
+/**
+ * A section's own create-action, sitting under what it creates — the same outlined
+ * button the Categories screen uses for "Add category", so every create-action in
+ * the app is one shape. Its leading "+" is safe here: the mark is inside a labelled
+ * button, not competing with the FAB's bare glyph.
+ */
+@Composable
+private fun SectionAction(text: String, onClick: () -> Unit) {
+  FlowFinOutlinedButton(
+    onClick = onClick,
+    text = text,
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(horizontal = HORIZONTAL)
+      .padding(top = 10.dp, bottom = 4.dp),
+    leadingIcon = FlowFinIcons.Add,
+  )
 }
 
 @Composable
