@@ -5,10 +5,12 @@ import arrow.core.Either
 import com.flowfin.core.domain.error.AccountError
 import com.flowfin.core.domain.error.CategoryError
 import com.flowfin.core.domain.error.DebtError
+import com.flowfin.core.domain.error.RecurringError
 import com.flowfin.core.domain.error.TransactionError
 import com.flowfin.core.domain.repository.AccountRepository
 import com.flowfin.core.domain.repository.CategoryRepository
 import com.flowfin.core.domain.repository.DebtRepository
+import com.flowfin.core.domain.repository.RecurringRepository
 import com.flowfin.core.domain.repository.TransactionRepository
 import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountBalance
@@ -27,6 +29,9 @@ import com.flowfin.core.model.DebtId
 import com.flowfin.core.model.DebtWithRemaining
 import com.flowfin.core.model.Money
 import com.flowfin.core.model.PersonId
+import com.flowfin.core.model.RecurringDraft
+import com.flowfin.core.model.RecurringSchedule
+import com.flowfin.core.model.RecurringScheduleId
 import com.flowfin.core.model.Transaction
 import com.flowfin.core.model.TransactionDraft
 import com.flowfin.core.model.TransactionId
@@ -138,10 +143,13 @@ internal class FakeAccountRepository(
 
 internal class FakeTransactionRepository(
   private val expenseByAccount: Map<AccountId, Money> = emptyMap(),
+  /** Spend inside the current month; defaults to the all-time figure. */
+  private val expenseThisMonth: Map<AccountId, Money>? = null,
   private val byAccount: List<Transaction> = emptyList(),
   private val flow: AccountFlow = AccountFlow(Money.ZERO, Money.ZERO),
 ) : TransactionRepository {
-  override fun observeExpenseByAccount(): Flow<Map<AccountId, Money>> = flowOf(expenseByAccount)
+  override fun observeExpenseByAccount(since: Instant): Flow<Map<AccountId, Money>> =
+    flowOf(if (since == Instant.DISTANT_PAST) expenseByAccount else expenseThisMonth ?: expenseByAccount)
   override fun observeByAccount(accountId: AccountId, limit: Long, offset: Long): Flow<List<Transaction>> = flowOf(byAccount)
   override fun observeFlow(accountId: AccountId, startAt: Instant, endAt: Instant): Flow<AccountFlow> = flowOf(flow)
   override fun feed(limit: Long): Flow<List<Transaction>> = throw NotImplementedError()
@@ -183,6 +191,21 @@ internal class FakeCategoryRepository(
   override suspend fun updateCustom(id: CategoryId, name: String, icon: String?, color: String?, displayOrder: Int): Either<CategoryError, Unit> = throw NotImplementedError()
   override suspend fun archive(id: CategoryId): Either<CategoryError, Unit> = throw NotImplementedError()
   override suspend fun unarchive(id: CategoryId): Either<CategoryError, Unit> = throw NotImplementedError()
+}
+
+internal class FakeRecurringRepository(
+  private val active: List<RecurringSchedule> = emptyList(),
+) : RecurringRepository {
+  override fun observeActive(): Flow<List<RecurringSchedule>> = flowOf(active)
+  override fun observeAll(): Flow<List<RecurringSchedule>> = flowOf(active)
+  override fun observePending(now: Instant): Flow<List<RecurringSchedule>> = throw NotImplementedError()
+  override suspend fun getById(id: RecurringScheduleId): RecurringSchedule? = throw NotImplementedError()
+  override suspend fun create(draft: RecurringDraft, firstDueAt: Instant): Either<RecurringError, RecurringSchedule> = throw NotImplementedError()
+  override suspend fun fire(schedule: RecurringSchedule, recordedAt: Instant, nextDueAt: Instant): Either<RecurringError, Unit> = throw NotImplementedError()
+  override suspend fun advanceNextDue(id: RecurringScheduleId, nextDueAt: Instant): Either<RecurringError, Unit> = throw NotImplementedError()
+  override suspend fun pause(id: RecurringScheduleId): Either<RecurringError, Unit> = throw NotImplementedError()
+  override suspend fun resume(id: RecurringScheduleId): Either<RecurringError, Unit> = throw NotImplementedError()
+  override suspend fun delete(id: RecurringScheduleId): Either<RecurringError, Unit> = throw NotImplementedError()
 }
 
 /** stateIn starts at [loading]; step past it to the computed state. */

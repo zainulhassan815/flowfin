@@ -618,4 +618,10 @@
   <string name="notif_reminder_title">Nothing logged today</string>
   <string name="notif_reminder_body">Add today\'s spending.</string>
 
+  <!-- Budget card · the line under an envelope's balance. A budget with a monthly
+       refill is measured against this month; one without has no period, so it
+       shows the lifetime picture instead. -->
+  <string name="budget_progress_month">of %1$s this month</string>
+  <string name="budget_progress_lifetime">of %1$s spent</string>
+
 </resources>

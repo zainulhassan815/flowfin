@@ -1,6 +1,5 @@
 package com.flowfin.core.ui
 
-import com.flowfin.core.designsystem.component.BudgetProgress
 import com.flowfin.core.model.Account
 import com.flowfin.core.model.AccountBalance
 import com.flowfin.core.model.AccountId
@@ -29,7 +28,7 @@ fun Account.parentName(accountsById: Map<AccountId, Account>): String =
 fun AccountBalance.toCardUi(
   accountsById: Map<AccountId, Account>,
   money: MoneyFormatter,
-  progress: BudgetProgress? = null,
+  progress: BudgetProgressUi? = null,
 ): AccountCardUi = AccountCardUi(
   id = account.id,
   name = account.name,

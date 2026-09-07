@@ -61,11 +61,12 @@ interface TransactionRepository {
   fun observeFlow(accountId: AccountId, startAt: Instant, endAt: Instant): Flow<AccountFlow>
 
   /**
-   * Cumulative expense outflow per account, keyed by id. Drives budget-envelope
-   * progress on the Accounts list: a budget's `spent`, with `funded = balance + spent`.
-   * Accounts with no expenses are absent from the map.
+   * Expense outflow per account since [since], keyed by id. Drives budget-envelope
+   * progress: a budget's `spent`. Pass [Instant.DISTANT_PAST] for the all-time
+   * figure that pairs with `funded = balance + spent`. Accounts with no expenses
+   * in the window are absent from the map.
    */
-  fun observeExpenseByAccount(): Flow<Map<AccountId, Money>>
+  fun observeExpenseByAccount(since: Instant): Flow<Map<AccountId, Money>>
 
   suspend fun getById(id: TransactionId): Transaction?
 

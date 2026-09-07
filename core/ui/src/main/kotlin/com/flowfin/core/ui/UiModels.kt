@@ -24,7 +24,18 @@ data class AccountCardUi(
   val colorKey: String?,
   val isBudget: Boolean,
   /** Set for budget envelopes shown as boxed cards (spend vs. funded); null elsewhere. */
-  val progress: BudgetProgress? = null,
+  val progress: BudgetProgressUi? = null,
+)
+
+/**
+ * [BudgetProgress] before its caption has a Context to be resolved against —
+ * whether an envelope is measured against this month or its lifetime is a domain
+ * fact, and the sentence that says so lives in resources.
+ */
+data class BudgetProgressUi(
+  val spent: String,
+  val caption: UiText,
+  val fraction: Float,
 )
 
 data class TxRowUi(

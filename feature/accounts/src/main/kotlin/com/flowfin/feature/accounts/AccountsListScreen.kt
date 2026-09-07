@@ -38,6 +38,9 @@ import com.flowfin.core.designsystem.theme.FlowFinTheme
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.resources.R
 import com.flowfin.core.ui.AccountCardUi
+import com.flowfin.core.ui.BudgetProgressUi
+import com.flowfin.core.ui.UiText
+import com.flowfin.core.ui.asString
 import com.flowfin.core.ui.categoryColor
 import com.flowfin.core.ui.categoryIcon
 import kotlin.uuid.Uuid
@@ -254,7 +257,9 @@ private fun AccountCardItem(card: AccountCardUi, onAccountClick: (AccountId) -> 
       decimal = card.balanceDecimal,
       tint = card.colorKey?.let { categoryColor(it) },
       dashedIcon = card.isBudget,
-      progress = card.progress,
+      progress = card.progress?.let {
+        BudgetProgress(spent = it.spent, caption = it.caption.asString(), fraction = it.fraction)
+      },
       onClick = { onAccountClick(card.id) },
     )
   }
@@ -278,7 +283,11 @@ private fun PreviewAccounts() = FlowFinTheme {
       budgets = listOf(
         AccountCardUi(
           AccountId(Uuid.random()), "Food", "Bank", "9,500", ".00", "restaurant", "food", isBudget = true,
-          progress = BudgetProgress(spent = "Rs 6,500", total = "Rs 16,000", fraction = 0.41f),
+          progress = BudgetProgressUi(
+            spent = "Rs 6,500",
+            caption = UiText.Raw("of Rs 16,000 this month"),
+            fraction = 0.41f,
+          ),
         ),
       ),
     ),

@@ -23,6 +23,7 @@ import com.flowfin.core.domain.usecase.CreatePerson
 import com.flowfin.core.domain.usecase.CreateRealAccount
 import com.flowfin.core.domain.usecase.CreateRecurringSchedule
 import com.flowfin.core.domain.usecase.FireSchedule
+import com.flowfin.core.domain.usecase.ObserveBudgetStatus
 import com.flowfin.core.domain.usecase.RecordBorrow
 import com.flowfin.core.domain.usecase.RecordLend
 import com.flowfin.core.domain.usecase.RecordRepayment
@@ -74,4 +75,5 @@ val dataModule = module {
   factory { CreateRecurringSchedule(get(), get(), get(), get(), get()) }
   factory { FireSchedule(get(), get(), get()) }
   factory { SkipSchedule(get(), get()) }
+  factory { ObserveBudgetStatus(get(), get(), get(), get(), get()) }
 }

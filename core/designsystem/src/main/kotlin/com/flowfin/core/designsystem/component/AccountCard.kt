@@ -39,8 +39,10 @@ import kotlin.math.roundToInt
  *  used. [fraction] (0..1) drives the bar; [spent] / [total] are the
  *  caller-formatted figures shown above it. */
 data class BudgetProgress(
+  /** The emphasised head of the line — the amount spent. */
   val spent: String,
-  val total: String,
+  /** The rest of it, already localized: "of Rs 28,000 this month". */
+  val caption: String,
   val fraction: Float,
 )
 
@@ -143,7 +145,7 @@ private fun BudgetProgressSection(progress: BudgetProgress, tint: Color) {
           withStyle(SpanStyle(color = palette.text, fontWeight = FontWeight.Medium)) {
             append(progress.spent)
           }
-          append(" of ${progress.total} spent")
+          append(" ${progress.caption}")
         },
         style = FlowFinTheme.typography.monoNum.copy(
           fontSize = 11.sp,
@@ -189,7 +191,7 @@ private fun PreviewAccountCards() = FlowFinTheme {
       decimal = ".00",
       tint = palette.categories.food,
       dashedIcon = true,
-      progress = BudgetProgress(spent = "6,000", total = "15,000", fraction = 0.4f),
+      progress = BudgetProgress(spent = "6,000", caption = "of 15,000 this month", fraction = 0.4f),
     )
   }
 }

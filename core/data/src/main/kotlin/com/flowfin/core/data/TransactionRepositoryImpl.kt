@@ -83,8 +83,8 @@ internal class TransactionRepositoryImpl(
       AccountFlow(inflow = Money(it.in_minor), outflow = Money(it.out_minor))
     }
 
-  override fun observeExpenseByAccount(): Flow<Map<AccountId, Money>> =
-    queries.expenseByAccount().asFlow().mapToList(dispatcher).map { rows ->
+  override fun observeExpenseByAccount(since: Instant): Flow<Map<AccountId, Money>> =
+    queries.expenseByAccount(since).asFlow().mapToList(dispatcher).map { rows ->
       rows.associate { it.account_id to Money(it.spent_minor) }
     }
 

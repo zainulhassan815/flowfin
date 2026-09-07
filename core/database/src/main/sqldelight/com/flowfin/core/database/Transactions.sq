@@ -233,12 +233,14 @@ FROM transactions
 WHERE (from_account_id = :accountId OR to_account_id = :accountId)
   AND recorded_at >= :startAt AND recorded_at < :endAt;
 
--- Cumulative expense outflow per account — drives budget-envelope progress
--- (spend vs. funded). Envelopes don't reset, so this is all-time, not ranged.
+-- Expense outflow per account since :since — drives budget-envelope progress.
+-- An envelope funded on a schedule is measured against the current month; one
+-- without a schedule has no period to measure, and passes the epoch to get the
+-- all-time figure its lifetime funding is the counterpart to.
 expenseByAccount:
 SELECT from_account_id AS account_id, COALESCE(SUM(amount_minor), 0) AS spent_minor
 FROM transactions
-WHERE kind = 'EXPENSE' AND from_account_id IS NOT NULL
+WHERE kind = 'EXPENSE' AND from_account_id IS NOT NULL AND recorded_at >= :since
 GROUP BY from_account_id;
 
 -- Expense breakdown by category, for Reports.

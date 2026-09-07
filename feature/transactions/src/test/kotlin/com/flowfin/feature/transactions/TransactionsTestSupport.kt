@@ -111,7 +111,7 @@ internal class FakeTransactionRepository(
   override fun observeCategoryTotals(kind: TransactionKind, startAt: Instant, endAt: Instant): Flow<List<CategoryTotal>> = throw NotImplementedError()
   override fun observeByAccount(accountId: AccountId, limit: Long, offset: Long): Flow<List<Transaction>> = throw NotImplementedError()
   override fun observeFlow(accountId: AccountId, startAt: Instant, endAt: Instant): Flow<AccountFlow> = throw NotImplementedError()
-  override fun observeExpenseByAccount(): Flow<Map<AccountId, Money>> = throw NotImplementedError()
+  override fun observeExpenseByAccount(since: Instant): Flow<Map<AccountId, Money>> = throw NotImplementedError()
   override suspend fun getById(id: TransactionId): Transaction? = throw NotImplementedError()
   override suspend fun record(draft: TransactionDraft): Either<TransactionError, Transaction> = throw NotImplementedError()
   override suspend fun updateContent(id: TransactionId, amount: Money, categoryId: CategoryId?, note: String?, recordedAt: Instant): Either<TransactionError, Unit> = throw NotImplementedError()

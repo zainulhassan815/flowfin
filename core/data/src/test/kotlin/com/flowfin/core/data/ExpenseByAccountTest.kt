@@ -38,7 +38,7 @@ class ExpenseByAccountTest {
     record(TransactionDraft.Allocation(bank.id, food.id, Money(16_000), recordedAt = at)).rightOrFail()
     record(TransactionDraft.Expense(food.id, Money(6_500), expense, note = null, recordedAt = at)).rightOrFail()
 
-    val spend = transactions.observeExpenseByAccount().first()
+    val spend = transactions.observeExpenseByAccount(Instant.DISTANT_PAST).first()
 
     assertEquals(Money(6_500), spend[food.id])
     // Bank only allocated out; an allocation isn't spend, so it's absent.
@@ -57,6 +57,6 @@ class ExpenseByAccountTest {
     record(TransactionDraft.Expense(food.id, Money(500), expense, note = null, recordedAt = at)).rightOrFail()
     record(TransactionDraft.Expense(food.id, Money(1_200), expense, note = null, recordedAt = at)).rightOrFail()
 
-    assertEquals(Money(1_700), transactions.observeExpenseByAccount().first()[food.id])
+    assertEquals(Money(1_700), transactions.observeExpenseByAccount(Instant.DISTANT_PAST).first()[food.id])
   }
 }

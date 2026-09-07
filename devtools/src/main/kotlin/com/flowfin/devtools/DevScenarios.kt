@@ -225,6 +225,15 @@ internal class DevScenarios(
     val spotify = expenseSchedule("Spotify", Money(90_000), Recurrence.Monthly(15), bank.id, expenseCategory("subscriptions"), daysFromNow(9))
     recurring.pause(spotify).bind()
 
+    // Each envelope's monthly refill as a real funding schedule, matching the
+    // allocations the loop above has already fired. Without these the budgets
+    // have no declared monthly figure, and their cards fall back to the lifetime
+    // picture — three months of funding under one month of spend.
+    allocationSchedule("Food refill", Money(2_800_000), bank.id, food)
+    allocationSchedule("Transport refill", Money(1_300_000), bank.id, transport)
+    allocationSchedule("Bills refill", Money(1_300_000), bank.id, bills)
+    allocationSchedule("Shopping refill", Money(1_100_000), bank.id, shopping)
+
     seedDebts(bank.id)
     backdateHistory(days = MONTHS_OF_HISTORY * 31 + 5)
   }
@@ -447,6 +456,21 @@ internal class DevScenarios(
     firstDueAt: Instant,
   ): RecurringScheduleId =
     recurring.create(RecurringDraft.Expense(name, amount, recurrence, from, category), firstDueAt).bind().id
+
+  /** A budget's monthly refill: money moves from a real account into the envelope
+   *  on the 1st, the cadence Add Budget offers. */
+  private suspend fun allocationSchedule(
+    name: String,
+    amount: Money,
+    from: AccountId,
+    toBudget: AccountId,
+  ): RecurringScheduleId {
+    val monthly = Recurrence.Monthly(dayOfMonth = 1)
+    return recurring.create(
+      RecurringDraft.Allocation(name, amount, monthly, from, toBudget),
+      firstDueAt = monthly.nextDueAfter(clock.now(), zone),
+    ).bind().id
+  }
 
   private suspend fun customCategory(
     name: String,
