@@ -4,7 +4,6 @@ import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
 import com.flowfin.core.domain.repository.SettingsRepository
-import com.flowfin.core.model.ThemePreference
 import com.flowfin.core.model.UserSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -21,8 +20,8 @@ internal class SettingsRepositoryImpl(
   // convenience, and defaults are a valid app.
   override fun observe(): Flow<UserSettings> = store.data.catch { emit(UserSettings()) }
 
-  override suspend fun setTheme(theme: ThemePreference) {
-    store.updateData { it.copy(theme = theme) }
+  override suspend fun update(transform: (UserSettings) -> UserSettings) {
+    store.updateData(transform)
   }
 }
 

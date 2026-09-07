@@ -65,6 +65,7 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.core.splashscreen)
   implementation(libs.androidx.lifecycle.runtimeCompose)
+  implementation(libs.androidx.work.runtime)
   implementation(libs.androidx.lifecycle.viewModel.navigation3)
   implementation(libs.androidx.navigation3.ui)
   implementation(libs.androidx.compose.material3)
@@ -77,4 +78,7 @@ dependencies {
   implementation(libs.kotlinx.datetime)
   implementation(libs.kotlinx.serialization.json)
   implementation(libs.arrow.core)
+
+  testImplementation(libs.kotlin.test)
+  testImplementation(libs.kotlin.test.junit)
 }

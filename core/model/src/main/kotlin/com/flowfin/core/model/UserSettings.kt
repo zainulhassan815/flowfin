@@ -1,5 +1,6 @@
 package com.flowfin.core.model
 
+import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable
 
 /**
@@ -16,4 +17,21 @@ enum class ThemePreference { LIGHT, DARK, SYSTEM }
 @Serializable
 data class UserSettings(
   val theme: ThemePreference = ThemePreference.LIGHT,
-)
+  val dailyReminderEnabled: Boolean = true,
+  val dailyReminderTime: LocalTime = LocalTime(20, 0),
+  val paymentAlertsEnabled: Boolean = true,
+  val budgetAlertsEnabled: Boolean = true,
+  /**
+   * Which alerts have already been sent, so a bill that stays overdue and a
+   * budget that stays over its threshold are announced once and not once a day.
+   * Keyed by subject, valued by the occurrence it fired for — see `AlertLog`.
+   *
+   * Not a preference, and it rides here anyway: it is a handful of short strings
+   * and a second DataStore to hold them would be more wiring than state.
+   */
+  val alertsFired: Map<String, String> = emptyMap(),
+) {
+  /** Whether anything needs scheduling at all. */
+  val notificationsEnabled: Boolean
+    get() = dailyReminderEnabled || paymentAlertsEnabled || budgetAlertsEnabled
+}

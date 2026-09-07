@@ -580,4 +580,27 @@
   <string name="reports_empty_title">Nothing to report yet.</string>
   <string name="reports_empty_body">Log a few transactions and this fills in — daily pace, a monthly net, and where the money actually goes.</string>
 
+  <!-- Notifications · channel names, as they appear in Android's own settings.
+       Channel ids are permanent once created; these labels are not. -->
+  <string name="channel_reminder">Daily reminder</string>
+  <string name="channel_reminder_sub">One nudge a day to log what you spent</string>
+  <string name="channel_payments">Payment alerts</string>
+  <string name="channel_payments_sub">Recurring payments that are due or overdue</string>
+  <string name="channel_budgets">Budget alerts</string>
+  <string name="channel_budgets_sub">Budgets running low or overspent</string>
+
+  <!-- Settings · notifications -->
+  <string name="settings_section_notifications">Notifications</string>
+  <string name="settings_reminder">Daily reminder</string>
+  <string name="settings_reminder_sub">A nudge at %1$s to log today\'s spend</string>
+  <string name="settings_reminder_time">Reminder time</string>
+  <string name="settings_reminder_time_sub">When the nudge arrives, give or take</string>
+  <string name="settings_payment_alerts">Payment alerts</string>
+  <string name="settings_payment_alerts_sub">When a recurring payment is due or overdue</string>
+  <string name="settings_budget_alerts">Budget alerts</string>
+  <string name="settings_budget_alerts_sub">When a budget runs low or goes over</string>
+  <string name="settings_notifications_blocked">Notifications are off for FlowFin. Turn them on in Android settings.</string>
+  <string name="settings_time_sheet_title">Reminder time</string>
+  <string name="action_done">Done</string>
+
 </resources>

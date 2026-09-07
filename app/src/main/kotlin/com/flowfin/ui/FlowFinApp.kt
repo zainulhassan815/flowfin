@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.annotation.StringRes
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -69,9 +70,19 @@ private val TABS = listOf(
 
 /** The app shell: one Scaffold owning the bottom nav + FAB, hosting the nav back stack. */
 @Composable
-fun FlowFinApp() {
+fun FlowFinApp(
+  deepLink: List<NavKey>? = null,
+  onDeepLinkHandled: () -> Unit = {},
+) {
   val navState = rememberNavigationState(HomeRoute, TOP_LEVEL_ROUTES.toSet())
   val navigator = remember(navState) { Navigator(navState) }
+
+  // A tapped notification lands on its tab first and its screen second, so the
+  // back gesture from a deep-linked detail goes up rather than out of the app.
+  LaunchedEffect(deepLink) {
+    deepLink?.forEach(navigator::navigate)
+    if (deepLink != null) onDeepLinkHandled()
+  }
 
   val appViewModel = koinViewModel<FlowFinAppViewModel>()
   val canAddTransaction by appViewModel.canAddTransaction.collectAsStateWithLifecycle()

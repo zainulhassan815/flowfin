@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.flowfin.core.domain.repository.CategoryRepository
 import com.flowfin.core.domain.repository.SettingsRepository
 import com.flowfin.core.model.ThemePreference
+import com.flowfin.core.model.UserSettings
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.datetime.LocalTime
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
@@ -24,6 +26,10 @@ class SettingsViewModel(
   ) { prefs, all ->
     SettingsUiState(
       theme = prefs.theme,
+      dailyReminderEnabled = prefs.dailyReminderEnabled,
+      dailyReminderTime = prefs.dailyReminderTime,
+      paymentAlertsEnabled = prefs.paymentAlertsEnabled,
+      budgetAlertsEnabled = prefs.budgetAlertsEnabled,
       activeCategoryCount = all.count { !it.isArchived },
       versionName = appVersion.name,
       versionCode = appVersion.code,
@@ -35,8 +41,18 @@ class SettingsViewModel(
       SettingsUiState(versionName = appVersion.name, versionCode = appVersion.code),
     )
 
-  fun onThemeChange(theme: ThemePreference) {
-    viewModelScope.launch { settingsRepository.setTheme(theme) }
+  fun onThemeChange(theme: ThemePreference) = edit { it.copy(theme = theme) }
+
+  fun onDailyReminderChange(enabled: Boolean) = edit { it.copy(dailyReminderEnabled = enabled) }
+
+  fun onReminderTimeChange(time: LocalTime) = edit { it.copy(dailyReminderTime = time) }
+
+  fun onPaymentAlertsChange(enabled: Boolean) = edit { it.copy(paymentAlertsEnabled = enabled) }
+
+  fun onBudgetAlertsChange(enabled: Boolean) = edit { it.copy(budgetAlertsEnabled = enabled) }
+
+  private fun edit(transform: (UserSettings) -> UserSettings) {
+    viewModelScope.launch { settingsRepository.update(transform) }
   }
 }
 

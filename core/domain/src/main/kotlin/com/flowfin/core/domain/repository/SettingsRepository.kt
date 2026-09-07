@@ -1,6 +1,5 @@
 package com.flowfin.core.domain.repository
 
-import com.flowfin.core.model.ThemePreference
 import com.flowfin.core.model.UserSettings
 import kotlinx.coroutines.flow.Flow
 
@@ -12,5 +11,7 @@ interface SettingsRepository {
 
   fun observe(): Flow<UserSettings>
 
-  suspend fun setTheme(theme: ThemePreference)
+  /** Apply a change. One method rather than a setter per field: every caller
+   *  already holds a [UserSettings], and the file is written whole either way. */
+  suspend fun update(transform: (UserSettings) -> UserSettings)
 }
