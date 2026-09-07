@@ -202,7 +202,7 @@ Found by inspection of the current tree. Ordered by how hard they block an uploa
 | 5 | **`:feature:settings` is empty** — no Kotlin sources at all. Settings is where export/import, currency, theme, about, and the privacy-policy link live. | `feature/settings/` | **Blocks launch** |
 | 6 | **`:feature:reports` is a nav entry only** — one file, `ReportsEntry.kt`. Monthly reports are PRD MVP scope. | `feature/reports/` | Scope call |
 | 7 | **Splash is unbranded.** `installSplashScreen()` is called but `Theme.FlowFin.Splash` inherits `android:Theme.Material.NoActionBar`, not androidx's `Theme.SplashScreen` — so no `windowSplashScreenBackground`, no animated icon, no `postSplashScreenTheme`. First frame is a default-coloured window. | `MainActivity.kt:22`, `app/src/main/res/values/themes.xml` | Polish, cheap |
-| 8 | **Daily reminders unimplemented.** PRD MVP item; no notification code, no `POST_NOTIFICATIONS` in the manifest. | — | Scope call |
+| 8 | **Notifications unimplemented.** PRD MVP item; no notification code, no `POST_NOTIFICATIONS` in the manifest. Being built for v1.0 — see §2.1 #8. | — | In progress |
 | 9 | **`applicationId = "com.flowfin"`** is permanent and unchangeable after first publish, and isn't the reverse of a domain we own. | `app/build.gradle.kts:12` | **Irreversible — decide now** |
 | 10 | No crash reporting. The PRD targets 99.5% crash-free sessions with no way to measure it. | — | Measurement |
 
@@ -228,10 +228,17 @@ we set WAL per-connection on every connection ([`CLAUDE.md`](../CLAUDE.md)). Exp
 also doubles as the Play data-portability story and is the #1 review request in this
 category. Keep `allowBackup="false"`.
 
-**#6 / #8 Scope.** Cut daily reminders from v1.0 — it's the largest remaining item and
-drags in a runtime permission plus Play's notification policy surface. Reports should
-stay: "where did it go" is the reason people open a tracker in month two. If time
-forces a cut, ship reports and cut reminders, never the reverse.
+**#6 Scope.** Reports stay: "where did it go" is the reason people open a tracker in
+month two.
+
+**#8 Scope — reversed 2026-09-07.** This previously read "cut daily reminders from
+v1.0". It no longer does. All three notification features ship in v1.0: the daily
+reminder, recurring payment due/overdue alerts, and budget threshold alerts (PRD
+§6.9). The runtime permission and Play's notification policy surface are real costs,
+but a tracker whose bills go unnoticed until you open it has the value backwards —
+"Netflix was due 2 days ago" is the notification worth the permission prompt. The ask
+is in context (at the onboarding reminder step, or when a notification setting is
+switched on), never on cold start, and the app works fully when it is declined.
 
 **#9 applicationId.** `com.flowfin` is not the reverse of a domain we control, and the
 `.co.uk` holder is a financial-services company with the same name. This is the single

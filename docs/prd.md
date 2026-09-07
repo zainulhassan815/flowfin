@@ -573,21 +573,56 @@ Users can track money they owe to others and money others owe to them, with part
 
 ---
 
-### 6.9 Daily Reminder
+### 6.9 Notifications
 
 #### 6.9.1 Description
-Notification to remind user to log daily expenses.
+Three kinds of notification, on three separate channels so a user can mute one
+without losing the others: the daily reminder to log spending, alerts for
+recurring payments that are due or overdue, and alerts for budgets that are
+running low or overspent.
 
-#### 6.9.2 Requirements
+Delivery is **approximate**. Exact firing needs `SCHEDULE_EXACT_ALARM`, which Play
+restricts to alarm and clock apps; FlowFin does not qualify. All three run on a
+periodic WorkManager job, so a notification arrives around its scheduled time
+rather than at it.
+
+Every notification is suppressed rather than repeated: the reminder does not fire
+on a day the user has already logged something, and each alert fires once per
+subject per period, not once a day for as long as the condition holds.
+
+#### 6.9.2 Daily reminder
 
 | ID | Requirement | Priority |
 |----|-------------|----------|
-| REM-01 | Send daily push notification at user-configured time | Must Have |
+| REM-01 | Send a daily notification at approximately the user-configured time | Must Have |
 | REM-02 | Default time: 8:00 PM | Must Have |
 | REM-03 | User can change reminder time | Must Have |
 | REM-04 | User can disable reminder | Must Have |
 | REM-05 | Tapping notification opens app | Must Have |
-| REM-06 | Notification text: "Don't forget to log today's expenses!" | Must Have |
+| REM-06 | Notification text: "Nothing logged today" / "Add today's spending." | Must Have |
+| REM-07 | Suppressed on a day that already has a logged transaction | Should Have |
+
+#### 6.9.3 Recurring payment alerts
+
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| BIL-01 | Notify when a recurring payment is due today | Must Have |
+| BIL-02 | Notify when a recurring payment is overdue, with the days overdue | Must Have |
+| BIL-03 | Budget funding schedules (`kind = ALLOCATION`) are excluded — they move money between the user's own accounts | Must Have |
+| BIL-04 | Alert once per schedule per due date, not daily for as long as it stays overdue | Must Have |
+| BIL-05 | Tapping opens the Recurring tab | Must Have |
+| BIL-06 | User can disable recurring payment alerts | Must Have |
+
+#### 6.9.4 Budget alerts
+
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| BUD-01 | Notify when a budget crosses 80% of its monthly funding | Must Have |
+| BUD-02 | Notify when a budget is overspent (envelope has gone negative) | Must Have |
+| BUD-03 | Measured against the budget's monthly funding amount, not lifetime funding | Must Have |
+| BUD-04 | Alert once per budget per threshold per funding period | Must Have |
+| BUD-05 | Tapping opens the budget | Must Have |
+| BUD-06 | User can disable budget alerts | Must Have |
 
 ---
 
@@ -598,6 +633,7 @@ Notification to remind user to log daily expenses.
 | ID | Requirement | Priority |
 |----|-------------|----------|
 | SET-01 | Configure daily reminder time | Must Have |
+| SET-01a | Enable/disable recurring payment alerts and budget alerts | Must Have |
 | SET-02 | Enable/disable daily reminder | Must Have |
 | SET-03 | Manage custom categories | Must Have |
 | SET-04 | View archived accounts | Must Have |
@@ -1448,7 +1484,7 @@ CREATE INDEX idx_debts_type_settled ON debts(type, is_settled);
 **Phase 4: Reports & Polish (Weeks 10-11)**
 - Monthly reports
 - Category breakdown charts
-- Daily reminder notifications
+- Notifications (daily reminder, bill alerts, budget alerts)
 - Settings screen
 - Onboarding flow
 
