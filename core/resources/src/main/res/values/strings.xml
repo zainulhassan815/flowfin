@@ -613,4 +613,9 @@
   <string name="notif_payment_due_body">%1$s.</string>
   <string name="notif_payment_late_body">%1$s, due %2$s.</string>
 
+  <!-- Notifications · the daily reminder. Declarative, and literally true: it is
+       suppressed on a day that already has something logged. -->
+  <string name="notif_reminder_title">Nothing logged today</string>
+  <string name="notif_reminder_body">Add today\'s spending.</string>
+
 </resources>
