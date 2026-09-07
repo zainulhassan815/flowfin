@@ -3,8 +3,13 @@ package com.flowfin.notifications
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.flowfin.core.domain.repository.RecurringRepository
 import com.flowfin.core.domain.repository.SettingsRepository
+import com.flowfin.core.ui.MoneyFormatter
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -21,6 +26,8 @@ class DailyNotificationWorker(
 ) : CoroutineWorker(context, params), KoinComponent {
 
   private val settingsRepository: SettingsRepository by inject()
+  private val recurring: RecurringRepository by inject()
+  private val money: MoneyFormatter by inject()
   private val notifier: Notifier by inject()
 
   override suspend fun doWork(): Result {
@@ -30,6 +37,20 @@ class DailyNotificationWorker(
 
     val settings = settingsRepository.observe().first()
     val log = AlertLog(settings.alertsFired)
+    val now = Clock.System.now()
+    val zone = TimeZone.currentSystemDefault()
+    val today = now.toLocalDateTime(zone).date
+
+    if (settings.paymentAlertsEnabled) {
+      notifier.postPaymentAlerts(
+        context = applicationContext,
+        pending = recurring.observePending(now).first(),
+        money = money,
+        log = log,
+        zone = zone,
+        today = today,
+      )
+    }
 
     settingsRepository.update { it.copy(alertsFired = log.seen) }
     return Result.success()

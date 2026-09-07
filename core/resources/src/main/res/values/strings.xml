@@ -603,4 +603,14 @@
   <string name="settings_time_sheet_title">Reminder time</string>
   <string name="action_done">Done</string>
 
+  <!-- Notifications · recurring payments. Same language the Recurring tab uses,
+       so the notification and the screen it opens agree. -->
+  <string name="notif_payment_due_title">%1$s is due today</string>
+  <plurals name="notif_payment_late_title">
+    <item quantity="one">%1$s is %2$d day late</item>
+    <item quantity="other">%1$s is %2$d days late</item>
+  </plurals>
+  <string name="notif_payment_due_body">%1$s.</string>
+  <string name="notif_payment_late_body">%1$s, due %2$s.</string>
+
 </resources>
