@@ -624,4 +624,11 @@
   <string name="budget_progress_month">of %1$s this month</string>
   <string name="budget_progress_lifetime">of %1$s spent</string>
 
+  <!-- Notifications · budgets. "Overspent" is the app's existing word for an
+       envelope that has gone negative, not a synonym for "past the threshold". -->
+  <string name="notif_budget_low_title">%1$s is %2$d%% spent this month</string>
+  <string name="notif_budget_low_body">%1$s of %2$s.</string>
+  <string name="notif_budget_over_title">%1$s is overspent</string>
+  <string name="notif_budget_over_body">%1$s past what is in the envelope.</string>
+
 </resources>

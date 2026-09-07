@@ -6,6 +6,7 @@ import androidx.work.WorkerParameters
 import com.flowfin.core.domain.repository.RecurringRepository
 import com.flowfin.core.domain.repository.SettingsRepository
 import com.flowfin.core.domain.repository.TransactionRepository
+import com.flowfin.core.domain.usecase.ObserveBudgetStatus
 import com.flowfin.core.ui.MoneyFormatter
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
@@ -29,6 +30,7 @@ class DailyNotificationWorker(
   private val settingsRepository: SettingsRepository by inject()
   private val recurring: RecurringRepository by inject()
   private val transactions: TransactionRepository by inject()
+  private val budgetStatus: ObserveBudgetStatus by inject()
   private val money: MoneyFormatter by inject()
   private val notifier: Notifier by inject()
 
@@ -61,6 +63,16 @@ class DailyNotificationWorker(
         log = log,
         today = today,
         zone = zone,
+      )
+    }
+
+    if (settings.budgetAlertsEnabled) {
+      notifier.postBudgetAlerts(
+        context = applicationContext,
+        budgets = budgetStatus().first(),
+        money = money,
+        log = log,
+        today = today,
       )
     }
 
