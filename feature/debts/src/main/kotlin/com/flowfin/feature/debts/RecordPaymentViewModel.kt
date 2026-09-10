@@ -7,6 +7,7 @@ import com.flowfin.core.designsystem.component.CalculatorKey
 import com.flowfin.core.domain.repository.AccountRepository
 import com.flowfin.core.domain.repository.DebtRepository
 import com.flowfin.core.domain.repository.PersonRepository
+import com.flowfin.core.domain.recordedAt
 import com.flowfin.core.domain.usecase.RecordRepayment
 import com.flowfin.core.model.AccountId
 import com.flowfin.core.model.DebtDirection
@@ -32,8 +33,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atTime
-import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
 /**
@@ -152,9 +151,7 @@ class RecordPaymentViewModel(
         debtId = debtId,
         account = state.selectedAccountId.takeIf { state.linkAccount },
         amount = amount,
-        // Midday, so a backdated repayment can't land on the wrong side of a
-        // timezone boundary and read as the day before.
-        recordedAt = (state.date ?: today()).atTime(12, 0).toInstant(zone),
+        recordedAt = (state.date ?: today()).recordedAt(clock, zone),
         note = state.note.trim().ifBlank { null },
       )
       when (result) {

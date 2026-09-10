@@ -6,6 +6,7 @@ import arrow.core.Either
 import com.flowfin.core.designsystem.component.CalculatorKey
 import com.flowfin.core.domain.repository.AccountRepository
 import com.flowfin.core.domain.repository.CategoryRepository
+import com.flowfin.core.domain.recordedAt
 import com.flowfin.core.domain.usecase.RecordTransaction
 import com.flowfin.core.model.AccountBalance
 import com.flowfin.core.model.AccountId
@@ -27,7 +28,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 
 class AddTransactionViewModel(
@@ -80,7 +80,7 @@ class AddTransactionViewModel(
     val state = form.value
     if (!state.canSave) return
     val amount = state.calculator.settled().value ?: return
-    val recordedAt = state.date.atStartOfDayIn(zone)
+    val recordedAt = state.date.recordedAt(clock, zone)
     val note = state.note.trim().ifBlank { null }
     val draft = when (state.type) {
       EntryType.Expense -> TransactionDraft.Expense(state.fromAccount.value ?: return, amount, state.category.value ?: return, note, recordedAt)

@@ -7,6 +7,7 @@ import com.flowfin.core.designsystem.component.CalculatorKey
 import com.flowfin.core.domain.repository.AccountRepository
 import com.flowfin.core.domain.repository.PersonRepository
 import com.flowfin.core.domain.usecase.CreatePerson
+import com.flowfin.core.domain.recordedAt
 import com.flowfin.core.domain.usecase.RecordBorrow
 import com.flowfin.core.domain.usecase.RecordLend
 import com.flowfin.core.model.AccountBalance
@@ -32,8 +33,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atTime
-import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
 /**
@@ -86,9 +85,8 @@ class AddDebtViewModel(
 
   fun onBlurAmount() = form.update { it.copy(amountFocused = false) }
 
-  /** Midday, so a backdated debt can't slip across a timezone boundary into the
-   *  day before. Falls back to "now" only if the date was never resolved. */
-  private fun AddDebtUiState.recordedAt() = date?.atTime(12, 0)?.toInstant(zone) ?: now
+  /** Falls back to "now" only if the date was never resolved. */
+  private fun AddDebtUiState.stampedAt() = date?.recordedAt(clock, zone) ?: now
 
   fun onPickDate(date: LocalDate) = form.update {
     it.copy(date = date, dateLabel = detailDateLabel(date), openSheet = null)
@@ -137,9 +135,9 @@ class AddDebtViewModel(
 
       val account = state.account.takeIf { state.linkAccount }
       val result = if (state.isBorrowing) {
-        recordBorrow(personId, account, amount, state.reason.trim().ifBlank { null }, state.recordedAt())
+        recordBorrow(personId, account, amount, state.reason.trim().ifBlank { null }, state.stampedAt())
       } else {
-        recordLend(personId, account, amount, state.reason.trim().ifBlank { null }, state.recordedAt())
+        recordLend(personId, account, amount, state.reason.trim().ifBlank { null }, state.stampedAt())
       }
 
       when (result) {
