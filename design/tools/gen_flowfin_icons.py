@@ -206,7 +206,7 @@ private fun lineIcon(pathData: String): ImageVector =
     )
   }}.build()
 
-@Preview(name = "FlowFin icons", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 360)
+@Preview(name = "Vessel icons", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 360)
 @Composable
 private fun PreviewFlowFinIcons() = FlowFinTheme {{
   val palette = FlowFinTheme.colors

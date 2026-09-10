@@ -97,8 +97,8 @@ fun FlowFinNotificationPreview(
 private fun PreviewNotificationPreview() = FlowFinTheme {
   Box(modifier = Modifier.padding(24.dp)) {
     FlowFinNotificationPreview(
-      mark = "f·",
-      app = "FlowFin",
+      mark = "v·",
+      app = "Vessel",
       time = "9:00 pm",
       text = "Don't forget — log today's spending before bed.",
     )

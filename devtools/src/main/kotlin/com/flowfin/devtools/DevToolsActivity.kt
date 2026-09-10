@@ -18,7 +18,7 @@ import org.koin.core.context.GlobalContext
 import org.koin.core.context.loadKoinModules
 
 /**
- * Debug-only launcher screen ("FlowFin Dev"), merged into the debug APK via
+ * Debug-only launcher screen ("Vessel Dev"), merged into the debug APK via
  * `debugImplementation` only. Runs in the app process, so the global Koin the
  * app's `Application` started is already up — we load [devModule] once on top of
  * it and resolve [DevScenarios] from the real repositories.

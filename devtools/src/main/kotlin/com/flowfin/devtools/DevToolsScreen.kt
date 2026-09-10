@@ -47,7 +47,7 @@ internal fun DevToolsScreen(
   onReseed: () -> Unit,
 ) {
   FlowFinScreenScaffold(
-    topBar = { FlowFinPageHeader(title = "FlowFin Dev", onBack = onClose) },
+    topBar = { FlowFinPageHeader(title = "Vessel Dev", onBack = onClose) },
     snackbarHost = { SnackbarHost(snackbarHostState) },
   ) {
     // No bottomBar here, so the list clears the gesture bar itself.
