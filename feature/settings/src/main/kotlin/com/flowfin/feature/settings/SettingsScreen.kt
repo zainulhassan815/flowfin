@@ -70,10 +70,12 @@ fun SettingsScreen(
   onReminderTimeChange: (LocalTime) -> Unit = {},
   onPaymentAlertsChange: (Boolean) -> Unit = {},
   onBudgetAlertsChange: (Boolean) -> Unit = {},
+  onBudgetThresholdChange: (Int) -> Unit = {},
   onCategories: () -> Unit = {},
 ) {
   var themeSheet by remember { mutableStateOf(false) }
   var timeSheet by remember { mutableStateOf(false) }
+  var thresholdSheet by remember { mutableStateOf(false) }
 
   // Asked for in context, when a switch is turned on — never on cold start. The
   // answer is re-read after the dialog rather than assumed, so a decline shows
@@ -138,6 +140,15 @@ fun SettingsScreen(
           checked = state.budgetAlertsEnabled,
           onCheckedChange = { enable(it, onBudgetAlertsChange) },
         )
+        HorizontalDivider(color = FlowFinTheme.colors.border)
+        FlowFinSettingsRow(
+          name = stringResource(R.string.settings_budget_threshold),
+          sub = stringResource(R.string.settings_budget_threshold_sub),
+          accessory = SettingsAccessory.Value(
+            stringResource(R.string.settings_percent, state.budgetThreshold),
+          ),
+          onClick = { thresholdSheet = true },
+        )
       }
       if (!allowed) {
         // The switches default on, so a fresh install never flips one and never
@@ -188,6 +199,17 @@ fun SettingsScreen(
     }
   }
 
+  if (thresholdSheet) {
+    ThresholdSheet(
+      selected = state.budgetThreshold,
+      onDismiss = { thresholdSheet = false },
+      onSelect = {
+        thresholdSheet = false
+        onBudgetThresholdChange(it)
+      },
+    )
+  }
+
   if (timeSheet) {
     TimeSheet(
       selected = state.dailyReminderTime,
@@ -208,6 +230,51 @@ fun SettingsScreen(
         onThemeChange(it)
       },
     )
+  }
+}
+
+/**
+ * The percentages on offer. Nothing above 90: [com.flowfin.core.model.BudgetStatus]
+ * clamps its fraction to 1.0 so an overspent envelope's bar stops at full, which
+ * means a threshold at or above 100% could never be crossed.
+ */
+private val THRESHOLDS = listOf(50, 60, 70, 75, 80, 90)
+
+@Composable
+private fun ThresholdSheet(
+  selected: Int,
+  onDismiss: () -> Unit,
+  onSelect: (Int) -> Unit,
+) {
+  val palette = FlowFinTheme.colors
+  FlowFinModalBottomSheet(onDismissRequest = onDismiss) {
+    FlowFinSheetHeader(title = stringResource(R.string.settings_budget_threshold), onClose = onDismiss)
+    Column(Modifier.padding(horizontal = HORIZONTAL).padding(bottom = 12.dp)) {
+      THRESHOLDS.forEach { percent ->
+        Row(
+          modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onSelect(percent) }
+            .padding(vertical = 14.dp),
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Text(
+            text = stringResource(R.string.settings_percent, percent),
+            modifier = Modifier.weight(1f),
+            style = FlowFinTheme.typography.bodyLg,
+            color = palette.text,
+          )
+          if (percent == selected) {
+            Icon(
+              imageVector = FlowFinIcons.Check,
+              contentDescription = null,
+              modifier = Modifier.size(18.dp),
+              tint = palette.text,
+            )
+          }
+        }
+      }
+    }
   }
 }
 

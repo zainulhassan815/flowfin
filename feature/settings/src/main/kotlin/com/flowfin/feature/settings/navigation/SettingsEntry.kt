@@ -24,6 +24,7 @@ fun EntryProviderScope<NavKey>.settingsEntry(navigator: Navigator) {
       onReminderTimeChange = viewModel::onReminderTimeChange,
       onPaymentAlertsChange = viewModel::onPaymentAlertsChange,
       onBudgetAlertsChange = viewModel::onBudgetAlertsChange,
+      onBudgetThresholdChange = viewModel::onBudgetThresholdChange,
       onCategories = { navigator.navigate(CategoriesRoute) },
     )
   }

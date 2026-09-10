@@ -405,7 +405,7 @@
   <!-- Whole-screen empty: no debts or receivables at all, ever. -->
   <string name="debts_empty_eyebrow">Owed &amp; owed to</string>
   <string name="debts_empty_title">Money moves between people. Keep score.</string>
-  <string name="debts_empty_body">Borrowed for rent, fronted lunch for a friend — record either direction. FlowFin reconciles each repayment until it settles.</string>
+  <string name="debts_empty_body">Borrowed for rent, fronted lunch for a friend — record either direction. Vessel reconciles each repayment until it settles.</string>
 
   <!-- Debt detail -->
   <!-- Amount label above the hero, by direction. -->
@@ -503,12 +503,12 @@
   <string name="settings_theme_light">Light</string>
   <string name="settings_theme_dark">Dark</string>
   <string name="settings_theme_system">System</string>
-  <string name="settings_theme_light_sub">The palette FlowFin is designed in</string>
+  <string name="settings_theme_light_sub">The palette Vessel is designed in</string>
   <string name="settings_theme_dark_sub">Easier at night, and on OLED</string>
   <string name="settings_theme_system_sub">Match the device setting</string>
   <!-- The brand wordmark, lowercase with its period per design/system/brand.html.
-       Not the launcher label, which is the plain name "FlowFin". -->
-  <string name="settings_wordmark" translatable="false">flowfin.</string>
+       Not the launcher label, which is the plain name "Vessel". -->
+  <string name="settings_wordmark" translatable="false">vessel.</string>
   <string name="settings_section_organize">Organize</string>
   <string name="settings_categories">Categories</string>
   <string name="settings_categories_sub">Income &amp; expense tags</string>
@@ -599,7 +599,11 @@
   <string name="settings_payment_alerts_sub">When a recurring payment is due or overdue</string>
   <string name="settings_budget_alerts">Budget alerts</string>
   <string name="settings_budget_alerts_sub">When a budget runs low or goes over</string>
-  <string name="settings_notifications_blocked">Notifications are off for FlowFin. Turn them on in Android settings.</string>
+  <string name="settings_budget_threshold">Running low at</string>
+  <string name="settings_budget_threshold_sub">How far into a budget\'s month counts as low</string>
+  <!-- A percentage as a settings value or a picker option, e.g. "80%". -->
+  <string name="settings_percent">%1$d%%</string>
+  <string name="settings_notifications_blocked">Notifications are off for Vessel. Turn them on in Android settings.</string>
   <string name="settings_time_sheet_title">Reminder time</string>
   <string name="action_done">Done</string>
 

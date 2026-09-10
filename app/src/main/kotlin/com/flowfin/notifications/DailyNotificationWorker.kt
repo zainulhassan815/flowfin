@@ -73,6 +73,7 @@ class DailyNotificationWorker(
         money = money,
         log = log,
         today = today,
+        threshold = settings.budgetThreshold,
       )
     }
 

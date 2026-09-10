@@ -14,6 +14,7 @@ data class SettingsUiState(
   val dailyReminderTime: LocalTime = LocalTime(20, 0),
   val paymentAlertsEnabled: Boolean = true,
   val budgetAlertsEnabled: Boolean = true,
+  val budgetThreshold: Int = 80,
   val activeCategoryCount: Int = 0,
   val versionName: String = "",
   val versionCode: String = "",

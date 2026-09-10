@@ -30,6 +30,7 @@ class SettingsViewModel(
       dailyReminderTime = prefs.dailyReminderTime,
       paymentAlertsEnabled = prefs.paymentAlertsEnabled,
       budgetAlertsEnabled = prefs.budgetAlertsEnabled,
+      budgetThreshold = prefs.budgetThreshold,
       activeCategoryCount = all.count { !it.isArchived },
       versionName = appVersion.name,
       versionCode = appVersion.code,
@@ -50,6 +51,8 @@ class SettingsViewModel(
   fun onPaymentAlertsChange(enabled: Boolean) = edit { it.copy(paymentAlertsEnabled = enabled) }
 
   fun onBudgetAlertsChange(enabled: Boolean) = edit { it.copy(budgetAlertsEnabled = enabled) }
+
+  fun onBudgetThresholdChange(percent: Int) = edit { it.copy(budgetThreshold = percent) }
 
   private fun edit(transform: (UserSettings) -> UserSettings) {
     viewModelScope.launch { settingsRepository.update(transform) }

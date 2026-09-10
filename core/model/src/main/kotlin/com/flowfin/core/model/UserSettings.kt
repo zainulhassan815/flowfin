@@ -22,6 +22,13 @@ data class UserSettings(
   val paymentAlertsEnabled: Boolean = true,
   val budgetAlertsEnabled: Boolean = true,
   /**
+   * How far into a budget's monthly refill counts as "running low", as a whole
+   * percent. Capped below 100 by the picker: [BudgetStatus.fraction] is clamped
+   * to 1.0 so the progress bar can't run off the end, and a threshold above that
+   * could never be crossed.
+   */
+  val budgetThreshold: Int = 80,
+  /**
    * Which alerts have already been sent, so a bill that stays overdue and a
    * budget that stays over its threshold are announced once and not once a day.
    * Keyed by subject, valued by the occurrence it fired for — see `AlertLog`.

@@ -126,7 +126,7 @@ private fun HomeTopBar(onSettings: () -> Unit) {
   ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
       Text(
-        text = "flowfin",
+        text = "vessel",
         style = FlowFinTheme.typography.h2.copy(fontWeight = FontWeight.Light),
         color = palette.text,
       )
