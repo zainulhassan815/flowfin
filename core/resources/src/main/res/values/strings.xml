@@ -32,7 +32,7 @@
   <string name="home_empty_title">Money lives somewhere. Tell us where.</string>
   <!-- A substring of home_empty_title that the empty state emphasises. -->
   <string name="home_empty_emphasis">somewhere.</string>
-  <string name="home_empty_body">Add the first place — your bank, the cash in your wallet, a mobile wallet. Every transaction starts from an account.</string>
+  <string name="home_empty_body">Add the first place your money sits. A bank, the cash in your wallet, a mobile wallet. Every transaction starts from an account.</string>
   <string name="home_empty_action">Add an account</string>
 
   <!-- Home · section headers -->
@@ -77,8 +77,8 @@
   <string name="tx_debt_lend">Lent to %1$s</string>
   <string name="tx_debt_repay_out">Repaid %1$s</string>
   <string name="tx_debt_repay_in">%1$s repaid you</string>
-  <!-- Fallback when an income/expense has no category. -->
-  <string name="tx_uncategorized">—</string>
+  <!-- Fallback when an income/expense has no category, e.g. the category was deleted. -->
+  <string name="tx_uncategorized">Uncategorised</string>
 
   <!-- Home · recent empty variants -->
   <string name="home_recent_empty_eyebrow">First entry</string>
@@ -86,7 +86,7 @@
   <string name="home_recent_empty_body">Tap + below to record an income, an expense, or a transfer between your accounts.</string>
   <string name="home_recent_quiet_eyebrow">A quiet stretch</string>
   <string name="home_recent_quiet_title">Nothing logged this week.</string>
-  <string name="home_recent_quiet_body">Your last entry was %1$s. Tap + to add today\'s.</string>
+  <string name="home_recent_quiet_body">Your last entry was %1$s. Tap + to add today\'s entry.</string>
 
   <!-- Add account -->
   <string name="add_account_title">New account</string>
@@ -167,14 +167,14 @@
   <!-- Budget section when real accounts exist but no envelopes yet. -->
   <string name="accounts_budgets_empty_eyebrow">Optional</string>
   <string name="accounts_budgets_empty_title">No budgets set.</string>
-  <string name="accounts_budgets_empty_body">Set aside part of a real account to watch a category — Food, Transport, anything you want to keep an eye on.</string>
+  <string name="accounts_budgets_empty_body">Set aside part of a real account to watch a category: Food, Transport, anything you want to keep an eye on.</string>
   <string name="accounts_budgets_empty_action">Set a budget</string>
   <!-- Faint section total when the budget section is empty. -->
   <string name="accounts_budgets_total_empty">empty</string>
   <!-- Whole-screen empty: no accounts at all. -->
   <string name="accounts_empty_eyebrow">Where money lives</string>
   <string name="accounts_empty_title">No accounts yet.</string>
-  <string name="accounts_empty_body">Add the first place your money sits — a bank, the cash in your wallet, a mobile wallet.</string>
+  <string name="accounts_empty_body">Add the first place your money sits. A bank, the cash in your wallet, a mobile wallet.</string>
   <string name="accounts_empty_action">Add an account</string>
 
   <!-- Account detail -->
@@ -195,9 +195,9 @@
   <string name="account_detail_qa_income_label">Income</string>
   <string name="account_detail_qa_income_sub">money in</string>
   <string name="account_detail_qa_expense_label">Expense</string>
-  <string name="account_detail_qa_expense_sub">spend</string>
+  <string name="account_detail_qa_expense_sub">money out</string>
   <string name="account_detail_qa_transfer_label">Transfer</string>
-  <string name="account_detail_qa_transfer_sub">to / from</string>
+  <string name="account_detail_qa_transfer_sub">between accounts</string>
   <!-- Activity section -->
   <string name="account_detail_activity_title">Activity</string>
   <string name="account_detail_activity_awaiting">Awaiting first entry</string>
@@ -210,7 +210,7 @@
   <string name="account_detail_not_found_body">This account is no longer active.</string>
 
   <!-- Add transaction -->
-  <string name="add_tx_title">Add</string>
+  <string name="add_tx_title">New transaction</string>
   <string name="add_tx_save">Save</string>
   <!-- Entry-type tabs -->
   <string name="add_tx_type_expense">Expense</string>
@@ -269,11 +269,11 @@
   <!-- Whole-screen empty: no schedules at all. -->
   <string name="recurring_empty_eyebrow">Set &amp; forget</string>
   <string name="recurring_empty_title">Nothing on repeat yet.</string>
-  <string name="recurring_empty_body">Bills and income that repeat — rent, salary, subscriptions — gather here, each with a nudge when it\'s due.</string>
+  <string name="recurring_empty_body">Rent, salary, subscriptions. Anything that repeats gathers here, with a nudge when it\'s due.</string>
   <!-- Schedules exist but all are paused — the empty-hint card in the "All active" section. -->
   <string name="recurring_all_paused_eyebrow">All paused</string>
   <string name="recurring_all_paused_title">Nothing running.</string>
-  <string name="recurring_all_paused_body">Every schedule is paused. Resume one to start surfacing it before its next due date.</string>
+  <string name="recurring_all_paused_body">Every schedule is paused. Resume one to see it here before its next due date.</string>
   <!-- Stats-line pill when nothing's currently running. -->
   <string name="recurring_all_paused_pill">All paused</string>
   <!-- The + action in the tab header. -->
@@ -281,7 +281,7 @@
 
   <!-- Paused schedules — a section in the tab's own flow, like Pending / Active -->
   <string name="recurring_paused_title">Paused</string>
-  <string name="recurring_paused_aux">Tap ▶ to resume</string>
+  <string name="recurring_paused_aux">Tap play to resume</string>
   <string name="recurring_resume_action">Resume %1$s</string>
   <!-- A paused row's meta, e.g. "Paused since 12 May". -->
   <string name="recurring_paused_since">Paused since %1$d %2$s</string>
@@ -371,7 +371,7 @@
   <string name="transactions_filter_out">Out</string>
   <string name="transactions_filter_transfers">Transfers</string>
   <!-- Whole-screen empty (nothing ever logged). -->
-  <string name="transactions_empty_eyebrow">No entries yet</string>
+  <string name="transactions_empty_eyebrow">The ledger</string>
   <string name="transactions_empty_title">Nothing logged yet.</string>
   <string name="transactions_empty_body">Your income, spending and transfers gather here as you record them.</string>
   <string name="transactions_empty_action">Add transaction</string>
@@ -386,8 +386,8 @@
   <string name="debts_net_position_label">Net position</string>
   <!-- Hero copy when every debt in the app is settled (distinct from never having any). -->
   <string name="debts_all_clear">All clear.</string>
-  <string name="debts_tab_i_owe">I Owe</string>
-  <string name="debts_tab_owe_me">Owe Me</string>
+  <string name="debts_tab_i_owe">I owe</string>
+  <string name="debts_tab_owe_me">Owed to me</string>
   <!-- Active-card amount label, by direction. -->
   <string name="debts_amount_label_i_owe">Remaining</string>
   <string name="debts_amount_label_owe_me">Owed</string>
@@ -405,7 +405,7 @@
   <!-- Whole-screen empty: no debts or receivables at all, ever. -->
   <string name="debts_empty_eyebrow">Owed &amp; owed to</string>
   <string name="debts_empty_title">Money moves between people. Keep score.</string>
-  <string name="debts_empty_body">Borrowed for rent, fronted lunch for a friend — record either direction. Vessel reconciles each repayment until it settles.</string>
+  <string name="debts_empty_body">Borrowed for rent, fronted lunch for a friend. Record either direction, and each repayment is tracked until it settles.</string>
 
   <!-- Debt detail -->
   <!-- Amount label above the hero, by direction. -->
@@ -440,7 +440,7 @@
   <string name="debt_detail_delete_title">Delete this debt?</string>
   <string name="debt_detail_delete_body">The origin and every payment recorded against it go too. This can\'t be undone.</string>
   <string name="debt_detail_delete_confirm">Delete</string>
-  <string name="debt_detail_not_found">This debt is no longer here.</string>
+  <string name="debt_detail_not_found">This debt is no longer available.</string>
 
   <!-- Record payment / receipt sheet -->
   <string name="debt_detail_sheet_title">Record payment</string>
@@ -459,7 +459,7 @@
   <string name="debt_detail_sheet_link_desc">Records this in your expense history</string>
   <string name="debt_detail_sheet_link_desc_receipt">Records this in your income history</string>
   <!-- Shown when linking is off: the debt updates but no account moves. -->
-  <string name="debt_detail_sheet_link_off">Tracked off-book — no account balance changes.</string>
+  <string name="debt_detail_sheet_link_off">Tracked off-book. No account balance changes.</string>
   <string name="debt_detail_sheet_no_accounts">No real account in this currency to move money through.</string>
   <string name="debt_detail_sheet_date">Date</string>
   <string name="debt_detail_sheet_note">Note</string>
@@ -468,7 +468,7 @@
   <string name="debt_detail_sheet_save_receipt">Save receipt</string>
 
   <!-- Any debt write that fails; the detail screen surfaces it as a snackbar. -->
-  <string name="debt_action_error">That didn\'t save. Try again.</string>
+  <string name="debt_action_error">Couldn\'t save. Please try again.</string>
 
   <!-- Add debt -->
   <string name="add_debt_title">New debt</string>
@@ -488,7 +488,7 @@
   <string name="add_debt_link_desc_borrow">Logs the money landing in your balance</string>
   <string name="add_debt_link_desc_lend">Logs the money leaving your balance</string>
   <!-- Shown when linking is off: the debt is recorded but no balance moves. -->
-  <string name="add_debt_link_off">Tracked off-book — the debt is recorded, but no account balance changes.</string>
+  <string name="add_debt_link_off">Tracked off-book. The debt is recorded, but no account balance changes.</string>
   <string name="add_debt_save">Save debt</string>
   <string name="add_debt_error">Couldn\'t save the debt. Please try again.</string>
 
@@ -509,9 +509,9 @@
   <!-- The brand wordmark, lowercase with its period per design/system/brand.html.
        Not the launcher label, which is the plain name "Vessel". -->
   <string name="settings_wordmark" translatable="false">vessel.</string>
-  <string name="settings_section_organize">Organize</string>
+  <string name="settings_section_organize">Organise</string>
   <string name="settings_categories">Categories</string>
-  <string name="settings_categories_sub">Income &amp; expense tags</string>
+  <string name="settings_categories_sub">How income and spending are grouped</string>
   <!-- Categories row badge, e.g. "14 active". -->
   <string name="settings_categories_badge">%1$d active</string>
 
@@ -542,7 +542,7 @@
     <item quantity="one">%1$d archived category</item>
     <item quantity="other">%1$d archived categories</item>
   </plurals>
-  <string name="categories_error">That didn\'t save. Try again.</string>
+  <string name="categories_error">Couldn\'t save. Please try again.</string>
 
   <!-- Footer build line, e.g. "Version 1.0.0 · Build 27". -->
   <string name="settings_version">Version %1$s · Build %2$s</string>
@@ -565,8 +565,8 @@
   <string name="reports_breakdown">By category</string>
   <string name="reports_share">%1$d%% of total</string>
   <plurals name="reports_txns">
-    <item quantity="one">%1$d txn</item>
-    <item quantity="other">%1$d txns</item>
+    <item quantity="one">%1$d entry</item>
+    <item quantity="other">%1$d entries</item>
   </plurals>
   <plurals name="reports_breakdown_count">
     <item quantity="one">%1$d transaction</item>
@@ -578,7 +578,7 @@
   <!-- Whole-screen empty: nothing recorded, ever. -->
   <string name="reports_empty_eyebrow">Where it went</string>
   <string name="reports_empty_title">Nothing to report yet.</string>
-  <string name="reports_empty_body">Log a few transactions and this fills in — daily pace, a monthly net, and where the money actually goes.</string>
+  <string name="reports_empty_body">Log a few transactions and this fills in: daily pace, a monthly net, and where the money actually goes.</string>
 
   <!-- Notifications · channel names, as they appear in Android's own settings.
        Channel ids are permanent once created; these labels are not. -->
@@ -592,7 +592,7 @@
   <!-- Settings · notifications -->
   <string name="settings_section_notifications">Notifications</string>
   <string name="settings_reminder">Daily reminder</string>
-  <string name="settings_reminder_sub">A nudge at %1$s to log today\'s spend</string>
+  <string name="settings_reminder_sub">A nudge at %1$s to log today\'s spending</string>
   <string name="settings_reminder_time">Reminder time</string>
   <string name="settings_reminder_time_sub">When the nudge arrives, give or take</string>
   <string name="settings_payment_alerts">Payment alerts</string>
@@ -633,7 +633,7 @@
   <string name="notif_budget_low_title">%1$s is %2$d%% spent this month</string>
   <string name="notif_budget_low_body">%1$s of %2$s.</string>
   <string name="notif_budget_over_title">%1$s is overspent</string>
-  <string name="notif_budget_over_body">%1$s past what is in the envelope.</string>
+  <string name="notif_budget_over_body">%1$s more than the envelope holds.</string>
 
   <!-- App lock. Deliberately does not claim more than a UI gate delivers. -->
   <string name="lock_title">Locked</string>
@@ -643,7 +643,7 @@
   <string name="lock_prompt_subtitle">Use your usual screen unlock</string>
   <string name="settings_section_privacy">Privacy</string>
   <string name="settings_app_lock">App lock</string>
-  <string name="settings_app_lock_sub">Ask for your screen unlock when opening</string>
+  <string name="settings_app_lock_sub">Ask for your screen unlock when you open Vessel</string>
   <string name="settings_app_lock_unavailable">Set a screen lock on this device to use it here.</string>
 
 </resources>
