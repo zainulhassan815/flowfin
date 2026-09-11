@@ -1410,10 +1410,46 @@ CREATE INDEX idx_debts_type_settled ON debts(type, is_settled);
 
 | Requirement | Implementation |
 |-------------|----------------|
-| Data at rest | SQLite encryption (SQLCipher) |
-| No cloud sync (MVP) | All data local |
-| Backup files | Encrypted export |
-| App lock (post-MVP) | Biometric/PIN |
+| Data at rest | Android file-based encryption, tied to the device lock screen. The database is **not** separately encrypted by the app. |
+| Off-device copies | `allowBackup="false"` — nothing leaves the device automatically. |
+| No cloud sync | All data local. |
+| Backup files | Encrypted export (not yet built). |
+| App lock | Device biometric or credential, gating the UI. See §10.7.1. |
+
+The first row previously read "SQLite encryption (SQLCipher)". Nothing in the app
+has ever done that, and stating it invited the Data Safety form to claim it. What
+actually protects the database when the device is off is the platform's own
+file-based encryption, which has been mandatory since Android 10 and is keyed to
+the user's lock screen.
+
+Adding SQLCipher on top is a real option and a separate decision: it means
+swapping the SQLDelight driver and wrapping the key in the Keystore, where a
+change of biometric enrolment invalidates the key and takes the data with it. It
+is not a line item to assume.
+
+#### 10.7.1 App lock
+
+| ID | Requirement | Priority |
+|----|-------------|----------|
+| LOCK-01 | The ledger can be put behind the device's own authentication | Should Have |
+| LOCK-02 | Authentication is the device biometric **or** its PIN / pattern / password — the app stores no secret of its own | Must Have |
+| LOCK-03 | Off by default | Must Have |
+| LOCK-04 | The lock re-applies when the app has been in the background beyond a short grace period | Must Have |
+| LOCK-05 | The setting is unavailable, with an explanation, when the device has no credential enrolled | Must Have |
+| LOCK-06 | The lock never prevents access it cannot restore: if the device can no longer authenticate, the ledger opens | Must Have |
+
+**What this protects against, and what it doesn't.** The gap it closes is the
+*unlocked* phone — handed to someone, left on a desk, read over a shoulder. It
+does not defend against a rooted device or a forensic image of `/data`, and the
+setting's copy should not imply that it does.
+
+LOCK-06 is the safety valve. A lock a user cannot pass is a ledger they have
+lost, so the gate asks the platform whether authentication is possible before it
+stands in the way.
+
+**Out of scope, deliberately:** the recents thumbnail still shows the last frame,
+and notifications still carry amounts to the lock screen. Both leak what the lock
+hides, and both are worth revisiting — neither is covered here.
 
 ---
 
@@ -1762,7 +1798,6 @@ AI creates:
 |---------|-------------|----------|
 | Cloud Sync | Optional cloud backup and sync | High |
 | Multi-device | Access from multiple devices | High |
-| App Lock | Biometric/PIN security | High |
 | Custom Date Range Reports | Flexible report periods | Medium |
 | Multi-currency | Handle foreign currency transactions | Medium |
 
