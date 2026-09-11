@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.flowfin.core.designsystem.component.FlowFinHeroAmount
 import com.flowfin.core.designsystem.component.FlowFinIconButton
+import com.flowfin.core.designsystem.component.FlowFinEmptyState
 import com.flowfin.core.designsystem.component.FlowFinOutlinedButton
 import com.flowfin.core.designsystem.component.FlowFinPersonAvatar
 import com.flowfin.core.designsystem.component.FlowFinProgressBar
@@ -64,11 +65,17 @@ fun DebtsScreen(
     Header(state, onAddDebt)
     when (state) {
       DebtsUiState.Loading -> Box(Modifier.weight(1f).fillMaxWidth())
-      DebtsUiState.Empty -> Notice(
-        eyebrow = stringResource(R.string.debts_empty_eyebrow),
-        title = stringResource(R.string.debts_empty_title),
-        body = stringResource(R.string.debts_empty_body),
-      )
+      // Same reason as Recurring: the add-action sits at the end of a list that
+      // an empty state replaces, so an empty Debts tab had no way to record a first one.
+      DebtsUiState.Empty -> Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+        FlowFinEmptyState(
+          eyebrow = stringResource(R.string.debts_empty_eyebrow),
+          title = stringResource(R.string.debts_empty_title),
+          body = stringResource(R.string.debts_empty_body),
+          actionLabel = stringResource(R.string.add_debt_action),
+          onAction = onAddDebt,
+        )
+      }
       is DebtsUiState.Content -> DebtsTabs(state, onDebtClick, onAddDebt, Modifier.weight(1f))
     }
   }
@@ -278,31 +285,6 @@ private fun Amount(whole: String, decimal: String) {
 }
 
 /** Centered, CTA-less informational state — the whole-screen empty state. */
-@Composable
-private fun Notice(eyebrow: String, title: String, body: String) {
-  val palette = FlowFinTheme.colors
-  Column(
-    modifier = Modifier.fillMaxSize().padding(horizontal = HORIZONTAL),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center,
-  ) {
-    Text(eyebrow.uppercase(), style = FlowFinTheme.typography.caption, color = palette.textFaint)
-    Text(
-      text = title,
-      modifier = Modifier.padding(top = 10.dp),
-      style = FlowFinTheme.typography.h2,
-      color = palette.textMute,
-      textAlign = TextAlign.Center,
-    )
-    Text(
-      text = body,
-      modifier = Modifier.padding(top = 10.dp),
-      style = FlowFinTheme.typography.body.copy(fontSize = 14.sp),
-      color = palette.textSoft,
-      textAlign = TextAlign.Center,
-    )
-  }
-}
 
 @Preview(name = "Debts · populated", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
 @Composable

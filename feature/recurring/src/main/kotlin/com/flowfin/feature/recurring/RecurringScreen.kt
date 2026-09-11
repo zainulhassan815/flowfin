@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.flowfin.core.designsystem.component.FlowFinIconButton
+import com.flowfin.core.designsystem.component.FlowFinEmptyState
 import com.flowfin.core.designsystem.component.FlowFinOutlinedButton
 import com.flowfin.core.designsystem.component.FlowFinPendingPaymentCard
 import com.flowfin.core.designsystem.component.PaymentStatus
@@ -67,11 +68,18 @@ fun RecurringScreen(
       Header(state, onAdd)
       when (state) {
         RecurringUiState.Loading -> Box(Modifier.weight(1f).fillMaxWidth())
-        RecurringUiState.Empty -> Notice(
-          eyebrow = stringResource(R.string.recurring_empty_eyebrow),
-          title = stringResource(R.string.recurring_empty_title),
-          body = stringResource(R.string.recurring_empty_body),
-        )
+        // FlowFinEmptyState, not a bare notice: the create-action lives at the
+        // end of the list, and an empty list renders no list — which left the
+        // only route to a first schedule unreachable.
+        RecurringUiState.Empty -> Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+          FlowFinEmptyState(
+            eyebrow = stringResource(R.string.recurring_empty_eyebrow),
+            title = stringResource(R.string.recurring_empty_title),
+            body = stringResource(R.string.recurring_empty_body),
+            actionLabel = stringResource(R.string.recurring_add_action),
+            onAction = onAdd,
+          )
+        }
         is RecurringUiState.Content -> LazyColumn(
           modifier = Modifier.weight(1f),
           contentPadding = PaddingValues(start = HORIZONTAL, end = HORIZONTAL, bottom = 96.dp),
@@ -314,30 +322,6 @@ private fun UpcomingRow(row: RecurringUpcomingUi, onClick: (RecurringScheduleId)
 }
 
 /** Centered, CTA-less informational state — used by the whole-screen empty state. */
-@Composable
-private fun Notice(eyebrow: String, title: String, body: String) {
-  val palette = FlowFinTheme.colors
-  Column(
-    modifier = Modifier.fillMaxSize().padding(horizontal = HORIZONTAL),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center,
-  ) {
-    Text(eyebrow.uppercase(), style = FlowFinTheme.typography.caption, color = palette.textFaint)
-    Text(
-      text = title,
-      modifier = Modifier.padding(top = 10.dp),
-      style = FlowFinTheme.typography.h2,
-      color = palette.textMute,
-    )
-    Text(
-      text = body,
-      modifier = Modifier.padding(top = 10.dp),
-      style = FlowFinTheme.typography.body.copy(fontSize = 14.sp),
-      color = palette.textSoft,
-      textAlign = TextAlign.Center,
-    )
-  }
-}
 
 @Preview(name = "Recurring · populated", backgroundColor = 0xFF08080A, showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
