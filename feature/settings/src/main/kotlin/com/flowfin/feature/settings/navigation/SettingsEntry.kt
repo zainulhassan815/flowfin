@@ -20,6 +20,7 @@ fun EntryProviderScope<NavKey>.settingsEntry(navigator: Navigator) {
       state = state,
       onBack = { navigator.goBack() },
       onThemeChange = viewModel::onThemeChange,
+      onAppLockChange = viewModel::onAppLockChange,
       onDailyReminderChange = viewModel::onDailyReminderChange,
       onReminderTimeChange = viewModel::onReminderTimeChange,
       onPaymentAlertsChange = viewModel::onPaymentAlertsChange,

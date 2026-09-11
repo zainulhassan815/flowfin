@@ -10,6 +10,7 @@ import kotlinx.datetime.LocalTime
  */
 data class SettingsUiState(
   val theme: ThemePreference = ThemePreference.LIGHT,
+  val appLockEnabled: Boolean = false,
   val dailyReminderEnabled: Boolean = true,
   val dailyReminderTime: LocalTime = LocalTime(20, 0),
   val paymentAlertsEnabled: Boolean = true,

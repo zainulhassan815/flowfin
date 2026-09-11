@@ -62,6 +62,7 @@ dependencies {
   debugImplementation(projects.devtools)
 
   implementation(libs.androidx.activity.compose)
+  implementation(libs.androidx.biometric)
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.core.splashscreen)
   implementation(libs.androidx.lifecycle.runtimeCompose)

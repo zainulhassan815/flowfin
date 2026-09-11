@@ -17,6 +17,11 @@ enum class ThemePreference { LIGHT, DARK, SYSTEM }
 @Serializable
 data class UserSettings(
   val theme: ThemePreference = ThemePreference.LIGHT,
+  /**
+   * Whether the ledger sits behind the device's own authentication. Off by
+   * default, and never a reason the ledger can't be opened — see `AppLock`.
+   */
+  val appLockEnabled: Boolean = false,
   val dailyReminderEnabled: Boolean = true,
   val dailyReminderTime: LocalTime = LocalTime(20, 0),
   val paymentAlertsEnabled: Boolean = true,

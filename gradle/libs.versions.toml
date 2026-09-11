@@ -9,6 +9,7 @@ androidDesugarJdkLibs = "2.1.4"
 # AndroidX
 androidxActivity = "1.9.3"
 androidxAppCompat = "1.7.0"
+androidxBiometric = "1.1.0"
 androidxCore = "1.15.0"
 androidxCoreSplashscreen = "1.0.1"
 androidxDataStore = "1.2.0"
@@ -52,6 +53,7 @@ android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs
 # AndroidX core
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
+androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "androidxBiometric" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxCoreSplashscreen" }
 androidx-datastore = { group = "androidx.datastore", name = "datastore", version.ref = "androidxDataStore" }

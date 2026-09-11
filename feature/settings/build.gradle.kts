@@ -8,6 +8,7 @@ android {
 
 dependencies {
   implementation(libs.androidx.activity.compose)
+  implementation(libs.androidx.biometric)
   implementation(libs.arrow.core)
   implementation(libs.kotlinx.datetime)
 }

@@ -39,6 +39,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
+import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.core.app.NotificationManagerCompat
 import com.flowfin.core.designsystem.component.FlowFinButton
 import com.flowfin.core.designsystem.component.FlowFinModalBottomSheet
@@ -66,6 +69,7 @@ fun SettingsScreen(
   modifier: Modifier = Modifier,
   onBack: () -> Unit = {},
   onThemeChange: (ThemePreference) -> Unit = {},
+  onAppLockChange: (Boolean) -> Unit = {},
   onDailyReminderChange: (Boolean) -> Unit = {},
   onReminderTimeChange: (LocalTime) -> Unit = {},
   onPaymentAlertsChange: (Boolean) -> Unit = {},
@@ -175,6 +179,33 @@ fun SettingsScreen(
           sub = stringResource(R.string.settings_appearance_sub),
           accessory = SettingsAccessory.Value(stringResource(state.theme.labelRes())),
           onClick = { themeSheet = true },
+        )
+      }
+
+      // The device decides whether this is on offer at all: a lock the phone
+      // can't open is a ledger the user has lost.
+      val canLock = remember {
+        BiometricManager.from(context)
+          .canAuthenticate(BIOMETRIC_WEAK or DEVICE_CREDENTIAL) == BiometricManager.BIOMETRIC_SUCCESS
+      }
+      SectionLabel(
+        text = stringResource(R.string.settings_section_privacy),
+        modifier = Modifier.padding(top = 26.dp, bottom = 10.dp),
+      )
+      FlowFinSettingsCard {
+        FlowFinSettingsToggleRow(
+          name = stringResource(R.string.settings_app_lock),
+          sub = stringResource(R.string.settings_app_lock_sub),
+          checked = state.appLockEnabled && canLock,
+          onCheckedChange = { if (canLock) onAppLockChange(it) },
+        )
+      }
+      if (!canLock) {
+        Text(
+          text = stringResource(R.string.settings_app_lock_unavailable),
+          modifier = Modifier.padding(top = 8.dp, start = 4.dp, end = 4.dp),
+          style = FlowFinTheme.typography.caption,
+          color = FlowFinTheme.colors.textSoft,
         )
       }
 

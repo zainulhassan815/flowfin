@@ -635,4 +635,15 @@
   <string name="notif_budget_over_title">%1$s is overspent</string>
   <string name="notif_budget_over_body">%1$s past what is in the envelope.</string>
 
+  <!-- App lock. Deliberately does not claim more than a UI gate delivers. -->
+  <string name="lock_title">Locked</string>
+  <string name="lock_body">Unlock to see your accounts.</string>
+  <string name="lock_action">Unlock</string>
+  <string name="lock_prompt_title">Unlock Vessel</string>
+  <string name="lock_prompt_subtitle">Use your usual screen unlock</string>
+  <string name="settings_section_privacy">Privacy</string>
+  <string name="settings_app_lock">App lock</string>
+  <string name="settings_app_lock_sub">Ask for your screen unlock when opening</string>
+  <string name="settings_app_lock_unavailable">Set a screen lock on this device to use it here.</string>
+
 </resources>

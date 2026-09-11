@@ -26,6 +26,7 @@ class SettingsViewModel(
   ) { prefs, all ->
     SettingsUiState(
       theme = prefs.theme,
+      appLockEnabled = prefs.appLockEnabled,
       dailyReminderEnabled = prefs.dailyReminderEnabled,
       dailyReminderTime = prefs.dailyReminderTime,
       paymentAlertsEnabled = prefs.paymentAlertsEnabled,
@@ -43,6 +44,8 @@ class SettingsViewModel(
     )
 
   fun onThemeChange(theme: ThemePreference) = edit { it.copy(theme = theme) }
+
+  fun onAppLockChange(enabled: Boolean) = edit { it.copy(appLockEnabled = enabled) }
 
   fun onDailyReminderChange(enabled: Boolean) = edit { it.copy(dailyReminderEnabled = enabled) }
 
